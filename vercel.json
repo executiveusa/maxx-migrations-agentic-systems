@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd banking && yarn install && yarn build",
+  "installCommand": "cd banking && yarn install",
+  "outputDirectory": "banking/dist",
+  "framework": "vite",
+  "root": "banking"
+}
