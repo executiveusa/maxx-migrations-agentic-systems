@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-07-03T06:51:53.683Z",
+  "baseUrl": "http://127.0.0.1:3100",
+  "routesChecked": 27,
+  "viewportsChecked": [
+    "mobile-375",
+    "tablet-768",
+    "desktop-1440"
+  ],
+  "totalChecks": 81,
+  "failureCount": 0,
+  "overallStatus": "pass",
+  "failures": []
+}

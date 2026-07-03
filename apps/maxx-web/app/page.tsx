@@ -4,6 +4,7 @@ import { HeroSection } from "@/components/landing/HeroSection";
 import { ProofPanel } from "@/components/landing/ProofPanel";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { MigrationCockpitPreview } from "@/components/landing/MigrationCockpitPreview";
+import { RecentUpdates } from "@/components/landing/RecentUpdates";
 import { FeatureStack } from "@/components/landing/FeatureStack";
 import { NonprofitUseCases } from "@/components/landing/NonprofitUseCases";
 import { PricingSection } from "@/components/landing/PricingSection";
@@ -21,6 +22,7 @@ export default function HomePage() {
         <ProofPanel />
         <HowItWorks />
         <MigrationCockpitPreview />
+        <RecentUpdates />
         <FeatureStack />
         <NonprofitUseCases />
         <PricingSection />

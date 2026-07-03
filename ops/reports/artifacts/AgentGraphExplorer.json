@@ -1,0 +1,10 @@
+{
+  "artifact_name": "AgentGraphExplorer",
+  "route": "/app/agents",
+  "udec_score": 8.7,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Keyboard-accessible agent list with live session history per selected agent."
+}

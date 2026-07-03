@@ -1,0 +1,10 @@
+{
+  "artifact_name": "OwnershipValueCalculator",
+  "route": "/pricing",
+  "udec_score": 8.8,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Interactive two-input calculator with real-time savings math, no placeholder numbers."
+}

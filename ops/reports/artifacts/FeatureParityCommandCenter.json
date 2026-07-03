@@ -1,0 +1,10 @@
+{
+  "artifact_name": "FeatureParityCommandCenter",
+  "route": "/features",
+  "udec_score": 8.7,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Live cross-links every feature page to its matching app route with a filterable status matrix."
+}

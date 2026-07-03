@@ -1,0 +1,10 @@
+{
+  "artifact_name": "WorkflowBuilderPreviewArtifact",
+  "route": "/features/workflows",
+  "udec_score": 8.6,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Template selector renders real step sequences from the seven shipped workflow templates."
+}

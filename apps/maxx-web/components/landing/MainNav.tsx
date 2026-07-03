@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/Button";
 
 const links: { href: string; label: string }[] = [
   { href: "/how-it-works", label: "How It Works" },
+  { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/migration-audit", label: "Migration Audit" },
+  { href: "/app", label: "Open App" },
 ];
 
 export function MainNav() {
