@@ -1,0 +1,10 @@
+{
+  "artifact_name": "GhlImportMapperArtifact",
+  "route": "/features/ghl-import",
+  "udec_score": 8.7,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Runs the real suggestMappings() field-mapping algorithm against sample GHL headers."
+}

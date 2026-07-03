@@ -5,19 +5,26 @@ const columns: { title: string; links: { href: string; label: string }[] }[] = [
     title: "Product",
     links: [
       { href: "/how-it-works", label: "How It Works" },
+      { href: "/features", label: "Features" },
       { href: "/pricing", label: "Pricing" },
       { href: "/migration-audit", label: "Migration Audit" },
     ],
   },
   {
-    title: "Company",
-    links: [{ href: "/", label: "About" }],
+    title: "Recent Updates",
+    links: [
+      { href: "/features/community", label: "Community & Courses" },
+      { href: "/features/workflows", label: "Workflow Builder" },
+      { href: "/features/social-planner", label: "Social Media Planner" },
+      { href: "/features/ghl-import", label: "GHL Import Wizard" },
+      { href: "/features/missed-call-text-back", label: "Missed Call Text Back" },
+    ],
   },
   {
     title: "Legal",
     links: [
-      { href: "/legal/privacy", label: "Privacy Policy" },
-      { href: "/legal/terms", label: "Terms of Use" },
+      { href: "/privacy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Use" },
     ],
   },
 ];

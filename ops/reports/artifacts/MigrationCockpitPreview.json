@@ -1,0 +1,10 @@
+{
+  "artifact_name": "MigrationCockpitPreview",
+  "route": "/",
+  "udec_score": 8.6,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Reused across the homepage and How It Works page; shows live crawl/extract/design stage progress."
+}

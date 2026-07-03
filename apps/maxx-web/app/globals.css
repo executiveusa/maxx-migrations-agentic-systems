@@ -41,6 +41,15 @@ h3,
   outline-offset: 2px;
 }
 
+/* CSS Grid items default to min-width: auto, which lets unbreakable
+   content (e.g. a long source URL) force the whole grid — and its
+   ancestors — wider than the viewport. This resets that default so grid
+   items shrink normally; break-words on the content itself handles the
+   rest. See docs/openspec/04_UI_UX_SPEC.md. */
+.grid > * {
+  min-width: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

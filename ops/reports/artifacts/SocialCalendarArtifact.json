@@ -1,0 +1,10 @@
+{
+  "artifact_name": "SocialCalendarArtifact",
+  "route": "/features/social-planner",
+  "udec_score": 8.5,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Filterable post list backed by seed social post data with accurate status pills."
+}

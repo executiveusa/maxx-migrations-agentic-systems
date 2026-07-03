@@ -1,0 +1,10 @@
+{
+  "artifact_name": "MissedCallRecoveryArtifact",
+  "route": "/features/missed-call-text-back",
+  "udec_score": 8.6,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Shows real recovery outcomes per missed call, including not-configured and opted-out states."
+}

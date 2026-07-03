@@ -1,0 +1,10 @@
+{
+  "artifact_name": "ToolPermissionMatrix",
+  "route": "/app/agents",
+  "udec_score": 8.9,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Filterable permission grid across all ten agents and five permission types."
+}
