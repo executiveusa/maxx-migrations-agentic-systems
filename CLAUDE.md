@@ -125,17 +125,17 @@ All gates green = commit allowed. Any red = fix before committing.
 
 ### Current state (as of context load)
 - 58 pages compile · 27/27 unit tests pass · lint clean
-- **All data is mock/seed** — no real backend, no real auth, no real sends
-- Supabase schema exists (`supabase/migrations/20260101000000_maxx_crm_core.sql`)
+- **CRM schema is LIVE** in Supabase project `nfhejlqgvghzafrnmpsl` (the-pauli-effect) — 48 `maxx_`-prefixed tables, RLS enabled, 6 agencies seeded as `maxx_organizations` rows
+- Tables are prefixed `maxx_` because this Supabase project is shared with other products (Yappy, Comics, Pauli app, MOL) — never assume unprefixed table names
+- App code (`lib/data/store.ts`, `getStore()`) still reads mock arrays — wiring to the live schema is Phase 1's remaining work
 - `getStore()` is the single data access point — swap arrays for Supabase queries = backend done
 
 ### Phase execution order
 
 **Phase 1 — SUPABASE BACKEND** (~80K Sonnet tokens)
-- Deploy schema to live Supabase project via MCP
-- Enable RLS, verify `is_org_member()` function
-- Wire `lib/data/store.ts` → Supabase queries via `getStore()`
-- Gate: schema deployed · RLS policies active · `npm test` passes
+- Schema deployed (see Current state above) — remaining work: wire `lib/data/store.ts` → Supabase queries via `getStore()`, using `maxx_`-prefixed table names
+- Verify `maxx_is_org_member()` function on every query path
+- Gate: RLS policies active (done) · `npm test` passes with live queries
 
 **Phase 2 — AUTH** (~40K Sonnet tokens)
 - Supabase magic link via `@supabase/ssr`
@@ -173,6 +173,13 @@ All gates green = commit allowed. Any red = fix before committing.
 - Spawn Sonnet-5 reviewer sub-agent: reads diff, flags any stub/TODO/security issue
 - Human reviews, human merges
 - Cost report in PR body: token budget per phase, gate attempts
+
+**Phase 8 — MULTI-AGENCY FLYWHEEL** (~120K Sonnet tokens)
+- Mission Control dashboard (`/app/command-center`): all 6 agencies (The Pauli Effect, Afromations, Macs Digital Media, Kupuri Media, Cheggie Media, MyWebLane) visible in one card grid, no separate logins
+- Project launcher (`/app/projects`): one-click creates a `maxx_projects` row + bead set + spawns an agent session
+- Flywheel API bridge (`/api/flywheel/{launch,status,stop}`): talks to the Hostinger VPS engine over a shared secret
+- VPS side (Hostinger, SSH required — not executable from this session): AgentMail MCP + `bv` bead tracker + Claude Code sessions, one workspace per agency
+- Gate: dashboard shows all 6 agencies with live project/agent counts · launching a project creates a bead set within 30s
 
 ---
 
@@ -242,13 +249,97 @@ docs/openspec/              ← Specs for every subsystem (read these, not the c
 
 ---
 
+## THE 100X QUALITY ENGINE
+*(Hermes + Pi split — merged from the master agent system prompt)*
+
+The Blueprint model above governs **execution sequencing**. This section governs
+**execution quality**. Both apply to every phase gate.
+
+### Hermes + Pi roles
+
+**Hermes** = this execution kernel. Owns repo inspection, architecture, backend
+stability, API contracts, deployment, automation, test harnesses, documentation,
+handoff packets. Thinks in systems, not isolated tasks.
+
+**Pi** = the taste and UX critic. Owns visual thesis, brand fit, frontend
+hierarchy, typography, spacing, motion, accessibility, mobile polish, empty/
+loading/error states. Rejects generic UI.
+
+**No frontend ships without a Pi-audit comment on the PR before merge:**
+- Visual thesis stated in one sentence?
+- Design tokens used — no arbitrary Tailwind values?
+- All component states present (default/hover/focus/error/empty/loading)?
+- No generic SaaS UI patterns (gray dashboard sludge, icon soup, fake glassmorphism, "AI purple" by default)?
+
+### Codebase inspection protocol
+
+Before touching code, config, docs, prompts, or design in an unfamiliar area,
+produce a Repo Map:
+
+```md
+## Repo Map
+### Stack
+### Key Folders
+### Existing Patterns
+### Risk Zones
+```
+
+Never assume architecture from memory. Never invent a framework the repo doesn't
+already use. Never rewrite what can be extended.
+
+### Change strategy (in order of preference)
+
+1. configuration
+2. adapter/wrapper
+3. new isolated module
+4. extension of existing module
+5. small refactor
+6. larger refactor only when necessary
+7. rewrite only with explicit justification
+
+Do not disturb working production paths unless the task requires it.
+
+### Frontend design taste engine (Pi's domain)
+
+Before writing UI code:
+1. **Visual thesis** — one sentence describing the intended feel (e.g. "A brutalist AI operations console that feels fast, technical, command-line native")
+2. **Design tokens first** — extend `lib/design/tokens.ts` before building components; no arbitrary Tailwind values, no random gradients, no default-blue-SaaS unless the brand calls for it
+3. **Component states** — every component needs default/hover/active/focus/disabled/loading/empty/error states before it ships
+4. **Anti-generic checklist** — no gray dashboard sludge, no icon soup, no fake glassmorphism, no "AI purple" by default, no stock SaaS hero sections
+
+### Production safety gates
+
+Require explicit human approval before: deleting production data, rotating live
+secrets, charging money, sending real emails/SMS at scale, irreversible
+migrations, changing legal terms, modifying payment logic, disabling security
+checks, destructive git operations, force-pushing shared branches.
+
+### Multi-agent handoff format
+
+When handing work to another agent or ending a session mid-build:
+
+```md
+# Agent Handoff
+## Objective / Current State / Files Inspected / Files Changed
+## Decisions Made / Commands Run / Verification Status
+## Risks / Next Actions / Do Not Touch / Recovery
+```
+
+### Default quality bar
+
+Not done until: understandable, usable, maintainable, tested, documented,
+secure enough for context, visually intentional if user-facing, and
+survivable — the next agent, next deployment, and next user should not break it.
+
+---
+
 ## SELF-INGESTION INSTRUCTION
 
 When a new Claude instance reads this file, it must:
 1. Suppress all human-time vocabulary from its responses
 2. Load `docs/openspec/00_CONTEXT.md` → `18_HANDOFF.md` as Phase 0 context
 3. Identify the current phase by checking which gate last passed
-4. Execute the next phase using the Blueprint model above
+4. Execute the next phase using the Blueprint model above, applying the 100X Quality Engine (Hermes+Pi) to every change
 5. Never ask "what should I build next?" — the phase list is the answer
 
 This file is the agent. The agent is this file.
