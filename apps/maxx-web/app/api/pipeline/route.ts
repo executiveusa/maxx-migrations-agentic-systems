@@ -36,27 +36,68 @@ function mapOpportunityRow(row: {
   };
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Parse pagination and filtering query params
+  const searchParams = request.nextUrl.searchParams;
+  const offset = parseInt(searchParams.get("offset") ?? "0", 10);
+  const limit = Math.min(parseInt(searchParams.get("limit") ?? "20", 10), 100); // cap at 100
+  const pipelineId = searchParams.get("pipelineId");
+  const stageId = searchParams.get("stageId");
+  const contactId = searchParams.get("contactId");
+
   if (isSeedMode()) {
-    const { opportunities } = getStore();
-    return NextResponse.json({ opportunities });
+    let { opportunities } = getStore();
+
+    // Apply filters in-memory
+    if (pipelineId) {
+      opportunities = opportunities.filter((o) => o.pipelineId === pipelineId);
+    }
+    if (stageId) {
+      opportunities = opportunities.filter((o) => o.stageId === stageId);
+    }
+    if (contactId) {
+      opportunities = opportunities.filter((o) => o.contactId === contactId);
+    }
+
+    // Apply pagination
+    const total = opportunities.length;
+    const paginated = opportunities.slice(offset, offset + limit);
+
+    return NextResponse.json({ opportunities: paginated, total, offset, limit });
   }
 
   try {
     const supabase = getSupabaseClient();
     const orgId = getCurrentOrgId();
-    const { data, error } = await supabase
+
+    // Build query with filters
+    let query = supabase
       .from("maxx_opportunities")
-      .select("*, maxx_contacts(first_name, last_name)")
-      .eq("organization_id", orgId)
-      .order("created_at", { ascending: false });
+      .select("*, maxx_contacts(first_name, last_name)", { count: "exact" })
+      .eq("organization_id", orgId);
+
+    if (pipelineId) {
+      query = query.eq("pipeline_id", pipelineId);
+    }
+    if (stageId) {
+      query = query.eq("stage_id", stageId);
+    }
+    if (contactId) {
+      query = query.eq("contact_id", contactId);
+    }
+
+    // Apply ordering and pagination
+    const { data, error, count } = await query
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: supabaseErrorStatus(error) });
     }
 
     const opportunities = (data ?? []).map(mapOpportunityRow);
-    return NextResponse.json({ opportunities });
+    const total = count ?? 0;
+    return NextResponse.json({ opportunities, total, offset, limit });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }

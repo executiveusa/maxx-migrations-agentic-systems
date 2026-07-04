@@ -15,7 +15,7 @@
     "harness:no-stubs": "node scripts/harness/no-stubs.mjs",
     "harness:routes": "node scripts/harness/route-audit.mjs",
     "harness:links": "node scripts/harness/link-check.mjs",
-    "harness:api": "node scripts/harness/api-smoke.mjs",
+    "harness:api": "node scripts/harness/api-crud.mjs",
     "harness:copy": "node scripts/harness/copy-audit.mjs",
     "harness:env": "node scripts/harness/env-audit.mjs",
     "harness:artifacts": "node scripts/harness/artifact-audit.mjs",

@@ -40,11 +40,31 @@ function mapContactRow(row: {
   };
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Parse pagination and filtering query params
+  const searchParams = request.nextUrl.searchParams;
+  const offset = parseInt(searchParams.get("offset") ?? "0", 10);
+  const limit = Math.min(parseInt(searchParams.get("limit") ?? "20", 10), 100); // cap at 100
+  const status = searchParams.get("status");
+  const source = searchParams.get("source");
+
   // Seed mode: local dev / test suite, no Supabase project required.
   if (isSeedMode()) {
-    const { contacts } = getStore();
-    return NextResponse.json({ contacts });
+    let { contacts } = getStore();
+
+    // Apply filters in-memory
+    if (status) {
+      contacts = contacts.filter((c) => c.status === status);
+    }
+    if (source) {
+      contacts = contacts.filter((c) => c.source === source);
+    }
+
+    // Apply pagination
+    const total = contacts.length;
+    const paginated = contacts.slice(offset, offset + limit);
+
+    return NextResponse.json({ contacts: paginated, total, offset, limit });
   }
 
   // Prod mode: query Supabase directly. Manually scoped by organization_id
@@ -53,18 +73,32 @@ export async function GET() {
   try {
     const supabase = getSupabaseClient();
     const orgId = getCurrentOrgId();
-    const { data, error } = await supabase
+
+    // Build query with filters
+    let query = supabase
       .from("maxx_contacts")
-      .select("*, maxx_contact_tags(tag)")
-      .eq("organization_id", orgId)
-      .order("created_at", { ascending: false });
+      .select("*, maxx_contact_tags(tag)", { count: "exact" })
+      .eq("organization_id", orgId);
+
+    if (status) {
+      query = query.eq("status", status);
+    }
+    if (source) {
+      query = query.eq("source", source);
+    }
+
+    // Apply ordering and pagination
+    const { data, error, count } = await query
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: supabaseErrorStatus(error) });
     }
 
     const contacts = (data ?? []).map(mapContactRow);
-    return NextResponse.json({ contacts });
+    const total = count ?? 0;
+    return NextResponse.json({ contacts, total, offset, limit });
   } catch (err) {
     return NextResponse.json({ error: (err as Error).message }, { status: 500 });
   }
