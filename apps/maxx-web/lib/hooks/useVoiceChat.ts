@@ -43,6 +43,76 @@ export function useVoiceChat(
   const animationFrameRef = useRef<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // TTS - Speak text using Browser SpeechSynthesis
+  const speakText = useCallback((text: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (typeof window === "undefined" || !window.speechSynthesis) {
+        reject(new Error("Speech Synthesis not supported"));
+        return;
+      }
+
+      window.speechSynthesis.cancel(); // Cancel any ongoing speech
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+
+      utterance.onend = () => resolve();
+      utterance.onerror = (event: any) =>
+        reject(new Error(`Speech synthesis error: ${event.error}`));
+
+      synthesisRef.current = utterance;
+      window.speechSynthesis.speak(utterance);
+    });
+  }, []);
+
+  // Handle incoming voice message
+  const handleVoiceMessage = useCallback(
+    async (transcript: string) => {
+      setState((prev) => ({ ...prev, isProcessing: true, error: null }));
+      abortControllerRef.current = new AbortController();
+
+      try {
+        // Build message history for the API
+        const messages = chatMessages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+        messages.push({ role: "user", content: transcript });
+
+        const response = await fetch("/api/agent/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages }),
+          signal: abortControllerRef.current.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Chat request failed");
+        }
+
+        // Parse SSE stream to get complete response
+        const responseText = await parseVoiceAgentStream(response);
+
+        // Speak the response
+        setState((prev) => ({ ...prev, isSpeaking: true }));
+        await speakText(responseText);
+        setState((prev) => ({ ...prev, isSpeaking: false, isProcessing: false }));
+      } catch (error) {
+        if (error instanceof Error && error.name !== "AbortError") {
+          setState((prev) => ({
+            ...prev,
+            error: error.message || "Voice processing failed",
+            isProcessing: false,
+            isSpeaking: false,
+          }));
+        }
+      }
+    },
+    [chatMessages, speakText]
+  );
+
   // Initialize SpeechRecognition (browser-specific APIs)
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -112,7 +182,7 @@ export function useVoiceChat(
         recognitionRef.current.abort();
       }
     };
-  }, []);
+  }, [handleVoiceMessage]);
 
   // Waveform animation loop
   useEffect(() => {
@@ -142,76 +212,6 @@ export function useVoiceChat(
       }
     };
   }, [state.isListening]);
-
-  // Handle incoming voice message
-  const handleVoiceMessage = useCallback(
-    async (transcript: string) => {
-      setState((prev) => ({ ...prev, isProcessing: true, error: null }));
-      abortControllerRef.current = new AbortController();
-
-      try {
-        // Build message history for the API
-        const messages = chatMessages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        }));
-        messages.push({ role: "user", content: transcript });
-
-        const response = await fetch("/api/agent/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages }),
-          signal: abortControllerRef.current.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error("Chat request failed");
-        }
-
-        // Parse SSE stream to get complete response
-        const responseText = await parseVoiceAgentStream(response);
-
-        // Speak the response
-        setState((prev) => ({ ...prev, isSpeaking: true }));
-        await speakText(responseText);
-        setState((prev) => ({ ...prev, isSpeaking: false, isProcessing: false }));
-      } catch (error) {
-        if (error instanceof Error && error.name !== "AbortError") {
-          setState((prev) => ({
-            ...prev,
-            error: error.message || "Voice processing failed",
-            isProcessing: false,
-            isSpeaking: false,
-          }));
-        }
-      }
-    },
-    [chatMessages]
-  );
-
-  // TTS - Speak text using Browser SpeechSynthesis
-  const speakText = (text: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      if (typeof window === "undefined" || !window.speechSynthesis) {
-        reject(new Error("Speech Synthesis not supported"));
-        return;
-      }
-
-      window.speechSynthesis.cancel(); // Cancel any ongoing speech
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1;
-      utterance.pitch = 1;
-      utterance.volume = 1;
-
-      utterance.onend = () => resolve();
-      utterance.onerror = (event: SpeechSynthesisErrorEvent) =>
-        reject(new Error(`Speech synthesis error: ${event.error}`));
-
-      synthesisRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
-    });
-  };
 
   const startListening = useCallback(() => {
     if (recognitionRef.current && !state.isListening) {
