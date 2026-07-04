@@ -13,3 +13,5 @@ export * from "@/lib/types/agents";
 export * from "@/lib/types/billing";
 export * from "@/lib/types/integrations";
 export * from "@/lib/types/audit";
+export * from "@/lib/types/project";
+export * from "@/lib/types/bead";

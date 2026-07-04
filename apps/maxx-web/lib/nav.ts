@@ -6,6 +6,8 @@ export interface NavItem {
 
 export const appNavItems: NavItem[] = [
   { href: "/app", label: "Dashboard", icon: "grid" },
+  { href: "/app/command-center", label: "Mission Control", icon: "grid" },
+  { href: "/app/projects", label: "Projects", icon: "kanban" },
   { href: "/app/contacts", label: "Contacts", icon: "users" },
   { href: "/app/pipeline", label: "Pipeline", icon: "kanban" },
   { href: "/app/forms", label: "Forms", icon: "form" },

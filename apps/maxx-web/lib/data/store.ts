@@ -8,6 +8,7 @@ import { importJobs as seedImportJobs } from "@/lib/mock-data/imports";
 import { migrationJobs as seedMigrationJobs } from "@/lib/mock-data/migrations";
 import { mctbRules as seedMctbRules, smsOptOuts as seedSmsOptOuts } from "@/lib/mock-data/telephony";
 import { courseEnrollments as seedCourseEnrollments } from "@/lib/mock-data/courses";
+import { agencies as seedAgencies, flywheelProjects as seedFlywheelProjects, beads as seedBeads, flywheelSessions as seedFlywheelSessions } from "@/lib/mock-data/flywheel";
 import type { Contact } from "@/lib/types/contacts";
 import type { Opportunity } from "@/lib/types/pipeline";
 import type { CrmForm, FormSubmission } from "@/lib/types/forms";
@@ -18,6 +19,9 @@ import type { ImportJob } from "@/lib/types/imports";
 import type { MigrationJob } from "@/lib/types/migrations";
 import type { MctbRule, SmsOptOut } from "@/lib/types/telephony";
 import type { CourseEnrollment } from "@/lib/types/courses";
+import type { Organization } from "@/lib/types/organizations";
+import type { FlywheelProject } from "@/lib/types/project";
+import type { Bead, FlywheelSession } from "@/lib/types/bead";
 
 /**
  * Process-lifetime in-memory store used while no Supabase project is
@@ -40,6 +44,10 @@ interface Store {
   mctbRules: MctbRule[];
   courseEnrollments: CourseEnrollment[];
   smsOptOuts: SmsOptOut[];
+  agencies: Organization[];
+  flywheelProjects: FlywheelProject[];
+  beads: Bead[];
+  flywheelSessions: FlywheelSession[];
 }
 
 const globalForStore = globalThis as unknown as { __maxxStore?: Store };
@@ -59,6 +67,10 @@ function createStore(): Store {
     mctbRules: [...seedMctbRules],
     courseEnrollments: seedCourseEnrollments.map((e) => ({ ...e, lessonProgress: [...e.lessonProgress] })),
     smsOptOuts: [...seedSmsOptOuts],
+    agencies: [...seedAgencies],
+    flywheelProjects: [...seedFlywheelProjects],
+    beads: [...seedBeads],
+    flywheelSessions: [...seedFlywheelSessions],
   };
 }
 
