@@ -29,6 +29,14 @@ import type { Bead, FlywheelSession } from "@/lib/types/bead";
  * API routes append real records so create flows (new form, new workflow,
  * new migration job, GHL import run) behave consistently within a session
  * instead of silently discarding writes.
+ *
+ * Seed vs. prod mode branching lives in each API route, not here:
+ * `getStore()` is ONLY for isSeedMode() === true. Prod-mode branches call
+ * lib/data/supabase-client.ts and query the maxx_-prefixed Supabase tables
+ * directly (see app/api/contacts, app/api/pipeline, app/api/workflows).
+ * getStore() intentionally has no Supabase-aware branch: mixing the two
+ * here would make it easy for a route to accidentally read/write the
+ * in-memory store in prod mode.
  */
 interface Store {
   contacts: Contact[];

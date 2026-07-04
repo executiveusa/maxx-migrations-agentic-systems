@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { Cormorant_Garamond, DM_Sans } from "next/font/google";
 import "./globals.css";
 
+export const dynamic = 'force-dynamic';
+
 const display = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["500", "600", "700"],
