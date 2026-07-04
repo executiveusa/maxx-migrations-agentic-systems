@@ -1,8 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { AppNav } from "@/components/app-shell/AppNav";
 import { AppHeader } from "@/components/app-shell/AppHeader";
 import { isSeedMode } from "@/lib/data/mode";
+import { VoiceButton } from "@/components/voice/VoiceButton";
+import { VoiceErrorBoundary } from "@/components/voice/VoiceErrorBoundary";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -26,6 +30,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mx-auto max-w-6xl">{children}</div>
         </main>
       </div>
+
+      {/* Voice input/output - floating button */}
+      <VoiceErrorBoundary>
+        <VoiceButton />
+      </VoiceErrorBoundary>
     </div>
   );
 }
