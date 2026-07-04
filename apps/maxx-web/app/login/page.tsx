@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
@@ -11,7 +11,7 @@ export default function LoginPage() {
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo") || "/app";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
@@ -45,7 +45,7 @@ export default function LoginPage() {
           <div className="bg-surface rounded-lg border border-border p-8 text-center">
             <h1 className="text-2xl font-bold text-text mb-4">Check your email</h1>
             <p className="text-text-secondary mb-4">
-              We've sent a magic link to <span className="font-semibold">{email}</span>
+              We&apos;ve sent a magic link to <span className="font-semibold">{email}</span>
             </p>
             <p className="text-sm text-text-secondary">
               Click the link in the email to sign in. The link expires in 24 hours.
@@ -73,7 +73,7 @@ export default function LoginPage() {
         <div className="bg-surface rounded-lg border border-border p-8">
           <h1 className="text-3xl font-bold text-text mb-2">Sign in</h1>
           <p className="text-text-secondary mb-8">
-            We'll send you a magic link to sign in securely.
+            We&apos;ll send you a magic link to sign in securely.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
