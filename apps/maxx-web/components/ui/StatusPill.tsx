@@ -12,7 +12,15 @@ type Status =
   | "setup_required"
   | "connected"
   | "running"
-  | "error";
+  | "error"
+  | "planned"
+  | "blocked"
+  | "archived"
+  | "open"
+  | "in_progress"
+  | "cancelled"
+  | "awaiting_approval"
+  | "stopped";
 
 const statusMap: Record<Status, { label: string; tone: "neutral" | "accent" | "warning" | "danger" | "info" }> = {
   active: { label: "Active", tone: "accent" },
@@ -27,6 +35,14 @@ const statusMap: Record<Status, { label: string; tone: "neutral" | "accent" | "w
   connected: { label: "Connected", tone: "accent" },
   running: { label: "Running", tone: "info" },
   error: { label: "Error", tone: "danger" },
+  planned: { label: "Planned", tone: "neutral" },
+  blocked: { label: "Blocked", tone: "danger" },
+  archived: { label: "Archived", tone: "neutral" },
+  open: { label: "Open", tone: "neutral" },
+  in_progress: { label: "In progress", tone: "info" },
+  cancelled: { label: "Cancelled", tone: "neutral" },
+  awaiting_approval: { label: "Awaiting approval", tone: "warning" },
+  stopped: { label: "Stopped", tone: "neutral" },
 };
 
 export function StatusPill({ status }: { status: Status }) {
