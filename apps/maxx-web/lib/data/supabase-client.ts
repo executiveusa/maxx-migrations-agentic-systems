@@ -42,21 +42,17 @@ export function getSupabaseClient(): SupabaseClient {
 /**
  * Resolves the organization id every prod-mode query is scoped to.
  *
- * Phase 2 will replace this with the organization derived from the
- * authenticated session's JWT claims. Until real auth/session middleware
- * exists there is no per-request identity to read an org id from, so
- * prod-mode deployments must set NEXT_PUBLIC_DEMO_ORG_ID to the uuid of the
- * maxx_organizations row they want every request scoped to. Failing loudly
- * here is intentional: silently falling back to the seed mock org id
- * ("org_riverside_mutual_aid", not a uuid) would produce confusing Postgres
- * errors instead of a clear configuration error.
+ * Phase 2: Still uses NEXT_PUBLIC_DEMO_ORG_ID for routes that run in prod-mode.
+ * Phase 3+ will update individual routes to extract org_id from the authenticated session.
+ *
+ * Failing loudly here is intentional: silently falling back to the seed mock org id
+ * ("org_riverside_mutual_aid", not a uuid) would produce confusing Postgres errors.
  */
 export function getCurrentOrgId(): string {
   const orgId = process.env.NEXT_PUBLIC_DEMO_ORG_ID;
   if (!orgId) {
     throw new Error(
-      "NEXT_PUBLIC_DEMO_ORG_ID is not set. Prod-mode API routes need an organization id to scope " +
-        "queries to until Phase 2 auth wires real sessions."
+      "NEXT_PUBLIC_DEMO_ORG_ID is not set. Set this env var or pass an org_id explicitly from the authenticated session."
     );
   }
   return orgId;
