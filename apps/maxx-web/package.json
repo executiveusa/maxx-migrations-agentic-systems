@@ -15,7 +15,7 @@
     "harness:no-stubs": "node scripts/harness/no-stubs.mjs",
     "harness:routes": "node scripts/harness/route-audit.mjs",
     "harness:links": "node scripts/harness/link-check.mjs",
-    "harness:api": "node scripts/harness/api-smoke.mjs",
+    "harness:api": "node scripts/harness/api-crud.mjs",
     "harness:copy": "node scripts/harness/copy-audit.mjs",
     "harness:env": "node scripts/harness/env-audit.mjs",
     "harness:artifacts": "node scripts/harness/artifact-audit.mjs",
@@ -24,6 +24,7 @@
     "verify:full": "npm run lint && npm run typecheck && npm run test && npm run build && npm run harness:all"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.28.0",
     "@hookform/resolvers": "^3.9.1",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
