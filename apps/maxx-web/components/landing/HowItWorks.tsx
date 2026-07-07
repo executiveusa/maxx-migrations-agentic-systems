@@ -1,23 +1,28 @@
 const steps = [
   {
     n: "01",
-    title: "Audit the current site",
-    body: "We map your existing website, tools, and data so nothing gets lost in the move.",
+    title: "Audit",
+    body: "We understand your stack, existing vendors, and pain points. One strategy call to align on vision.",
   },
   {
     n: "02",
-    title: "Clone and map the system",
-    body: "We capture structure, copy, and assets, then map them onto an owned component system.",
+    title: "Map",
+    body: "Design the CRM and workflows for your org. Configure contacts, pipeline, forms, and automations.",
   },
   {
     n: "03",
-    title: "Upgrade UI, CRM, and automations",
-    body: "We rebuild the site with a premium design system and connect it to a real CRM and automations.",
+    title: "Install",
+    body: "Set up Maxx platform, import contacts, configure integrations—SMS text-back, social planner, community.",
   },
   {
     n: "04",
-    title: "Hand over the keys",
-    body: "You receive owned code, owned data, and a working system — with optional ongoing partnership.",
+    title: "30-day onboarding",
+    body: "Hands-on setup, staff training, workflow testing. Forms, courses, and documentation included.",
+  },
+  {
+    n: "05",
+    title: "Optional partner",
+    body: "Ongoing AI agent support, quarterly reviews, new workflow development. Monthly fee optional.",
   },
 ];
 

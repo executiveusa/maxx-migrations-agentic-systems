@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   description:
     "We clone, upgrade, and connect your website into an owned AI-powered CRM system, so your organization stops renting fragile tools and starts building on infrastructure it controls.",
   metadataBase: new URL("https://maxxmigrations.com"),
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

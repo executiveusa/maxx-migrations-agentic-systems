@@ -21,6 +21,8 @@ export function MigrationAuditForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">(
     "idle",
   );
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
+  const [persisted, setPersisted] = useState<"supabase" | "in_memory" | null>(null);
 
   const {
     register,
@@ -39,6 +41,9 @@ export function MigrationAuditForm() {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error("Request failed");
+      const body = await res.json();
+      setResultMessage(body.message ?? "Migration audit request received.");
+      setPersisted(body.persisted ?? null);
       setStatus("success");
     } catch {
       setStatus("error");
@@ -52,12 +57,11 @@ export function MigrationAuditForm() {
         className="rounded-2xl border border-accent bg-accent-soft p-8 text-center"
       >
         <h2 className="font-display text-2xl font-semibold">
-          Thank you — your migration audit request is in.
+          {persisted === "in_memory"
+            ? "Request received (demo mode)"
+            : "Thank you — your migration audit request is in."}
         </h2>
-        <p className="mt-2 text-muted">
-          A human from Maxx Migrations will follow up within two business
-          days to schedule your strategy call.
-        </p>
+        <p className="mt-2 text-muted">{resultMessage}</p>
       </div>
     );
   }
