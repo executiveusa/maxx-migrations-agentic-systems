@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MaxxLogoCompact } from "@/components/brand/MaxxLogo";
 
 const columns: { title: string; links: { href: string; label: string }[] }[] = [
   {
@@ -34,7 +35,7 @@ export function Footer() {
     <footer className="mx-auto max-w-6xl px-4 py-16">
       <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
         <div>
-          <p className="font-display text-lg font-semibold">Maxx Migrations</p>
+          <MaxxLogoCompact className="mb-3" alt="Maxx Migrations" />
           <p className="mt-2 text-sm text-muted">
             Sovereign AI infrastructure for Pacific Northwest nonprofits and
             social-purpose teams.

@@ -4,13 +4,13 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Table, Thead, Th, Tbody, Td } from "@/components/ui/Table";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { getStore } from "@/lib/data/store";
+import { getForms } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = { title: "Forms" };
 export const dynamic = "force-dynamic";
 
-export default function FormsPage() {
-  const { forms } = getStore();
+export default async function FormsPage() {
+  const forms = await getForms();
   return (
     <>
       <PageHeader

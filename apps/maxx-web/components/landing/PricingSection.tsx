@@ -67,6 +67,9 @@ export function PricingSection() {
           Optional maintenance runs $500–$2,500/month depending on
           complexity — never required.
         </p>
+        <p className="mt-4 max-w-2xl border-l-2 border-accent pl-4 text-sm font-medium">
+          No forced monthly subscription — tools and data ownership transfer entirely to your org.
+        </p>
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {tiers.map((tier) => (
             <div

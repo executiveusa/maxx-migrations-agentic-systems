@@ -1,22 +1,26 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { MaxxLogo } from "@/components/brand/MaxxLogo";
+import { isSeedMode } from "@/lib/data/mode";
 
-const links: { href: string; label: string }[] = [
+const getLinks = (inSeedMode: boolean) => [
   { href: "/how-it-works", label: "How It Works" },
   { href: "/features", label: "Features" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/app", label: "Open App" },
+  { href: "/app", label: inSeedMode ? "View Demo App" : "Open App" },
 ];
 
 export function MainNav() {
+  const inSeedMode = isSeedMode();
+  const links = getLinks(inSeedMode);
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/95 backdrop-blur">
       <nav
         aria-label="Primary"
         className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4"
       >
-        <Link href="/" className="font-display text-xl font-semibold">
-          Maxx Migrations
+        <Link href="/" className="transition-opacity hover:opacity-80">
+          <MaxxLogo compact={false} alt="Maxx Migrations - Home" />
         </Link>
         <ul className="hidden items-center gap-8 md:flex">
           {links.map((link) => (

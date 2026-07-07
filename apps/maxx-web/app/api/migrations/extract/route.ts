@@ -42,9 +42,12 @@ export async function POST(request: NextRequest) {
     submittedAt: new Date().toISOString(),
   };
 
+  const supabaseConfigured = isIntegrationConfigured("NEXT_PUBLIC_SUPABASE_URL");
+
+  // Always append to in-memory store (process lifetime) so submissions never drop
   getStore().migrationAuditRequests.push(record);
 
-  const supabaseConfigured = isIntegrationConfigured("NEXT_PUBLIC_SUPABASE_URL");
+  // TODO: Also insert into Supabase when NEXT_PUBLIC_SUPABASE_URL is configured
 
   return NextResponse.json({
     received: true,
