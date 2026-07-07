@@ -4,13 +4,13 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { StatusPill } from "@/components/ui/StatusPill";
-import { getStore } from "@/lib/data/store";
+import { getWorkflows } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = { title: "Workflows" };
 export const dynamic = "force-dynamic";
 
-export default function WorkflowsPage() {
-  const { workflows } = getStore();
+export default async function WorkflowsPage() {
+  const workflows = await getWorkflows();
   return (
     <>
       <PageHeader

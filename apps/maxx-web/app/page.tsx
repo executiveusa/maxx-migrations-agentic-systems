@@ -1,6 +1,11 @@
 import { AnnouncementBar } from "@/components/landing/AnnouncementBar";
 import { MainNav } from "@/components/landing/MainNav";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { ValueStack } from "@/components/landing/ValueStack";
+import { OnboardingPath } from "@/components/landing/OnboardingPath";
+import { ComparisonTable } from "@/components/landing/ComparisonTable";
+import { OrganizationOwnership } from "@/components/landing/OrganizationOwnership";
+import { WhoThisIsFor } from "@/components/landing/WhoThisIsFor";
 import { ProofPanel } from "@/components/landing/ProofPanel";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { MigrationCockpitPreview } from "@/components/landing/MigrationCockpitPreview";
@@ -19,6 +24,11 @@ export default function HomePage() {
       <MainNav />
       <main id="main-content">
         <HeroSection />
+        <ValueStack />
+        <OnboardingPath />
+        <ComparisonTable />
+        <OrganizationOwnership />
+        <WhoThisIsFor />
         <ProofPanel />
         <HowItWorks />
         <MigrationCockpitPreview />

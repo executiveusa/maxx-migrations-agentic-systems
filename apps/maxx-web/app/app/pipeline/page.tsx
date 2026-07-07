@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { PipelineView } from "@/components/pipeline/PipelineView";
 import { pipeline } from "@/lib/mock-data/pipeline";
-import { getStore } from "@/lib/data/store";
+import { getOpportunities, getContacts } from "@/lib/supabase/queries";
 
 export const metadata: Metadata = { title: "Pipeline" };
 export const dynamic = "force-dynamic";
 
-export default function PipelinePage() {
-  const { opportunities, contacts } = getStore();
+export default async function PipelinePage() {
+  const opportunities = await getOpportunities();
+  const contacts = await getContacts();
   return (
     <PipelineView
       pipeline={pipeline}
