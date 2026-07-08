@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { MaxxLogo } from "@/components/brand/MaxxLogo";
@@ -13,11 +16,13 @@ const getLinks = (inSeedMode: boolean) => [
 export function MainNav() {
   const inSeedMode = isSeedMode();
   const links = getLinks(inSeedMode);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-bg/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-bg">
       <nav
         aria-label="Primary"
-        className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4"
+        className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-4"
       >
         <Link href="/" className="transition-opacity hover:opacity-80">
           <MaxxLogo compact={false} alt="Maxx Migrations - Home" />
@@ -37,14 +42,27 @@ export function MainNav() {
         <Button href="/migration-audit" className="hidden md:inline-flex">
           Start a Migration Audit
         </Button>
-        <details className="md:hidden">
-          <summary className="cursor-pointer list-none rounded-md border border-border px-3 py-2 text-sm">
-            Menu
-          </summary>
-          <ul className="absolute left-0 right-0 mt-2 space-y-1 border-t border-border bg-surface p-4">
+        <button
+          type="button"
+          onClick={() => setMobileOpen((open) => !open)}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav-menu"
+          className="rounded-md border border-border px-3 py-2 text-sm md:hidden"
+        >
+          {mobileOpen ? "Close" : "Menu"}
+        </button>
+        {mobileOpen && (
+          <ul
+            id="mobile-nav-menu"
+            className="absolute left-0 right-0 top-full z-50 space-y-1 border-t border-border bg-surface p-4 shadow-lg md:hidden"
+          >
             {links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className="block py-2 text-sm">
+                <Link
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-2 text-sm"
+                >
                   {link.label}
                 </Link>
               </li>
@@ -55,7 +73,7 @@ export function MainNav() {
               </Button>
             </li>
           </ul>
-        </details>
+        )}
       </nav>
     </header>
   );

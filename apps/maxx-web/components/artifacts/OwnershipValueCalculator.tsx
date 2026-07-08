@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { Field, Input } from "@/components/ui/Input";
 
 export function OwnershipValueCalculator() {
-  const [monthlySaas, setMonthlySaas] = useState(450);
+  const [monthlySaas, setMonthlySaas] = useState(600);
   const [years, setYears] = useState(3);
 
   const rentedTotal = monthlySaas * 12 * years;

@@ -22,8 +22,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <AppHeader />
         {isSeedMode() && (
-          <div className="border-b border-amber-500/30 bg-amber-500/10 px-6 py-2 text-center text-xs text-amber-300">
-            Local build mode: auth provider not configured. Demo organization loaded from seed data.
+          <div className="border-b border-accent/30 bg-accent-soft px-6 py-2 text-center text-xs text-accent">
+            You&rsquo;re viewing sample data in the live demo — this is what your team&rsquo;s workspace looks like, no setup required to explore.
           </div>
         )}
         <main id="main-content" className="min-w-0 flex-1 px-6 py-8">

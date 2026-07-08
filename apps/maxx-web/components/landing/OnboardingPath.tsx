@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const steps = [
   {
     number: "1",
@@ -55,6 +57,12 @@ export function OnboardingPath() {
           </div>
         ))}
       </div>
+      <Link
+        href="/how-it-works"
+        className="mt-8 inline-block text-sm font-medium text-accent hover:underline"
+      >
+        See the full walkthrough on How It Works →
+      </Link>
     </section>
   );
 }

@@ -7,7 +7,6 @@ import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { OrganizationOwnership } from "@/components/landing/OrganizationOwnership";
 import { WhoThisIsFor } from "@/components/landing/WhoThisIsFor";
 import { ProofPanel } from "@/components/landing/ProofPanel";
-import { HowItWorks } from "@/components/landing/HowItWorks";
 import { MigrationCockpitPreview } from "@/components/landing/MigrationCockpitPreview";
 import { RecentUpdates } from "@/components/landing/RecentUpdates";
 import { FeatureStack } from "@/components/landing/FeatureStack";
@@ -30,7 +29,6 @@ export default function HomePage() {
         <OrganizationOwnership />
         <WhoThisIsFor />
         <ProofPanel />
-        <HowItWorks />
         <MigrationCockpitPreview />
         <RecentUpdates />
         <FeatureStack />

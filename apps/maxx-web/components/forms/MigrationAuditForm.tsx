@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Field, Input, Select, Textarea } from "@/components/ui/Input";
 import {
   migrationAuditSchema,
   type MigrationAuditInput,
@@ -76,17 +77,15 @@ export function MigrationAuditForm() {
         label="Organization name"
         error={errors.organizationName?.message}
       >
-        <input
+        <Input
           {...register("organizationName")}
-          className="form-input"
           autoComplete="organization"
         />
       </Field>
 
       <Field label="Website URL" error={errors.websiteUrl?.message}>
-        <input
+        <Input
           {...register("websiteUrl")}
-          className="form-input"
           type="url"
           placeholder="https://"
         />
@@ -94,12 +93,11 @@ export function MigrationAuditForm() {
 
       <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Contact name" error={errors.contactName?.message}>
-          <input {...register("contactName")} className="form-input" autoComplete="name" />
+          <Input {...register("contactName")} autoComplete="name" />
         </Field>
         <Field label="Email" error={errors.email?.message}>
-          <input
+          <Input
             {...register("email")}
-            className="form-input"
             type="email"
             autoComplete="email"
           />
@@ -107,11 +105,11 @@ export function MigrationAuditForm() {
       </div>
 
       <Field label="Phone (optional)" error={errors.phone?.message}>
-        <input {...register("phone")} className="form-input" type="tel" autoComplete="tel" />
+        <Input {...register("phone")} type="tel" autoComplete="tel" />
       </Field>
 
       <Field label="Organization type" error={errors.organizationType?.message}>
-        <select {...register("organizationType")} className="form-input" defaultValue="">
+        <Select {...register("organizationType")} defaultValue="">
           <option value="" disabled>
             Select one
           </option>
@@ -120,24 +118,24 @@ export function MigrationAuditForm() {
           <option value="community_organization">Community organization</option>
           <option value="agency_or_consultant">Agency or consultant</option>
           <option value="other">Other</option>
-        </select>
+        </Select>
       </Field>
 
       <Field label="Mission focus" error={errors.missionFocus?.message}>
-        <input {...register("missionFocus")} className="form-input" />
+        <Input {...register("missionFocus")} />
       </Field>
 
       <Field label="Current tools (optional)" error={errors.currentTools?.message}>
-        <input {...register("currentTools")} className="form-input" />
+        <Input {...register("currentTools")} />
       </Field>
 
       <Field label="Biggest problem right now" error={errors.biggestProblem?.message}>
-        <textarea {...register("biggestProblem")} className="form-input min-h-[100px]" />
+        <Textarea {...register("biggestProblem")} />
       </Field>
 
       <div className="grid gap-6 sm:grid-cols-2">
         <Field label="Budget range" error={errors.budgetRange?.message}>
-          <select {...register("budgetRange")} className="form-input" defaultValue="">
+          <Select {...register("budgetRange")} defaultValue="">
             <option value="" disabled>
               Select one
             </option>
@@ -146,10 +144,10 @@ export function MigrationAuditForm() {
                 {b}
               </option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Desired timeline" error={errors.desiredTimeline?.message}>
-          <select {...register("desiredTimeline")} className="form-input" defaultValue="">
+          <Select {...register("desiredTimeline")} defaultValue="">
             <option value="" disabled>
               Select one
             </option>
@@ -158,7 +156,7 @@ export function MigrationAuditForm() {
                 {t}
               </option>
             ))}
-          </select>
+          </Select>
         </Field>
       </div>
 
@@ -177,27 +175,5 @@ export function MigrationAuditForm() {
         </p>
       )}
     </form>
-  );
-}
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="text-sm font-medium">{label}</span>
-      <div className="mt-1">{children}</div>
-      {error && (
-        <span role="alert" className="mt-1 block text-sm text-red-400">
-          {error}
-        </span>
-      )}
-    </label>
   );
 }
