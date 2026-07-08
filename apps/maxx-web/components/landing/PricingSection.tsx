@@ -31,7 +31,7 @@ const tiers = [
       "Deployment handoff",
       "Training session",
     ],
-    cta: "Talk to Us",
+    cta: "Start a Migration Audit",
     featured: true,
   },
   {
@@ -49,7 +49,7 @@ const tiers = [
       "Monthly optimization",
       "Priority support",
     ],
-    cta: "Talk to Us",
+    cta: "Start a Migration Audit",
     featured: false,
   },
 ];

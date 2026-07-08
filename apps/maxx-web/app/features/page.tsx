@@ -3,7 +3,6 @@ import Link from "next/link";
 import { MainNav } from "@/components/landing/MainNav";
 import { Footer } from "@/components/landing/Footer";
 import { featureNavItems } from "@/lib/nav";
-import { FeatureParityCommandCenter } from "@/components/artifacts/FeatureParityCommandCenter";
 
 export const metadata: Metadata = {
   title: "Features — Maxx Migrations",
@@ -55,9 +54,6 @@ export default function FeaturesPage() {
               </Link>
             ))}
           </div>
-        </section>
-        <section className="mx-auto max-w-4xl px-4 pb-20">
-          <FeatureParityCommandCenter />
         </section>
       </main>
       <Footer />

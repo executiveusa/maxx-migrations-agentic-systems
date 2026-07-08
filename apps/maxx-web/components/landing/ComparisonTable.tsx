@@ -1,3 +1,6 @@
+// Every row is phrased as a positive claim, so `true` always means
+// "good" and renders as a green checkmark for both columns — no
+// downside (e.g. vendor lock-in) can accidentally render as a win.
 const features = [
   { name: "Code ownership", ghl: false, maxx: true },
   { name: "Data ownership", ghl: false, maxx: true },
@@ -5,9 +8,17 @@ const features = [
   { name: "Migration support", ghl: false, maxx: true },
   { name: "AI agent toolkit", ghl: false, maxx: true },
   { name: "Handoff & training", ghl: false, maxx: true },
-  { name: "Vendor lock-in", ghl: true, maxx: false },
-  { name: "Monthly subscription required", ghl: true, maxx: false },
+  { name: "No vendor lock-in", ghl: false, maxx: true },
+  { name: "No forced monthly subscription", ghl: false, maxx: true },
 ];
+
+function Mark({ present }: { present: boolean }) {
+  return present ? (
+    <span className="text-accent">✓</span>
+  ) : (
+    <span className="text-muted">—</span>
+  );
+}
 
 export function ComparisonTable() {
   return (
@@ -35,18 +46,10 @@ export function ComparisonTable() {
               <tr key={feature.name} className="border-b border-border">
                 <td className="py-3 px-4">{feature.name}</td>
                 <td className="py-3 px-4 text-center">
-                  {feature.ghl ? (
-                    <span className="text-accent">✓</span>
-                  ) : (
-                    <span className="text-muted">—</span>
-                  )}
+                  <Mark present={feature.ghl} />
                 </td>
                 <td className="py-3 px-4 text-center">
-                  {feature.maxx ? (
-                    <span className="text-accent">✓</span>
-                  ) : (
-                    <span className="text-muted">—</span>
-                  )}
+                  <Mark present={feature.maxx} />
                 </td>
               </tr>
             ))}

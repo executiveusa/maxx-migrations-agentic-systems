@@ -16,6 +16,9 @@ export function MigrationCockpitPreview() {
           A single dashboard for your migration job, contacts, pipeline, and
           AI agents — owned by your organization from day one.
         </p>
+        <p className="mt-2 text-sm text-muted">
+          Illustrative preview — not live data.
+        </p>
         <div className="mt-10 grid gap-4 rounded-2xl border border-border bg-surface-2 p-6 sm:grid-cols-2 lg:grid-cols-4">
           {panels.map((panel) => (
             <div key={panel.label} className="rounded-xl bg-bg p-4">

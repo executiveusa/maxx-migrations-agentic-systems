@@ -20,10 +20,6 @@ const values = [
     description: "Structured handoff: training sessions, system documentation, team alignment.",
   },
   {
-    title: "Code ownership",
-    description: "Complete access to source code, deployment pipelines, and infrastructure.",
-  },
-  {
     title: "Optional AI partnership",
     description: "Continue working with us as your ongoing technology partner — or go independent.",
   },

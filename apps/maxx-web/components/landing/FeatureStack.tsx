@@ -11,7 +11,7 @@ export function FeatureStack() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-20">
       <h2 className="font-display text-3xl font-semibold md:text-4xl">
-        What you own
+        The product, feature by feature
       </h2>
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => (
