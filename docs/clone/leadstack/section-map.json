@@ -1,0 +1,34 @@
+{
+  "source": "https://www.leadstack.dev/#how-it-works",
+  "capture_method": "spec-derived (live browser fetch blocked by network policy, HTTP 403 at proxy CONNECT level — see bead-0003)",
+  "captured_at": "2026-06-30",
+  "sections": [
+    { "order": 1, "id": "announcement-bar", "purpose": "Top-of-page short promo/urgency strip above nav." },
+    { "order": 2, "id": "main-nav", "purpose": "Logo, primary nav links, primary CTA button (sticky)." },
+    { "order": 3, "id": "hero", "purpose": "Headline + subhead + primary/secondary CTA + hero visual/product shot." },
+    { "order": 4, "id": "proof-panel", "purpose": "Logos/stats/trust markers reinforcing credibility immediately after hero." },
+    { "order": 5, "id": "how-it-works", "purpose": "Numbered step sequence explaining the process end-to-end." },
+    { "order": 6, "id": "inside-the-platform", "purpose": "Tour of the product/sub-account: dashboard, pipeline, inbox, calendar, site builder." },
+    { "order": 7, "id": "feature-stack", "purpose": "Grid/list of individual feature cards (CRM, automations, forms, booking, etc)." },
+    { "order": 8, "id": "social-proof", "purpose": "Customer reviews / testimonials / case-study highlights." },
+    { "order": 9, "id": "pricing", "purpose": "Tiered pricing cards with feature comparison and CTA per tier." },
+    { "order": 10, "id": "faq", "purpose": "Accordion of common objections/questions." },
+    { "order": 11, "id": "final-cta", "purpose": "Closing conversion block before footer." },
+    { "order": 12, "id": "footer", "purpose": "Sitemap links, legal links, contact/social." }
+  ],
+  "nav_items_pattern": ["Product/How it works", "Pricing", "Resources/Proof", "Contact/Get started CTA"],
+  "pricing_pattern": {
+    "tier_count": 3,
+    "structure": "ascending tiers, each a superset of the previous, rightmost tier marked as recommended/popular",
+    "cta_per_tier": true
+  },
+  "faq_topic_categories": [
+    "setup/onboarding time",
+    "what's included vs add-on",
+    "data ownership/portability",
+    "support/maintenance model",
+    "pricing/billing mechanics"
+  ],
+  "footer_link_categories": ["product", "company", "legal", "contact/social"],
+  "notes": "Structure reconstructed from the build prompt's own Stage-1 spec (sections 6-9), which the user supplied directly and which already enumerates section order, copy direction, and design tokens. No third-party copy was retrieved or reproduced — live fetch to leadstack.dev returned HTTP 403 at the network proxy before any HTML was received."
+}

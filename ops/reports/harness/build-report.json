@@ -1,0 +1,46 @@
+{
+  "generatedAt": "2026-07-03T06:52:27.289Z",
+  "overallStatus": "pass",
+  "checks": [
+    {
+      "id": "preflight",
+      "script": "scripts/harness/preflight.mjs",
+      "passed": true
+    },
+    {
+      "id": "no-stubs",
+      "script": "scripts/harness/no-stubs.mjs",
+      "passed": true
+    },
+    {
+      "id": "routes",
+      "script": "scripts/harness/route-audit.mjs",
+      "passed": true
+    },
+    {
+      "id": "links",
+      "script": "scripts/harness/link-check.mjs",
+      "passed": true
+    },
+    {
+      "id": "api",
+      "script": "scripts/harness/api-smoke.mjs",
+      "passed": true
+    },
+    {
+      "id": "copy",
+      "script": "scripts/harness/copy-audit.mjs",
+      "passed": true
+    },
+    {
+      "id": "env",
+      "script": "scripts/harness/env-audit.mjs",
+      "passed": true
+    },
+    {
+      "id": "artifacts",
+      "script": "scripts/harness/artifact-audit.mjs",
+      "passed": true
+    }
+  ]
+}

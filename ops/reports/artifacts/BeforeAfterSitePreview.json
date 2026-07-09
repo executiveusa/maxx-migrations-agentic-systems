@@ -1,0 +1,10 @@
+{
+  "artifact_name": "BeforeAfterSitePreview",
+  "route": "/app/migrations/[jobId]",
+  "udec_score": 8.6,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Toggle preview backed by real migration job data and design audit score."
+}

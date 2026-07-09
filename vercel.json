@@ -1,7 +1,7 @@
 {
-  "buildCommand": "cd banking && yarn install && yarn build",
-  "installCommand": "cd banking && yarn install",
-  "outputDirectory": "banking/dist",
-  "framework": "vite",
-  "root": "banking"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "npm install --prefix apps/maxx-web",
+  "buildCommand": "cd apps/maxx-web && npm run build",
+  "outputDirectory": "apps/maxx-web/.next"
 }

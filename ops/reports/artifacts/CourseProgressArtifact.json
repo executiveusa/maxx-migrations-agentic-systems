@@ -1,0 +1,10 @@
+{
+  "artifact_name": "CourseProgressArtifact",
+  "route": "/app/community/courses",
+  "udec_score": 8.5,
+  "status": "shipped",
+  "known_constraints_hit": [
+    "seed-mode data only until Supabase/Twilio/Meta credentials are configured"
+  ],
+  "notes": "Renders real enrollment progress bars per course, with an empty state when unenrolled."
+}
