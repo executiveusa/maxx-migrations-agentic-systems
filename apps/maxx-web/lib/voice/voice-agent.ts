@@ -25,6 +25,7 @@ export async function parseVoiceAgentStream(response: Response): Promise<string>
   }
 
   let assistantText = "";
+  let pendingApprovalText = "";
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
 
@@ -50,6 +51,11 @@ export async function parseVoiceAgentStream(response: Response): Promise<string>
               assistantText += event.content;
             }
 
+            if (event.type === "tool_call_pending") {
+              const action = event.toolName?.replaceAll("_", " ") ?? "requested action";
+              pendingApprovalText = `The ${action} action is ready, but it needs your approval before I can continue.`;
+            }
+
             // Stop on stream complete or error
             if (event.type === "done" || event.type === "error") {
               break;
@@ -62,6 +68,10 @@ export async function parseVoiceAgentStream(response: Response): Promise<string>
     }
   } finally {
     reader.releaseLock();
+  }
+
+  if (!assistantText && pendingApprovalText) {
+    return pendingApprovalText;
   }
 
   if (!assistantText) {
