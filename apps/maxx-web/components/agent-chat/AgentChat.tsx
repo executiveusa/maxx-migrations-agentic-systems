@@ -144,12 +144,6 @@ export function AgentChat() {
     }
   };
 
-  const handleApproveConfirmation = () => {
-    // In a real implementation, this would send an approval to the backend
-    // For now, we'll just close the dialog and let the agent continue
-    setPendingConfirmation(null);
-  };
-
   const handleRejectConfirmation = () => {
     setPendingConfirmation(null);
     setMessages((prev) => [
@@ -220,6 +214,9 @@ export function AgentChat() {
             <p className="text-sm text-muted mb-6">
               {`Do you want to ${pendingConfirmation.toolName.replace(/_/g, " ")}?`}
             </p>
+            <p className="text-sm text-muted mb-6">
+              This action has not run. Server-side approval execution is not enabled yet, so MAXX will keep it blocked rather than pretend an approval was recorded.
+            </p>
             <div className="flex gap-2 justify-end">
               <ButtonEl
                 variant="secondary"
@@ -227,7 +224,7 @@ export function AgentChat() {
               >
                 Cancel
               </ButtonEl>
-              <ButtonEl onClick={handleApproveConfirmation}>Approve</ButtonEl>
+              <ButtonEl disabled>Approve</ButtonEl>
             </div>
           </>
         )}
