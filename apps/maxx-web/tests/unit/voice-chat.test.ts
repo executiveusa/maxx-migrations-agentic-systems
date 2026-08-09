@@ -65,7 +65,7 @@ describe("Voice Agent", () => {
       expect(result).toBe("Hello world");
     });
 
-    it("ignores tool_call_pending and tool_result events", async () => {
+    it("keeps agent text when tool events are also present", async () => {
       const sseText = [
         `data: ${JSON.stringify({ type: "text", content: "I'll create a contact" })}`,
         `data: ${JSON.stringify({ type: "tool_call_pending", toolName: "create_contact" })}`,
@@ -79,6 +79,21 @@ describe("Voice Agent", () => {
 
       const result = await parseVoiceAgentStream(response);
       expect(result).toBe("I'll create a contact named John");
+    });
+
+    it("returns a speakable approval status when a write has no text response", async () => {
+      const sseText = [
+        `data: ${JSON.stringify({ type: "tool_call_pending", toolName: "create_contact" })}`,
+        `data: ${JSON.stringify({ type: "done", reason: "awaiting_approval" })}`,
+      ].join("\n");
+
+      const mockStream = createMockStream(sseText + "\n\n");
+      const response = { body: mockStream } as Response;
+
+      const result = await parseVoiceAgentStream(response);
+      expect(result).toBe(
+        "The create contact action is ready, but it needs your approval before I can continue.",
+      );
     });
 
     it("throws error when response has no body", async () => {
