@@ -1,4 +1,7 @@
 # MAXX MIGRATIONS — AI EXECUTION KERNEL
+
+> GOVERNANCE AUTHORITY: Before following this kernel, read `AGENTS.md`, `docs/icm/HUMAN_MACHINE_CONTRACT.md`, and `docs/icm/ICM_CORE.md`. The Human ↔ Machine Contract overrides legacy execution shortcuts. In particular, humans are not limited to final merge: consequential money, legal, credential, destructive, sensitive-public, security, privacy, and production actions require the contract's human gate.
+
 > Self-ingesting operating system for every AI agent that touches this repo.
 > Read this before any tool call. It replaces all human-time thinking.
 
@@ -51,8 +54,8 @@ ONE PR AT THE END
 ```
 
 **No phase starts without the previous gate passing.**
-**No human intervention between phases.**
-**Human in the loop: final merge only.**
+**Do not interrupt humans for safe machine work between phases.**
+**Human gates are risk-based, not phase-based.** Apply the Human ↔ Machine Contract immediately before consequential actions; final merge remains a human review gate unless separately authorized by repository policy.
 
 ---
 
@@ -242,7 +245,7 @@ docs/openspec/              ← Specs for every subsystem (read these, not the c
 **The sale**: GHL Pro = $297/mo × 24mo = $7,128. Data locked forever.  
 **Our answer**: $6,000 once. Own the code. Own the data. AI agent included.
 
-**The agent IS the product.** The UI is a confirmation surface. The user speaks or types. The agent does everything. Every write/send/publish/delete requires human confirmation — agent proposes, human approves, one click.
+**The business outcome is the product.** ICM is durable business memory; agents are replaceable workers; the UI is an inspection/decision surface. Prefer voice for ordinary command. Safe reversible work should not require ritual confirmation; consequential actions follow the Human ↔ Machine Contract. The interface should progressively disappear without weakening authority or evidence.
 
 **Voice round-trip target**: < 1.5 seconds STT → agent → TTS.  
 **Agent cost target**: < $0.63/org/month at 50 queries/day.

@@ -1,7 +1,12 @@
 # 00 — Context
 
-Maxx Migrations is a sovereign AI CRM and website migration platform for
-nonprofits, agencies, and social-purpose teams. The product is delivered
+Maxx Migrations is the canonical owner-controlled ICM and agentic execution engine behind MACS Digital Media. CRM, website migration, social, grants/opportunity workflows, browser tools, voice, and future capabilities are modules beneath that operating-system boundary, not the product definition itself.
+
+The public storefront lives in `executiveusa/macsdigitalmedia`. This repository owns private client context, isolation, agents, policy, approvals, execution, evidence, and export/handoff.
+
+The north star is a voice-first, progressively disappearing interface: owners state outcomes conversationally; the system performs safe digital work and brings humans only the decisions their truth, judgment, relationships, or authority require.
+
+The existing product is delivered The product is delivered
 as a one-time sovereign install: migrated website, connected CRM, and
 configured automations, deployed into infrastructure the customer owns
 (their own Supabase project, their own hosting).
