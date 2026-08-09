@@ -15,7 +15,7 @@ import { getToolDefinitions, executeTool, type ToolName } from "@/lib/agents/too
  *
  * Response: text/event-stream with JSON events
  * { type: "text", content: "..." } — assistant text chunk
- * { type: "tool_call", toolName: "...", toolInput: {...} } — tool call pending approval
+ * { type: "tool_call_pending", toolName: "...", toolInput: {...} } — write blocked pending approval
  * { type: "tool_result", toolName: "...", content: "..." } — tool execution result
  * { type: "error", error: "..." } — error message
  * { type: "done" } — stream end marker
@@ -102,23 +102,12 @@ export async function POST(request: NextRequest): Promise<Response> {
                     })}\n\n`,
                   );
 
-                  // Execute write tool
-                  const result = await executeTool(block.name as ToolName, block.input, orgId);
-                  loopMessages.push({
-                    role: "assistant",
-                    content: assistantContent as any,
-                  });
-                  loopMessages.push({
-                    role: "user",
-                    content: [
-                      {
-                        type: "tool_result",
-                        tool_use_id: block.id,
-                        content: result,
-                      },
-                    ],
-                  });
-                  assistantContent.length = 0; // Clear for next iteration
+                  // Fail closed. A write must never execute from the proposal stream.
+                  // The approval path will execute the exact persisted action only after
+                  // a matching human approval is revalidated server-side.
+                  controller.enqueue(`data: ${JSON.stringify({ type: "done", reason: "awaiting_approval" })}\n\n`);
+                  controller.close();
+                  return;
                 } else {
                   // Read-only tool, execute immediately
                   const result = await executeTool(block.name as ToolName, block.input, orgId);
