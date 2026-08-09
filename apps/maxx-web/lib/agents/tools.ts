@@ -114,8 +114,11 @@ export function getToolDefinitions(): Anthropic.Tool[] {
 }
 
 /**
- * Execute a tool call. For write tools, returns a pending result that requires confirmation.
- * For read tools, executes immediately and returns the result.
+ * Execute an already-authorized tool call.
+ *
+ * IMPORTANT: this function does not implement approval. Callers are responsible
+ * for enforcing the Human ↔ Machine Contract before invoking a write tool.
+ * The chat proposal route must never call this for a pending write.
  */
 export async function executeTool(
   toolName: ToolName,
