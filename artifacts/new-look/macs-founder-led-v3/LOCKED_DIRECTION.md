@@ -1,47 +1,45 @@
 # MACS Founder-Led Frontend Direction
 
-Status: locked for implementation
-Date: 2026-08-10
+**Status:** LOCKED
 
-## Core story
+## Homepage story
 
-MACS was built by solving the same operating problems its customers face: too many subscriptions, disconnected systems, repeated manual work, scattered business knowledge and technology that expects a nontechnical owner to become technical.
+1. Pacific Northwest father + son.
+2. We built MACS by solving the same technology problems we had ourselves.
+3. Lead with the owner's pain: too many subscriptions, disconnected systems, repetitive work, scattered information, confusing AI/automation.
+4. Flip quickly to the desired outcome: fewer tools, organized business context, less manual work, owner control.
+5. Diagnose before prescribing. No prescription before diagnosis.
+6. Use real transformation work as proof.
+7. Keep the $497 Vibe Audit as the primary first decision.
+8. Position MAXX Migrations as the flagship high-value ownership/migration transformation.
+9. Hand over the keys; ongoing support is optional rather than captivity.
 
-## Public promise
+## Founder roles
 
-Technology should make running the business easier, not give the owner another job.
+- Stacy: nontechnical founder and design constraint. MACS technology must be understandable to the owner.
+- Stavari: owner of PostaTees; Shopify, e-commerce and UGC operator perspective.
 
-## Founder position
+## MAXX brand extension — locked 2026-08-10
 
-- Pacific Northwest
-- father + son
-- built for nontechnical business owners
-- Stacy as a nontechnical founder is part of the design story
-- real founder photography only; no stock or synthetic founder imagery
+- MACS Digital Media = company and human partnership.
+- MAXX = product universe.
+- Agent MAXX = AI avatar/operator product intended for a free downloadable release once the release artifact is verified.
+- MAXX Notes = editorial brand, subtitle **Notes from the Northwest**.
+- MAXX Products / MAXX Drops = repeatable free and paid one-off digital products; individual offers are not public until delivery is verified.
+- MAXX Migrations = premium backend transformation.
+- Hermes = runtime under the hood, not the customer-facing brand.
 
-## Funnel
+## Commercial posture
 
-1. Founder/local hero
-2. This was us — pain recognition
-3. Desired outcome — imagine the opposite
-4. Diagnose first — no prescription before diagnosis
-5. Selected work — ASC3ND + Client Zero
-6. Ownership path — Vibe Audit → Vibe Rescue → Sovereign Launch → MAXX Migrations
-7. Final low-decision CTA
+- Do not compete as a generic mid-market AI agency.
+- Premium custom work stays diagnosis-led and selective.
+- Smaller MAXX products create accessible value and repeatable revenue without turning MACS into a low-price service shop.
+- Treat small digital products like entry objects in a premium brand: useful, intentional, self-contained and well presented.
+- No fake luxury scarcity, fake price anchors or unverified enterprise claims.
 
-## Offer logic
+## Availability truth
 
-- $497 Vibe Audit is the public first decision.
-- Bigger systems are only recommended after diagnosis.
-- MAXX Migrations is the flagship backend transformation for businesses trapped in expensive or fragmented platforms.
-- MAXX promise: extract → understand → redesign → rebuild → migrate → train → hand over the keys.
-- Ongoing MACS support is optional after handoff.
-
-## Brand principles
-
-- Diagnose before we prescribe.
-- If we do not believe the customer needs a bigger system, do not sell one.
-- Explain outcomes before architecture.
-- ICM supports portability and ownership under the hood; it is not the homepage headline.
-- Case studies explain MACS capabilities through before → intervention → ownership, not feature walls.
-- Short sections, bounded choices, plain language, high scanability.
+- Agent MAXX is **in development**, not yet a verified public download.
+- MAXX Notes is a live preview editorial surface; individual seeded notes remain drafts until approved.
+- MAXX Drops is a product framework, not a currently stocked store.
+- MAXX Migrations remains diagnosis-led and must not claim unverified runtime proof.
