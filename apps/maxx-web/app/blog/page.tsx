@@ -5,9 +5,9 @@ import { Footer } from "@/components/landing/Footer";
 import { Lift, Reveal } from "@/components/landing/MotionPrimitives";
 
 export const metadata: Metadata = {
-  title: "Northwest Field Notes — MACS Digital Media",
+  title: "MAXX Notes — Notes from the Northwest",
   description:
-    "Plain-English technology notes for nontechnical business owners: fewer subscriptions, simpler systems, useful AI, e-commerce, ownership and practical fixes.",
+    "Plain-English technology notes for nontechnical business owners: fewer subscriptions, simpler systems, useful AI, e-commerce, ownership and practical fixes from the Pacific Northwest.",
 };
 
 const topics = [
@@ -81,12 +81,12 @@ export default function BlogPage() {
           <NorthwestBackdrop />
           <div className="relative mx-auto min-h-[66vh] max-w-7xl px-5 py-20 md:px-8 md:py-28 lg:flex lg:items-end lg:py-32">
             <Reveal className="max-w-5xl">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#a9d7c4]">Working title · Northwest Field Notes</p>
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#a9d7c4]">MAXX Notes · Notes from the Northwest</p>
               <h1 className="mt-7 font-display text-[clamp(4rem,9vw,8.5rem)] font-semibold leading-[0.88] tracking-[-0.06em]">
                 Technology for people who have a business to run.
               </h1>
               <p className="mt-8 max-w-3xl text-lg leading-8 text-[#cddbd5] md:text-2xl md:leading-10">
-                Down-to-earth field notes from the Pacific Northwest about subscriptions, AI, e-commerce, disconnected systems and the boring digital work nobody started a business to manage.
+                Down-to-earth notes from the Pacific Northwest about subscriptions, AI, e-commerce, disconnected systems and the boring digital work nobody started a business to manage.
               </p>
               <div className="mt-8 flex flex-wrap gap-2 text-xs font-bold uppercase tracking-[0.11em] text-[#c5d7cf]">
                 <span className="rounded-full border border-white/20 px-4 py-2">Nontechnical first</span>
@@ -107,12 +107,12 @@ export default function BlogPage() {
             </Reveal>
 
             <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {topics.map((topic, index) => (
+              {topics.map((topic) => (
                 <Lift key={topic.number} className="h-full">
                   <article className="flex h-full min-h-[360px] flex-col justify-between rounded-[1.75rem] border border-border bg-surface p-6 md:p-8">
                     <div>
                       <div className="flex items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
-                        <span>Field note {topic.number}</span>
+                        <span>MAXX Note {topic.number}</span>
                         <span>{topic.category}</span>
                       </div>
                       <h3 className="mt-8 font-display text-3xl font-semibold leading-[1.02] tracking-[-0.035em] md:text-4xl">{topic.title}</h3>
@@ -151,13 +151,13 @@ export default function BlogPage() {
           <Reveal className="mx-auto max-w-7xl px-5 md:px-8">
             <div className="grid gap-10 rounded-[2rem] bg-[#171b18] p-7 text-[#f7f3ea] md:p-10 lg:grid-cols-[.78fr_1.22fr] lg:gap-16">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#a9d7c4]">How this blog will work</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#a9d7c4]">How MAXX Notes works</p>
                 <h2 className="mt-5 font-display text-4xl font-semibold leading-[0.98] tracking-[-0.04em] md:text-6xl">Real questions first. Articles second.</h2>
               </div>
               <div className="space-y-5 text-base leading-7 text-[#c7d2cd]">
                 <p>We are seeding the editorial desk with 30 days of customer problems: software cost, failed automation, AI confusion, ownership, Shopify, UGC and the questions local operators keep asking.</p>
                 <p>Those dates are coverage slots, not fake publication history. Drafts stay drafts until a human reviews the claims, usefulness and fit.</p>
-                <p>When an article is live, it will have a real publication date, clear source notes where needed and one practical next step.</p>
+                <p>When a note is live, it will have a real publication date, clear source notes where needed and one practical next step.</p>
               </div>
             </div>
           </Reveal>
@@ -167,7 +167,10 @@ export default function BlogPage() {
           <Reveal className="mx-auto max-w-5xl px-5 md:px-8">
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">Have one of these problems now?</p>
             <h2 className="mt-6 font-display text-5xl font-semibold leading-[0.96] tracking-[-0.05em] md:text-7xl">You do not have to become technical before asking for help.</h2>
-            <Link href="/audit" className="mt-9 inline-flex rounded-full bg-accent px-7 py-4 text-sm font-bold text-white">Start the $497 Vibe Audit</Link>
+            <div className="mt-9 flex flex-wrap justify-center gap-4">
+              <Link href="/maxx" className="inline-flex rounded-full border border-border px-7 py-4 text-sm font-bold">Meet Agent MAXX</Link>
+              <Link href="/audit" className="inline-flex rounded-full bg-accent px-7 py-4 text-sm font-bold text-white">Start the $497 Vibe Audit</Link>
+            </div>
           </Reveal>
         </section>
       </main>
