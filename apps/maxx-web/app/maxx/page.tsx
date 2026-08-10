@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { MainNav } from "@/components/landing/MainNav";
 import { Footer } from "@/components/landing/Footer";
+import { FounderBrandStrip } from "@/components/landing/FounderBrandStrip";
 import { Lift, Reveal } from "@/components/landing/MotionPrimitives";
 
 export const metadata: Metadata = {
@@ -81,6 +82,8 @@ export default function MaxxPage() {
             </Reveal>
           </div>
         </section>
+
+        <FounderBrandStrip />
 
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
