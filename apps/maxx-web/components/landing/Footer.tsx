@@ -2,7 +2,8 @@ import Link from "next/link";
 import { MACS_LOGO_DATA_URI } from "@/lib/brand-assets";
 
 const primary = [
-  { href: "/blog", label: "Northwest Field Notes" },
+  { href: "/maxx", label: "Agent MAXX" },
+  { href: "/blog", label: "MAXX Notes" },
   { href: "/work/asc3nd", label: "ASC3ND" },
   { href: "/work/macs-client-zero", label: "Client Zero" },
   { href: "/audit", label: "Start the Vibe Audit" },
@@ -22,7 +23,7 @@ export function Footer() {
           <div>
             <img src={MACS_LOGO_DATA_URI} width={160} height={121} alt="MACS Digital Media" className="h-16 w-auto object-contain" />
             <p className="mt-5 max-w-xl text-sm leading-6 text-muted">
-              A Pacific Northwest father-and-son company helping nontechnical owners diagnose digital bottlenecks, simplify the stack and build systems they can understand and own.
+              MACS is the Pacific Northwest father-and-son company. MAXX is the product family: practical agents, tools, notes and owner-controlled systems designed for people who do not want another technology job.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-8">
@@ -50,7 +51,7 @@ export function Footer() {
         </div>
         <div className="mt-14 border-t border-border pt-6 text-xs leading-5 text-muted">
           <p>AI may inspect, classify, summarize and propose within authorized scope. Sensitive decisions, financial approvals, destructive actions and final public messaging remain human-controlled unless narrower authority is explicitly approved.</p>
-          <p className="mt-3">© {new Date().getFullYear()} MACS Digital Media.</p>
+          <p className="mt-3">© {new Date().getFullYear()} MACS Digital Media. MAXX is the MACS product family.</p>
         </div>
       </div>
     </footer>
