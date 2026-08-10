@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { MACS_LOGO_DATA_URI } from "@/lib/brand-assets";
 
 const primary = [
+  { href: "/blog", label: "Northwest Field Notes" },
+  { href: "/work/asc3nd", label: "ASC3ND" },
   { href: "/work/macs-client-zero", label: "Client Zero" },
-  { href: "/#system", label: "System" },
   { href: "/audit", label: "Start the Vibe Audit" },
   { href: "/app", label: "Client login / demo" },
 ];
@@ -18,9 +20,9 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <div className="grid gap-12 md:grid-cols-[1.3fr_.7fr]">
           <div>
-            <p className="font-display text-3xl font-semibold tracking-[-0.04em]">MACS Digital Media</p>
-            <p className="mt-4 max-w-xl text-sm leading-6 text-muted">
-              We diagnose digital bottlenecks, build owner-controlled business systems when the evidence justifies them, and keep consequential AI actions under human control.
+            <img src={MACS_LOGO_DATA_URI} alt="MACS Digital Media" className="h-16 w-auto object-contain" />
+            <p className="mt-5 max-w-xl text-sm leading-6 text-muted">
+              A Pacific Northwest father-and-son company helping nontechnical owners diagnose digital bottlenecks, simplify the stack and build systems they can understand and own.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-8">
