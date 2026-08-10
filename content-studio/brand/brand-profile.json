@@ -1,8 +1,12 @@
 {
-  "status": "derived from approved MACS frontend and owner-provided assets",
+  "status": "derived from approved MACS frontend, owner-provided assets and current MAXX brand decision",
+  "companyBrand": "MACS Digital Media",
+  "productBrand": "MAXX",
+  "editorialBrand": "MAXX Notes — Notes from the Northwest",
   "logo": "owner-provided MACS Digital Media PNG embedded in preview brand-assets.ts",
   "founderPhoto": "owner-provided Stacy + Stavari waterfront photo embedded in preview brand-assets.ts",
-  "visualDirection": "Pacific Northwest editorial; warm paper, charcoal, evergreen, muted slate; real people before technology imagery",
+  "agentAvatar": "canonical Agent MAXX avatar exists outside this repo; do not invent or replace it until the approved asset is supplied",
+  "visualDirection": "Pacific Northwest editorial; warm paper, charcoal, evergreen, muted slate; real people before technology imagery; MAXX product surfaces may use a darker cinematic control-room layer without replacing the MACS human story",
   "hostTokens": {
     "background": "var(--bg)",
     "surface": "var(--surface)",
@@ -28,6 +32,9 @@
     "problem before product",
     "real images and proof",
     "no generic AI imagery",
-    "no fake backdated articles"
+    "no fake backdated articles",
+    "Agent MAXX is a product character, not a substitute for founder trust",
+    "do not claim Agent MAXX is downloadable until a verified release exists",
+    "do not advertise unbuilt MAXX digital products as available"
   ]
 }
