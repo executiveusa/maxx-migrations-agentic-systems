@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-08-10",
+  "backend_to_ui": [
+    {
+      "finding": "Stage 00 intake exists but was not the dominant public product path.",
+      "resolution": "Homepage now routes one plain-language bottleneck into /audit, then into the existing /intake/ context surface."
+    },
+    {
+      "finding": "Client Zero approval/evidence behavior belongs to the authenticated operator product, not the public acquisition homepage.",
+      "resolution": "Public homepage explains human control; review actions remain under /app/client-zero."
+    },
+    {
+      "finding": "Detailed feature routes remain useful but are too technical as primary acquisition navigation.",
+      "resolution": "Routes are preserved but removed from primary marketing navigation; capability is hidden by progressive disclosure rather than deleted."
+    }
+  ],
+  "ui_to_backend": [
+    {
+      "finding": "Old homepage offered three pricing/implementation choices before diagnosis.",
+      "resolution": "Homepage now sells one front-door offer: the $497 Vibe Audit. Rescue Sprint, Sovereign Launch and MAXX Operations are explained as post-audit paths."
+    },
+    {
+      "finding": "Old proof panel described representative organization types rather than evidence-backed work.",
+      "resolution": "Homepage now uses MACS Client Zero as the only current case study and includes an explicit runtime-proof caveat."
+    },
+    {
+      "finding": "Old homepage duplicated product explanation across many sections.",
+      "resolution": "15 homepage marketing sections reduced to seven bounded funnel sections."
+    },
+    {
+      "finding": "Legacy migration-audit form remains a separate route and capability.",
+      "resolution": "It is preserved for compatibility, but new public CTAs route to the guided Vibe Audit entry instead of deleting the legacy flow."
+    }
+  ],
+  "release_constraints": [
+    "Do not claim live Supabase tenant-isolation or approval receipts until runtime evidence exists.",
+    "Do not restyle the authenticated /app surface as part of this marketing redesign.",
+    "Do not remove preserved legacy capability routes in this slice.",
+    "Keep public interaction burden to one dominant next action and no more than three starter choices."
+  ]
+}
