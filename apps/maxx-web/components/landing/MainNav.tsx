@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 
 const links = [
+  { href: "/#about", label: "Why MACS" },
+  { href: "/#system", label: "Diagnose First" },
   { href: "/#work", label: "Work" },
-  { href: "/#system", label: "System" },
-  { href: "/#about", label: "About" },
 ];
 
 export function MainNav() {
@@ -17,7 +17,7 @@ export function MainNav() {
       <nav aria-label="Primary" className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-4 md:px-8">
         <Link href="/" className="group inline-flex flex-col leading-none">
           <span className="font-display text-xl font-bold tracking-[-0.04em] text-text">MACS</span>
-          <span className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-muted">Digital Media</span>
+          <span className="mt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-muted">Digital Media · Pacific Northwest</span>
         </Link>
 
         <div className="hidden items-center gap-8 md:flex">
