@@ -18,7 +18,7 @@ export function MainNav() {
     <header className="sticky top-0 z-40 border-b border-border bg-bg">
       <nav aria-label="Primary" className="relative mx-auto flex max-w-7xl items-center justify-between px-5 py-3 md:px-8">
         <Link href="/" aria-label="MACS Digital Media home" className="inline-flex items-center gap-3">
-          <img src={MACS_LOGO_DATA_URI} alt="MACS Digital Media" className="h-11 w-auto object-contain md:h-12" />
+          <img src={MACS_LOGO_DATA_URI} width={160} height={121} alt="MACS Digital Media" className="h-11 w-auto object-contain md:h-12" />
           <span className="hidden text-[9px] font-bold uppercase tracking-[0.16em] text-muted sm:block">Pacific Northwest</span>
         </Link>
 
