@@ -1,0 +1,16 @@
+{
+  "companyName": {"value":"MACS Digital Media","confidence":"verified","safeForPublication":true,"source":"owner-approved homepage direction"},
+  "location": {"value":"Pacific Northwest","confidence":"verified","safeForPublication":true,"source":"owner-approved positioning"},
+  "businessType": {"value":"father-and-son technology partner for nontechnical business owners","confidence":"verified","safeForPublication":true,"source":"owner-approved positioning"},
+  "primaryOffer": {"value":"$497 Vibe Audit","confidence":"verified","safeForPublication":true,"source":"current homepage offer"},
+  "flagshipOffer": {"value":"MAXX Migrations","confidence":"verified","safeForPublication":true,"source":"owner-approved offer ladder"},
+  "primaryAudience": {"value":"nontechnical small-business and nonprofit owners dealing with disconnected tools, subscription sprawl, manual work and AI confusion","confidence":"verified","safeForPublication":true,"source":"owner-approved pain map"},
+  "founders": [
+    {"name":"Stacy","role":"Founder / nontechnical owner perspective","confidence":"verified","safeForPublication":true,"source":"owner-provided context"},
+    {"name":"Stavari","role":"E-commerce, Shopify and UGC; owner of PostaTees","confidence":"verified","safeForPublication":true,"source":"owner-provided context"}
+  ],
+  "conversionGoal": {"value":"Start the $497 Vibe Audit","confidence":"verified","safeForPublication":true,"source":"current funnel"},
+  "brandPromise": {"value":"Diagnose before prescribing; build only what earns its place; preserve owner control and handoff","confidence":"verified","safeForPublication":true,"source":"locked homepage direction"},
+  "contentAudience": {"value":"people trying to solve technical business problems without becoming technical","confidence":"verified","safeForPublication":true,"source":"owner request"},
+  "blogWorkingName": {"value":"Northwest Field Notes","confidence":"proposed","safeForPublication":false,"source":"working editorial concept"}
+}
