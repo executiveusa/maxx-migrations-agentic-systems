@@ -1,0 +1,15 @@
+:root {
+  --content-bg: var(--bg);
+  --content-surface: var(--surface);
+  --content-text: var(--text);
+  --content-muted: var(--muted);
+  --content-accent: var(--accent);
+  --content-border: var(--border);
+  --content-heading-font: var(--font-display, Georgia, serif);
+  --content-body-font: var(--font-body, system-ui, sans-serif);
+  --content-radius: 1.75rem;
+  --content-content-width: 72rem;
+}
+
+/* This bridge documents the intended mapping for the future isolated content studio.
+   It does not modify host design tokens. */
