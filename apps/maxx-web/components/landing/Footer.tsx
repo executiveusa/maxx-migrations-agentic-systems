@@ -20,7 +20,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <div className="grid gap-12 md:grid-cols-[1.3fr_.7fr]">
           <div>
-            <img src={MACS_LOGO_DATA_URI} alt="MACS Digital Media" className="h-16 w-auto object-contain" />
+            <img src={MACS_LOGO_DATA_URI} width={160} height={121} alt="MACS Digital Media" className="h-16 w-auto object-contain" />
             <p className="mt-5 max-w-xl text-sm leading-6 text-muted">
               A Pacific Northwest father-and-son company helping nontechnical owners diagnose digital bottlenecks, simplify the stack and build systems they can understand and own.
             </p>
