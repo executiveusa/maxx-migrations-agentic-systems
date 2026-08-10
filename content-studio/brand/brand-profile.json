@@ -1,0 +1,33 @@
+{
+  "status": "derived from approved MACS frontend and owner-provided assets",
+  "logo": "owner-provided MACS Digital Media PNG embedded in preview brand-assets.ts",
+  "founderPhoto": "owner-provided Stacy + Stavari waterfront photo embedded in preview brand-assets.ts",
+  "visualDirection": "Pacific Northwest editorial; warm paper, charcoal, evergreen, muted slate; real people before technology imagery",
+  "hostTokens": {
+    "background": "var(--bg)",
+    "surface": "var(--surface)",
+    "text": "var(--text)",
+    "muted": "var(--muted)",
+    "accent": "var(--accent)",
+    "border": "var(--border)"
+  },
+  "type": {
+    "display": "existing font-display / Cormorant Garamond direction",
+    "body": "existing body / DM Sans direction",
+    "rule": "large editorial headlines, short paragraphs, readable body width"
+  },
+  "motion": {
+    "library": "Motion for React",
+    "use": "subtle in-view opacity/14px rise and small card lift only",
+    "reducedMotion": "required",
+    "prohibited": ["scroll-jacking","long parallax","continuous decorative motion","motion that hides the next action"]
+  },
+  "contentRules": [
+    "nontechnical-first",
+    "one dominant action",
+    "problem before product",
+    "real images and proof",
+    "no generic AI imagery",
+    "no fake backdated articles"
+  ]
+}
