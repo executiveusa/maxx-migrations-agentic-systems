@@ -1,70 +1,56 @@
 import Link from "next/link";
-import { MaxxLogoCompact } from "@/components/brand/MaxxLogo";
 
-const columns: { title: string; links: { href: string; label: string }[] }[] = [
-  {
-    title: "Product",
-    links: [
-      { href: "/how-it-works", label: "How It Works" },
-      { href: "/features", label: "Features" },
-      { href: "/pricing", label: "Pricing" },
-      { href: "/migration-audit", label: "Migration Audit" },
-    ],
-  },
-  {
-    title: "Recent Updates",
-    links: [
-      { href: "/features/community", label: "Community & Courses" },
-      { href: "/features/workflows", label: "Workflow Builder" },
-      { href: "/features/social-planner", label: "Social Media Planner" },
-      { href: "/features/ghl-import", label: "GHL Import Wizard" },
-      { href: "/features/missed-call-text-back", label: "Missed Call Text Back" },
-    ],
-  },
-  {
-    title: "Legal",
-    links: [
-      { href: "/privacy", label: "Privacy Policy" },
-      { href: "/terms", label: "Terms of Use" },
-    ],
-  },
+const primary = [
+  { href: "/work/macs-client-zero", label: "Client Zero" },
+  { href: "/#system", label: "System" },
+  { href: "/audit", label: "Start the Vibe Audit" },
+  { href: "/app", label: "Client login / demo" },
+];
+
+const legal = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
 ];
 
 export function Footer() {
   return (
-    <footer className="mx-auto max-w-6xl px-4 py-16">
-      <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4">
-        <div>
-          <MaxxLogoCompact className="mb-3" alt="Maxx Migrations" />
-          <p className="mt-2 text-sm text-muted">
-            Sovereign AI infrastructure for Pacific Northwest nonprofits and
-            social-purpose teams.
-          </p>
-        </div>
-        {columns.map((col) => (
-          <div key={col.title}>
-            <p className="text-sm font-medium text-muted">{col.title}</p>
-            <ul className="mt-3 space-y-2">
-              {col.links.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-sm hover:text-accent">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+    <footer className="border-t border-border py-14 md:py-20">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <div className="grid gap-12 md:grid-cols-[1.3fr_.7fr]">
+          <div>
+            <p className="font-display text-3xl font-semibold tracking-[-0.04em]">MACS Digital Media</p>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-muted">
+              We diagnose digital bottlenecks, build owner-controlled business systems when the evidence justifies them, and keep consequential AI actions under human control.
+            </p>
           </div>
-        ))}
+          <div className="grid grid-cols-2 gap-8">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted">Navigate</p>
+              <ul className="mt-4 space-y-3">
+                {primary.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm hover:text-accent">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted">Legal</p>
+              <ul className="mt-4 space-y-3">
+                {legal.map((link) => (
+                  <li key={link.href}>
+                    <Link href={link.href} className="text-sm hover:text-accent">{link.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="mt-14 border-t border-border pt-6 text-xs leading-5 text-muted">
+          <p>AI may inspect, classify, summarize and propose within authorized scope. Sensitive decisions, financial approvals, destructive actions and final public messaging remain human-controlled unless narrower authority is explicitly approved.</p>
+          <p className="mt-3">© {new Date().getFullYear()} MACS Digital Media.</p>
+        </div>
       </div>
-      <p className="mt-12 text-xs text-muted">
-        AI assists with migration, content, support, and automation.
-        Sensitive decisions, legal approvals, payment approvals, and final
-        public messaging remain under human control.
-      </p>
-      <p className="mt-4 text-xs text-muted">
-        © {new Date().getFullYear()} Maxx Migrations. Not affiliated with or
-        endorsed by GoHighLevel, HubSpot, Twilio, Stripe, or Supabase.
-      </p>
     </footer>
   );
 }
