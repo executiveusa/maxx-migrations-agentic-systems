@@ -90,10 +90,12 @@ export default function HomePage() {
               <figure className="relative overflow-hidden rounded-[2rem] border border-border bg-[#173f35] text-[#f7f3ea] shadow-[0_24px_70px_rgba(20,35,29,0.16)]">
                 <img
                   src={MACS_FOUNDER_DATA_URI}
+                  width={420}
+                  height={560}
                   alt="Stacy and Stavari, the father-and-son team behind MACS Digital Media"
                   className="aspect-[4/5] h-full w-full object-cover"
                 />
-                <figcaption className="absolute inset-x-0 bottom-0 bg-[#102f28]/95 px-6 py-5 backdrop-blur-sm md:px-8">
+                <figcaption className="absolute inset-x-0 bottom-0 bg-[#102f28]/95 px-6 py-5 md:px-8">
                   <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#a9d7c4]">Father + son · Pacific Northwest</p>
                   <p className="mt-2 font-display text-2xl font-semibold tracking-[-0.03em]">Stacy + Stavari</p>
                 </figcaption>
