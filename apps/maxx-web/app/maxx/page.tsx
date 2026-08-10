@@ -38,6 +38,15 @@ const productLanes = [
   },
 ];
 
+const benchmarkRows = [
+  ["Business intake", "Can it turn messy owner language into clean, useful company context?"],
+  ["Tool use", "Can it call the right approved tool and stop when human approval is required?"],
+  ["ICM recall", "Can it work from the company brain without inventing facts that are not there?"],
+  ["Boring work", "Can it reliably handle follow-up, classification, summaries and repeatable office work?"],
+  ["Local operation", "What hardware does it need, how fast is it, and can sensitive work stay on-device?"],
+  ["Real cost", "What does the owner actually pay in hardware, hosting, energy and maintenance?"],
+];
+
 export default function MaxxPage() {
   return (
     <div className="marketing-shell min-h-screen bg-bg text-text">
@@ -142,6 +151,76 @@ export default function MaxxPage() {
                 </Lift>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="bg-[#0f2822] py-20 text-[#f7f3ea] md:py-28">
+          <div className="mx-auto max-w-7xl px-5 md:px-8">
+            <Reveal>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#9fcfbb]">Build in public · Home Team Face-Off 001</p>
+              <h2 className="mt-6 max-w-5xl font-display text-5xl font-semibold leading-[0.94] tracking-[-0.05em] md:text-7xl">
+                Before we go looking everywhere else, we want to see what the home team can actually do.
+              </h2>
+              <p className="mt-7 max-w-3xl text-lg leading-8 text-[#cedbd5]">
+                Our first open-model business test starts with two Pacific Northwest AI families: Microsoft Phi and Ai2 Olmo. No fan club. No benchmark theater. We are testing whether they can do useful work for real businesses inside the MAXX + ICM stack.
+              </p>
+            </Reveal>
+
+            <div className="mt-14 grid gap-6 lg:grid-cols-2">
+              <Reveal>
+                <article className="h-full rounded-[2rem] border border-white/15 bg-white/[0.04] p-7 md:p-10">
+                  <div className="flex items-center justify-between gap-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a9d7c4]">
+                    <span>Redmond</span><span>Candidate A</span>
+                  </div>
+                  <h3 className="mt-6 font-display text-4xl font-semibold tracking-[-0.04em] md:text-5xl">Microsoft Phi</h3>
+                  <p className="mt-5 text-base leading-7 text-[#cedbd5]">
+                    Phi is Microsoft&apos;s open small-language-model family. We are starting with Phi-4-mini through Foundry Local because it is designed for compact local inference, instruction following and function calling without requiring every task to leave the device.
+                  </p>
+                  <a href="https://azure.microsoft.com/en-us/products/phi/" target="_blank" rel="noreferrer" className="mt-7 inline-block border-b border-[#a9d7c4] pb-1 text-sm font-bold">Microsoft Phi source →</a>
+                </article>
+              </Reveal>
+              <Reveal delay={0.06}>
+                <article className="h-full rounded-[2rem] border border-white/15 bg-white/[0.04] p-7 md:p-10">
+                  <div className="flex items-center justify-between gap-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#a9d7c4]">
+                    <span>Seattle</span><span>Candidate B</span>
+                  </div>
+                  <h3 className="mt-6 font-display text-4xl font-semibold tracking-[-0.04em] md:text-5xl">Ai2 Olmo</h3>
+                  <p className="mt-5 text-base leading-7 text-[#cedbd5]">
+                    Olmo is Ai2&apos;s fully open language-model family, with data, code, weights and training details available for inspection. We are starting with an instruct model that can be run locally and evaluated against the same business tasks as Phi.
+                  </p>
+                  <a href="https://allenai.org/olmo" target="_blank" rel="noreferrer" className="mt-7 inline-block border-b border-[#a9d7c4] pb-1 text-sm font-bold">Ai2 Olmo source →</a>
+                </article>
+              </Reveal>
+            </div>
+
+            <Reveal className="mt-12 grid gap-10 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#9fcfbb]">The scorecard</p>
+                <h3 className="mt-5 font-display text-4xl font-semibold leading-[0.98] tracking-[-0.04em] md:text-6xl">Real business work wins.</h3>
+                <p className="mt-6 text-base leading-7 text-[#c7d4ce]">We will publish the wins, the misses and the hardware bill. No winner is declared until the work says so.</p>
+              </div>
+              <div className="border-b border-white/15">
+                {benchmarkRows.map(([title, body], index) => (
+                  <div key={title} className="grid gap-3 border-t border-white/15 py-5 md:grid-cols-[42px_165px_1fr] md:gap-6 md:py-6">
+                    <span className="text-xs text-[#91aa9f]">0{index + 1}</span>
+                    <h4 className="font-display text-xl font-semibold tracking-[-0.025em]">{title}</h4>
+                    <p className="text-sm leading-6 text-[#c7d4ce]">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            <Reveal className="mt-14 rounded-[1.75rem] border border-white/15 p-7 md:p-9">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#9fcfbb]">Why start here?</p>
+              <p className="mt-4 max-w-4xl font-display text-3xl font-semibold leading-tight tracking-[-0.035em] md:text-4xl">
+                Seattle and Redmond already have serious open-AI work happening in our backyard. We want to test it, learn from it and build around what actually helps owners before defaulting to the biggest name on the internet.
+              </p>
+              <div className="mt-7 grid gap-4 text-sm leading-6 text-[#c7d4ce] md:grid-cols-2">
+                <p><strong className="text-white">Ai2:</strong> a Seattle nonprofit working on fully open models plus real-world efforts including wildfire-management tools and open Earth-observation systems.</p>
+                <p><strong className="text-white">Microsoft:</strong> a Washington-rooted company investing locally in nonprofit technology, AI readiness, TechSpark, housing and other community infrastructure.</p>
+              </div>
+              <p className="mt-7 text-xs leading-5 text-[#9eb1a8]">Technology references are not partnership or endorsement claims. If a formal relationship exists later, we will say exactly what it is.</p>
+            </Reveal>
           </div>
         </section>
 
