@@ -4,6 +4,9 @@
   "businessType": {"value":"father-and-son technology partner for nontechnical business owners","confidence":"verified","safeForPublication":true,"source":"owner-approved positioning"},
   "primaryOffer": {"value":"$497 Vibe Audit","confidence":"verified","safeForPublication":true,"source":"current homepage offer"},
   "flagshipOffer": {"value":"MAXX Migrations","confidence":"verified","safeForPublication":true,"source":"owner-approved offer ladder"},
+  "productBrand": {"value":"MAXX","confidence":"verified","safeForPublication":true,"source":"owner decision 2026-08-10"},
+  "freeProduct": {"value":"Agent MAXX — downloadable AI avatar/operator product","confidence":"verified","safeForPublication":true,"source":"owner decision 2026-08-10","availability":"in development; do not claim downloadable until release is verified"},
+  "digitalProductLayer": {"value":"MAXX Products / MAXX Drops — repeatable free and paid one-off agents, starter systems, checklists, templates and operator tools","confidence":"verified","safeForPublication":true,"source":"owner decision 2026-08-10","availability":"product shelf forming; individual offers require separate verification before sale"},
   "primaryAudience": {"value":"nontechnical small-business and nonprofit owners dealing with disconnected tools, subscription sprawl, manual work and AI confusion","confidence":"verified","safeForPublication":true,"source":"owner-approved pain map"},
   "founders": [
     {"name":"Stacy","role":"Founder / nontechnical owner perspective","confidence":"verified","safeForPublication":true,"source":"owner-provided context"},
@@ -12,5 +15,6 @@
   "conversionGoal": {"value":"Start the $497 Vibe Audit","confidence":"verified","safeForPublication":true,"source":"current funnel"},
   "brandPromise": {"value":"Diagnose before prescribing; build only what earns its place; preserve owner control and handoff","confidence":"verified","safeForPublication":true,"source":"locked homepage direction"},
   "contentAudience": {"value":"people trying to solve technical business problems without becoming technical","confidence":"verified","safeForPublication":true,"source":"owner request"},
-  "blogWorkingName": {"value":"Northwest Field Notes","confidence":"proposed","safeForPublication":false,"source":"working editorial concept"}
+  "blogName": {"value":"MAXX Notes","subtitle":"Notes from the Northwest","confidence":"verified","safeForPublication":true,"source":"owner decision 2026-08-10"},
+  "runtimeBrandRule": {"value":"Hermes may power MAXX under the hood but is not the customer-facing product brand","confidence":"verified","safeForPublication":false,"source":"existing MAXX architecture plus current owner direction"}
 }
