@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MainNav } from "@/components/landing/MainNav";
 import { Footer } from "@/components/landing/Footer";
 import { Reveal } from "@/components/landing/MotionPrimitives";
+import { SnoqualmieHeroMedia } from "@/components/landing/SnoqualmieHeroMedia";
 import { MACS_FOUNDER_DATA_URI } from "@/lib/brand-assets";
 
 export const metadata: Metadata = {
@@ -11,11 +12,6 @@ export const metadata: Metadata = {
   description:
     "A Pacific Northwest father-and-son company helping nontechnical owners simplify tools, connect systems, reduce repetitive work and keep control of what they build.",
 };
-
-const SNOQUALMIE_VIDEO =
-  "https://upload.wikimedia.org/wikipedia/commons/transcoded/b/b7/Snoqualmie_Falls_2019-03-01_1063.ogv/Snoqualmie_Falls_2019-03-01_1063.ogv.480p.vp9.webm";
-const SNOQUALMIE_POSTER =
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Snoqualmie_Falls_2019-03-01_1063.ogv/960px--Snoqualmie_Falls_2019-03-01_1063.ogv.jpg";
 
 const pains = [
   "Paying for software you barely use.",
@@ -86,18 +82,7 @@ export default function HomePage() {
       <MainNav />
       <main id="main-content">
         <section className="relative isolate min-h-[78svh] overflow-hidden bg-[#0d1815] text-[#f7f3ea] md:min-h-[84svh]">
-          <video
-            className="absolute inset-0 h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={SNOQUALMIE_POSTER}
-            aria-hidden="true"
-          >
-            <source src={SNOQUALMIE_VIDEO} type="video/webm" />
-          </video>
+          <SnoqualmieHeroMedia />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,20,16,.88)_0%,rgba(7,20,16,.68)_48%,rgba(7,20,16,.25)_100%)]" />
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0d1815]/65 to-transparent" />
 
@@ -127,7 +112,7 @@ export default function HomePage() {
           </p>
         </section>
 
-        <section id="about" className="border-b border-border bg-surface py-18 md:py-24">
+        <section id="about" className="border-b border-border bg-surface py-20 md:py-24">
           <div className="mx-auto grid max-w-7xl gap-10 px-5 md:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:gap-16">
             <Reveal>
               <figure className="relative overflow-hidden rounded-[2rem] bg-[#173f35] text-[#f7f3ea]">
@@ -165,7 +150,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="problems" className="py-18 md:py-24">
+        <section id="problems" className="py-20 md:py-24">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <div className="grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-20">
               <Reveal>
@@ -194,7 +179,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="outcome" className="border-y border-border bg-surface py-18 md:py-24">
+        <section id="outcome" className="border-y border-border bg-surface py-20 md:py-24">
           <Reveal className="mx-auto max-w-7xl px-5 md:px-8">
             <Label>Imagine the opposite</Label>
             <h2 className="mt-5 max-w-5xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.045em] md:text-7xl">
@@ -216,7 +201,7 @@ export default function HomePage() {
           </Reveal>
         </section>
 
-        <section id="system" className="bg-[#102f28] py-18 text-[#f7f3ea] md:py-24">
+        <section id="system" className="bg-[#102f28] py-20 text-[#f7f3ea] md:py-24">
           <div className="mx-auto grid max-w-7xl gap-10 px-5 md:px-8 lg:grid-cols-[.72fr_1.28fr] lg:gap-20">
             <Reveal>
               <Label light>Diagnose first</Label>
@@ -242,7 +227,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section id="work" className="py-18 md:py-24">
+        <section id="work" className="py-20 md:py-24">
           <Reveal className="mx-auto max-w-7xl px-5 md:px-8">
             <Label>Selected work</Label>
             <h2 className="mt-5 max-w-5xl font-display text-5xl font-semibold leading-[0.96] tracking-[-0.045em] md:text-7xl">Look at what changed.</h2>
@@ -274,7 +259,7 @@ export default function HomePage() {
           </Reveal>
         </section>
 
-        <section className="border-y border-border bg-surface py-18 md:py-24">
+        <section className="border-y border-border bg-surface py-20 md:py-24">
           <Reveal className="mx-auto max-w-7xl px-5 md:px-8">
             <Label>The ownership path</Label>
             <div className="mt-5 grid gap-10 lg:grid-cols-[.72fr_1.28fr] lg:gap-16">
@@ -302,7 +287,7 @@ export default function HomePage() {
           </Reveal>
         </section>
 
-        <section id="home-team" className="bg-[#111714] py-18 text-[#f7f3ea] md:py-24">
+        <section id="home-team" className="bg-[#111714] py-20 text-[#f7f3ea] md:py-24">
           <div className="mx-auto grid max-w-7xl gap-10 px-5 md:px-8 lg:grid-cols-[.86fr_1.14fr] lg:items-end lg:gap-16">
             <Reveal>
               <Label light>Build in public · Home Team Face-Off 001</Label>
@@ -323,7 +308,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="flex min-h-[58svh] items-center py-18 md:py-24">
+        <section className="flex min-h-[58svh] items-center py-20 md:py-24">
           <Reveal className="mx-auto w-full max-w-7xl px-5 md:px-8">
             <div className="grid gap-10 lg:grid-cols-[.82fr_1.18fr] lg:items-end lg:gap-20">
               <div>
