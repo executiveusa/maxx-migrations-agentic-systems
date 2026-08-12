@@ -3,11 +3,10 @@ import { MACS_LOGO_DATA_URI } from "@/lib/brand-assets";
 
 const primary = [
   { href: "/maxx", label: "Agent MAXX" },
-  { href: "/blog", label: "MAXX Notes" },
+  { href: "/blog", label: "MAXX Blog" },
   { href: "/work/asc3nd", label: "ASC3ND" },
   { href: "/work/macs-client-zero", label: "Client Zero" },
-  { href: "/audit", label: "Start the Vibe Audit" },
-  { href: "/app", label: "Client login / demo" },
+  { href: "/audit", label: "Diagnose it · $497" },
 ];
 
 const legal = [
@@ -23,7 +22,7 @@ export function Footer() {
           <div>
             <img src={MACS_LOGO_DATA_URI} width={160} height={121} alt="MACS Digital Media" className="h-16 w-auto object-contain" />
             <p className="mt-5 max-w-xl text-sm leading-6 text-muted">
-              MACS is the Pacific Northwest father-and-son company. MAXX is the product family: practical agents, tools, notes and owner-controlled systems designed for people who do not want another technology job.
+              Father + son from the Pacific Northwest. MACS helps nontechnical owners simplify the digital side of the business. MAXX is the product family we build around that work.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-8">
