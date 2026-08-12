@@ -26,7 +26,7 @@ const productLanes = [
   },
   {
     label: "Editorial",
-    title: "MAXX Notes",
+    title: "MAXX Blog",
     state: "Preview live",
     body: "Notes from the Northwest for nontechnical owners dealing with subscriptions, AI, e-commerce, messy systems and the technology work they never wanted to manage.",
   },
@@ -65,7 +65,7 @@ export default function MaxxPage() {
               </p>
               <div className="mt-9 flex flex-wrap gap-4">
                 <span className="rounded-full border border-white/20 px-6 py-3 text-sm font-bold text-[#dbe6e1]">Agent MAXX · Free release coming</span>
-                <Link href="/blog" className="rounded-full bg-[#f7f3ea] px-6 py-3 text-sm font-bold text-[#111714]">Read MAXX Notes</Link>
+                <Link href="/blog" className="rounded-full bg-[#f7f3ea] px-6 py-3 text-sm font-bold text-[#111714]">Read MAXX Blog</Link>
               </div>
             </Reveal>
 
@@ -235,7 +235,7 @@ export default function MaxxPage() {
                 ["MACS Digital Media", "The father-and-son company and trusted human relationship."],
                 ["MAXX", "The product universe customers see and remember."],
                 ["Agent MAXX", "The downloadable AI avatar/operator product."],
-                ["MAXX Notes", "Notes from the Northwest: education, problem-solving and practical technology guidance."],
+                ["MAXX Blog", "Notes from the Northwest: education, problem-solving and practical technology guidance."],
                 ["MAXX Migrations", "The flagship high-value ownership and migration transformation."],
                 ["Hermes", "Runtime infrastructure under the hood—not the customer-facing brand."],
               ].map(([name, body]) => (
