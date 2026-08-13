@@ -20,9 +20,36 @@ Own here:
 - social/research/video job orchestration;
 - APIs used by the public storefront and Agent MAXX.
 
-## Current truth
+## Current database home — explicit owner decision 2026-08-12
 
-The repo is a very large ERPNext-derived codebase with newer MAXX application layers. Client Zero intake/approval/evidence structures exist, but live Supabase tenant-isolation and approval-runtime proof remain release gates.
+For the build/test phase, MAXX uses the connected Supabase project **Botanic Creations** (`cyxdevcjycmffhmwxojh`) as a temporary shared Postgres host, following the same isolated-schema pattern used by the other products in that project.
+
+MAXX owns two schemas there:
+
+- `maxx` — portable business context, projects, workflow state, action proposals, approvals, artifacts, evidence, events, external references and audit records;
+- `maxx_private` — server-only integration bindings and ingress metadata. Store secret references only, never secret values.
+
+The intended later destination is an **owner-controlled server**. Prefer self-hosted Supabase/Postgres for a low-friction move because the current testing schema uses Supabase Auth/RLS primitives. A move to vanilla Postgres is also possible but requires replacing the `auth.users` / `auth.uid()` adapter rather than copying those Supabase-specific references unchanged.
+
+Do not create a second active MAXX database while this temporary home is authoritative. The older repository reference to project `nfhejlqgvghzafrnmpsl` is legacy evidence to reconcile later, not the current build/test target.
+
+## Database proof completed from ChatGPT
+
+On 2026-08-12 the connected Supabase tool successfully:
+
+1. applied `create_maxx_portable_core_v1`;
+2. applied `index_maxx_portable_core_v1`;
+3. seeded `macs-digital-media` + `client-zero`;
+4. created a real `bootstrap.chatgpt_smoke_test` workflow run;
+5. wrote a run step, evidence receipt, event and audit record;
+6. read the same records back successfully;
+7. verified there are no remaining unindexed foreign keys in `maxx` / `maxx_private`.
+
+This proves privileged ChatGPT ↔ database round-trip access. It does **not** yet prove authenticated tenant RLS, public ingress, Agent MAXX auth, or approval-gated execution.
+
+## Security note
+
+All `maxx` business tables have RLS enabled. Supabase's table inspector currently flags RLS as disabled on the two server-only `maxx_private` tables. Direct grants to `public`, `anon` and `authenticated` were revoked, and the schema is intended for service-role/server access only, but the critical RLS advisor must be explicitly resolved before calling the database production-ready. Do not silently add permissive policies.
 
 ## Architecture direction
 
@@ -32,7 +59,9 @@ The durable moat is customer-owned context + workflows + evaluations + approvals
 
 ## Next inspection
 
-1. Map current MAXX-specific code away from inherited ERPNext surface area.
+1. Resolve the `maxx_private` RLS decision explicitly.
 2. Define stable `/v1` contracts for public intake and Agent MAXX.
-3. Create an isolated MAXX schema in the approved Supabase project only after ownership/isolation is explicitly approved.
-4. Prove the Client Zero runtime before expanding autonomous writes.
+3. Add authenticated test users/tenants through the real app auth flow, then prove cross-tenant RLS denial.
+4. Implement and prove exact persisted approval revalidation immediately before consequential execution.
+5. Map current MAXX-specific code away from inherited ERPNext surface area.
+6. Keep migration/export instructions current so `maxx` + `maxx_private` can later move to the owner's server without redesigning the product.
