@@ -1,4 +1,4 @@
-version: 1
+version: 2
 last_inspected: 2026-08-12
 canonical_backend: executiveusa/maxx-migrations-agentic-systems
 core:
@@ -9,11 +9,11 @@ core:
   - repo: executiveusa/maxx-migrations-agentic-systems
     role: sovereign_backend
     status: core
-    next: isolate MAXX domain modules and prove tenant/data/approval/evidence runtime
+    next: compare existing backend modules with the tested control plane in macs-agent-portal, consolidate instead of rebuilding, then prove tenant/data/approval/evidence runtime
   - repo: executiveusa/macs-agent-portal
     role: agent_maxx_interface
-    status: core
-    next: security audit, then connect to backend through tenant-scoped API/context contracts
+    status: core_with_backend_overlap
+    next: audit tracked env risk; preserve portal UX and client SDK; inventory tested control-plane modules for extraction/consolidation into canonical backend
 products:
   - repo: executiveusa/maxx-clipz
     role: short_form_video_factory
