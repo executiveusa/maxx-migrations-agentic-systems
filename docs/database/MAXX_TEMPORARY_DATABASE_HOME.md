@@ -15,7 +15,6 @@ This is a temporary shared Postgres home for development, integration tests and 
 ## Ownership boundary
 
 MAXX may own data only in:
-
 - `maxx.*`
 - `maxx_private.*`
 - its row in `platform.app_registry`
@@ -42,6 +41,7 @@ Do not treat unrelated Botanic Creations schemas as MAXX data. Cross-product joi
 `maxx_private`:
 - integration_bindings
 - ingress_events
+- execution_ledger
 
 ## Secrets rule
 
@@ -63,7 +63,7 @@ MAXX Migrations backend
 maxx + maxx_private
        ^
        |
-       | authenticated versioned MAXX API
+       | JWT-protected MAXX API
        |
 Agent MAXX portal
 ```
@@ -75,65 +75,78 @@ Neither the public site nor Agent MAXX receives the Supabase `service_role` key.
 - `create_maxx_portable_core_v1`
 - `index_maxx_portable_core_v1`
 - `harden_maxx_private_rls_v1`
+- `maxx_agent_authenticated_api_v1`
+- `maxx_agent_service_support_v1`
+- `maxx_release_proof_cleanup_v1`
+- `maxx_execution_ledger_fk_indexes_v1`
 
-A ChatGPT smoke workflow was successfully written and read back after the core/index migrations.
+The source-controlled migration filenames preserve the actual applied Supabase versions.
 
-## Private-schema security decision — resolved
+## Private-schema security
 
-`maxx_private.integration_bindings` and `maxx_private.ingress_events` now have RLS enabled.
+`maxx_private.integration_bindings`, `maxx_private.ingress_events` and `maxx_private.execution_ledger` have RLS enabled.
 
 Current direct-access boundary:
-- `public`: no schema usage / no table access;
-- `anon`: no schema usage / no table access;
-- `authenticated`: no schema usage / no table access;
-- `service_role`: server-side table access retained.
+- `public`: no direct client access;
+- `anon`: no direct client access;
+- `authenticated`: no direct client access;
+- `service_role`: server-side access retained.
 
-No anon/authenticated RLS policies are defined on `maxx_private`. Supabase therefore reports `rls_enabled_no_policy` at INFO. That is intentional for these server-only tables and is not the former critical RLS-disabled condition.
-
-The applied hardening migration is source-controlled at:
-`apps/maxx-web/supabase/migrations/20260813024716_harden_maxx_private_rls_v1.sql`.
+No anon/authenticated RLS policies are defined on the MAXX private tables. Supabase therefore reports `rls_enabled_no_policy` at INFO. That is intentional for server-only tables and is not an RLS-disabled condition.
 
 ## Authenticated tenant-isolation proof
 
-A rollback-only live test was executed against Botanic Creations using two synthetic `auth.users`, two synthetic organizations and one project per organization.
+A rollback-only live test was executed against Botanic Creations using two synthetic authenticated identities, two synthetic organizations and one project per organization.
 
 Verified:
-1. tenant A saw exactly one organization: tenant A;
-2. tenant A could not read tenant B's project;
-3. tenant A's attempted update against tenant B's project affected zero rows;
-4. tenant B saw exactly one organization: tenant B;
-5. tenant B could not read tenant A's project;
-6. tenant B's attempted update against tenant A's project affected zero rows;
-7. the transaction rolled back and follow-up checks confirmed zero synthetic users, organizations or projects remained.
+1. tenant A saw only tenant A;
+2. tenant A could not read or update tenant B's project;
+3. tenant B saw only tenant B;
+4. tenant B could not read or update tenant A's project;
+5. the transaction rolled back and follow-up checks confirmed no synthetic users, organizations or projects remained.
 
-The regression test is source-controlled at:
+Regression test:
 `apps/maxx-web/supabase/tests/maxx_tenant_isolation.sql`.
 
-## Proof boundary
+## Agent MAXX authenticated API proof
 
-The following are now proven in the temporary database:
-- privileged ChatGPT database round trip;
-- business-table RLS enabled;
-- private-table RLS and grant boundary;
-- two-tenant authenticated read/write isolation for organizations/projects.
+Deployed Edge Function: `maxx-agent-api` with JWT verification enabled.
 
-Release gates still required:
+The caller's JWT is validated. Normal reads/proposals/decisions execute through a caller-scoped Supabase client so RLS remains authoritative. The service role is used only inside the server function for the controlled execution primitive and is never returned to the client.
 
-1. public/webhook ingress is validated, rate-bounded and idempotent;
-2. Agent MAXX authenticates through a versioned backend API rather than receiving a service-role key;
-3. proposal has no side effect before approval;
-4. rejection causes zero side effects;
-5. every consequential action revalidates the exact persisted approval/action hash immediately before execution;
-6. repeated approval/execution requests produce one side effect only;
-7. evidence and audit records survive restart;
-8. export/restore to an owner-controlled server is rehearsed.
+A disposable real Supabase Auth identity exercised this path end to end. The proof harness was disabled immediately afterward and its synthetic identity/records were removed.
+
+Verified:
+- unauthenticated API request denied;
+- authenticated snapshot succeeded;
+- rejected proposal produced zero execution rows and zero evidence receipts;
+- approved proposal was bound to the exact persisted action hash;
+- the executor recomputed/revalidated that hash immediately before execution;
+- first approved execution produced one controlled execution;
+- repeated execution returned the same execution id idempotently;
+- approved final counts: one execution row, one evidence receipt, one executed event;
+- proof cleanup left zero synthetic release-proof users, memberships or proposals.
+
+`execute_test_action` is a controlled internal governance proof. It does not prove arbitrary third-party side effects.
+
+## Advisor status
+
+After `maxx_execution_ledger_fk_indexes_v1`, Supabase no longer reports an unindexed foreign key for MAXX `execution_ledger`. New MAXX indexes may appear as `unused_index` INFO while this test database is lightly used; retain them until real workload evidence says otherwise.
+
+Unrelated advisor findings in other Botanic Creations schemas are not MAXX-owned and are not modified by this runbook.
+
+## Remaining release gates
+
+1. wire the actual `macs-agent-portal` business/Hermes lane to `maxx-agent-api`;
+2. prove public/webhook ingress with validation, rate limits and idempotency;
+3. prove real external consequential adapters under the same approval/hash/exactly-once contract;
+4. rehearse export/restore to an owner-controlled server.
 
 ## Later move to MAXX's own server
 
 Preferred low-friction destination: owner-controlled self-hosted Supabase/Postgres, because the current test schema uses Supabase Auth (`auth.users`, `auth.uid()`) and RLS.
 
 Migration procedure should eventually be automated and rehearsed:
-
 1. quiesce writes or establish a cutoff;
 2. export `maxx` + `maxx_private` schema and data;
 3. export required auth identities through an approved identity migration process if moving Supabase Auth;
