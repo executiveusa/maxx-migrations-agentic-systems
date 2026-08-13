@@ -80,7 +80,7 @@ Map it to the MAXX ladder without forcing every capability into a standalone Saa
 Define how the product is discovered: MAXX Blog, build-in-public tests, social clips, local partnerships, community work, referral, direct outreach, free product or premium diagnosis.
 
 ### 09 — GOVERNANCE
-Define read/draft/write/send/publish/spend/delete authority. Consequential actions require persisted approval until explicitly narrowed by proof.
+Define read/draft/write/send/publish/spend/delete/approve/abstain authority before implementation. Proof may justify changing which actions are classified as consequential, but **every action that remains consequential requires an exact persisted approval that is revalidated immediately before execution**. No product score, benchmark result, prior success rate or agent self-assessment may waive that invariant.
 
 ### 10 — HANDOFF
 Update `REPO_REGISTRY.yaml`, the repo's `CONTEXT.md`, evidence, decision and next inspection. A memoryless agent must be able to resume without chat history.
