@@ -8,32 +8,65 @@ Last updated: 2026-08-12
 - Backend/data/process brain: `executiveusa/maxx-migrations-agentic-systems`
 - Agent MAXX interface: `executiveusa/macs-agent-portal`
 
-## Infrastructure observed
+## Temporary database home — approved
 
-- Vercel `macsdigitalmedia` project exists and is separate from MAXX Migrations. A docs-only routing PR triggered the existing build and exposed a TypeScript failure in `lib/managed-content.ts` (`GenericStringError` → `ManagedContentRow` cast). The changed PR file was only `AGENTS.md`, so treat this as pre-existing/public-site build debt to fix in the public repo, not a suite-router regression.
-- Vercel `macs-agent-portal` project exists. During this audit one portal Vercel project check was green while another check reported an account/platform deployment block; do not call the portal production live from that evidence.
-- Vercel MAXX Migrations docs branch built green on both existing MAXX Migrations Vercel projects.
-- Connected Supabase currently exposes only `botanic-creations` in this session. Schemas include multiple isolated product schemas, but no MAXX-specific schema was observed. No database mutation was made during this portfolio pass.
-- The backend repository contains `apps/maxx-web/supabase/migrations/20260101000000_maxx_crm_core.sql`, whose header records a MAXX CRM schema as deployed to project ref `nfhejlqgvghzafrnmpsl` on 2026-07-04. That project is not exposed by the currently connected Supabase session, so its current existence/data/security state is **unverified here**. Reconcile it before creating any replacement MAXX database or schema.
+Owner decision on 2026-08-12: use **Botanic Creations** Supabase (`cyxdevcjycmffhmwxojh`) for the MAXX build/test phase so the system can be exercised directly from ChatGPT and later moved to an owner-controlled server.
 
-## Important codebase discovery
+Current schemas:
+- `maxx` — business/context/workflow/approval/evidence layer;
+- `maxx_private` — server-only ingress/integration metadata.
 
-`macs-agent-portal` already contains substantial tested backend/control-plane work: approvals, feature flags, browser worker, memory, scheduler, Hermes adapter, voice gateway, owner strategy, backup/restore, security hardening, CI and a typed client SDK. Repository history also states that this existing control plane is single-organization, not a proven multi-tenant SaaS backend.
+Applied migrations in Botanic Creations:
+- `create_maxx_portable_core_v1`
+- `index_maxx_portable_core_v1`
+- `harden_maxx_private_rls_v1`
 
-Therefore the core backend phase is **consolidation, not greenfield duplication**. Preserve proof and tests, compare with MAXX Migrations capability-by-capability, then move/wrap the winning implementation behind the canonical backend contract.
+Seeded durable test state:
+- organization: `macs-digital-media`
+- project: `client-zero`
+- completed workflow: `bootstrap.chatgpt_smoke_test`
+- verified step, evidence receipt, event and audit round trip.
 
-## Immediate risks / decisions
+Migration destination: owner-controlled server. Self-hosted Supabase/Postgres is the easiest direct move because current test auth/RLS uses Supabase primitives. Vanilla Postgres remains possible with an auth adapter migration.
 
-1. Do not merge public-site design work into MAXX Migrations. PR #19 was closed unmerged after the boundary correction.
-2. Port approved founder/Snoqualmie concepts into `macsdigitalmedia` later.
-3. Fix the public site's current TypeScript build blocker in its own bounded release slice.
-4. Reconcile public offer/pricing contract before GTM automation: current repo truth includes a $7,500 Washington Founding Launch while recent direction also uses a $497 diagnosis/front door.
-5. Audit the committed `.env` file in public `macs-agent-portal` without exposing contents; rotate any real credentials.
-6. **First reconcile the previously deployed MAXX Supabase project `nfhejlqgvghzafrnmpsl`:** determine ownership, availability, schema/data, RLS and whether any runtime still points to it. Only then decide whether to reuse/migrate it, create an isolated MAXX schema in an approved shared project, or create a dedicated project. Never create a second source of truth by default.
-7. Build the Agent MAXX Portal ↔ MAXX Migrations capability matrix before moving code.
-8. Audit `maxx-craft` and spy-scape against MAXX Migrations for code extraction, not parallel control planes.
-9. Benchmark the social stack end to end: Research → editorial → video → Postiz → metrics.
+The older repository reference to Supabase project `nfhejlqgvghzafrnmpsl` is legacy evidence, not the active build/test target. Do not silently synchronize or merge its data into Botanic Creations.
 
-## Next bounded phase
+## Current database release truth
 
-Inspect the three core repos deeply and produce one connection spec with exact API routes, auth, source-of-truth ownership, migration/consolidation choices and deployment boundaries. No broad implementation until that spec passes review.
+Verified from ChatGPT against Botanic Creations:
+- schema creation and migrations;
+- privileged read/write round trip;
+- RLS enabled on all business-facing `maxx` tables;
+- RLS enabled on both `maxx_private` tables;
+- `public`, `anon` and `authenticated` have no `maxx_private` schema usage or table SELECT privilege;
+- `service_role` retains server-side table access;
+- no remaining unindexed foreign keys in `maxx` / `maxx_private` after the index migration;
+- two authenticated synthetic users were mapped to two synthetic tenants inside a rollback-only transaction;
+- tenant A saw only tenant A and could not read or update tenant B's project;
+- tenant B saw only tenant B and could not read or update tenant A's project;
+- all synthetic auth users, organizations and projects were confirmed absent after rollback.
+
+The Supabase security advisor no longer reports the prior critical RLS-disabled finding for MAXX. It now reports `rls_enabled_no_policy` at INFO for the two `maxx_private` tables; that is intentional because they are server-only and have no client grants or client policies.
+
+Not yet release-proven:
+- public/webhook ingress contract;
+- Agent MAXX authenticated API access;
+- exact persisted approval revalidation immediately before consequential execution;
+- rejection => zero side effects;
+- repeated approval/execution => exactly one side effect;
+- owner-server export/restore rehearsal.
+
+## Other infrastructure observed
+
+- Vercel `macsdigitalmedia` project exists and is separate from MAXX Migrations. A docs-only routing PR exposed an existing TypeScript failure in `lib/managed-content.ts`; this is public-site debt, not a suite-router regression.
+- Vercel `macs-agent-portal` exists. One portal project check was green while another reported an account/platform deployment block; do not call the portal production live from that evidence.
+- `macs-agent-portal` contains substantial tested control-plane work that should be consolidated capability-by-capability into the canonical backend rather than rebuilt.
+
+## Immediate priorities
+
+1. Wire MAXX Migrations to the new `maxx` schemas through versioned backend contracts; never give the public site or Agent MAXX a service-role database key.
+2. Implement and prove public/webhook ingress with bounded server-side validation and idempotency.
+3. Prove proposal → persisted approval → exact hash revalidation → exactly-once consequential execution → evidence, including rejection with zero side effects.
+4. Build the Agent MAXX Portal ↔ MAXX Migrations capability matrix before moving code.
+5. Fix the public MACS website build in its own repo and keep it as a thin storefront/webhook client.
+6. Rehearse exporting/restoring only MAXX-owned schemas/data to an owner-controlled server before declaring sovereignty complete.
