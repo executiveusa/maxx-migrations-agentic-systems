@@ -1,4 +1,4 @@
-version: 2
+version: 3
 last_inspected: 2026-08-12
 canonical_backend: executiveusa/maxx-migrations-agentic-systems
 core:
@@ -17,46 +17,76 @@ core:
 products:
   - repo: executiveusa/maxx-clipz
     role: short_form_video_factory
+    suite_role: PRODUCT
     status: product_candidate
-    disposition: USE
+    engineering_posture: FORK
+    portfolio_action: USE
   - repo: executiveusa/postiz-maxx-clipz
     role: social_distribution_engine
+    suite_role: CAPABILITY
     status: capability_candidate
-    disposition: USE
+    engineering_posture: WRAP
+    portfolio_action: USE
   - repo: executiveusa/MAXX-Research
     role: deep_research_agent
+    suite_role: CAPABILITY
     status: capability_candidate
-    disposition: USE
+    engineering_posture: WRAP
+    portfolio_action: USE
   - repo: executiveusa/Agentic-AIGC-MAXX-EDITS
     role: generative_video_engine
-    status: capability_candidate
-    disposition: STUDY_AND_WRAP
+    suite_role: INCUBATOR
+    status: capability_candidate_pending_benchmark
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
   - repo: executiveusa/MAXX-Video-Agent
     role: video_understand_edit_remake_engine
-    status: capability_candidate
-    disposition: STUDY_AND_WRAP
+    suite_role: INCUBATOR
+    status: capability_candidate_pending_benchmark
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
   - repo: executiveusa/maxx-coze-studio
     role: visual_agent_workflow_studio
+    suite_role: INCUBATOR
     status: internal_tool_candidate
-    disposition: STUDY
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
   - repo: executiveusa/maxx-craft
     role: wordpress_to_next_migration_engine
+    suite_role: LEGACY
     status: overlap_candidate
-    disposition: EXTRACT_AND_MERGE
+    engineering_posture: STUDY_ONLY
+    portfolio_action: MERGE
   - repo: executiveusa/maxxiescraper
     role: mixed_research_scraping_frontend
+    suite_role: INCUBATOR
     status: salvage_audit_required
-    disposition: PARK
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
 legacy_incubator:
   - repo: executiveusa/spy-scape-mustang-maXx
     role: legacy_agent_maxx_smart_site_and_lead_desk
+    suite_role: LEGACY
     status: salvage_source
-    disposition: EXTRACT_AND_MERGE
+    engineering_posture: STUDY_ONLY
+    portfolio_action: MERGE
   - repo: executiveusa/maxxclipz
     role: old_static_maxxclipz_placeholder
+    suite_role: LEGACY
     status: likely_archive
-    disposition: ARCHIVE_AFTER_ASSET_CHECK
+    engineering_posture: DISCARD
+    portfolio_action: ARCHIVE
   - repo: executiveusa/maxx-casino-portal
     role: unrelated_lovable_flowise_experiment
+    suite_role: QUARANTINE
     status: quarantine_non_core
-    disposition: ARCHIVE_OR_SEPARATE_BRAND
+    engineering_posture: DISCARD
+    portfolio_action: ARCHIVE
+platform_capabilities:
+  - name: home_team_model_lab
+    role: local_open_model_evaluation
+    suite_role: CAPABILITY
+    status: active_research
+    engineering_posture: WRAP
+    portfolio_action: USE
+    context: icm/maxx-suite/02_products/home-team-model-lab/CONTEXT.md
