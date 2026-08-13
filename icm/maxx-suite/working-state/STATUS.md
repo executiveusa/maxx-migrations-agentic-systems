@@ -19,8 +19,9 @@ Current schemas:
 Applied migrations in Botanic Creations:
 - `create_maxx_portable_core_v1`
 - `index_maxx_portable_core_v1`
+- `harden_maxx_private_rls_v1`
 
-Seeded test state:
+Seeded durable test state:
 - organization: `macs-digital-media`
 - project: `client-zero`
 - completed workflow: `bootstrap.chatgpt_smoke_test`
@@ -28,27 +29,32 @@ Seeded test state:
 
 Migration destination: owner-controlled server. Self-hosted Supabase/Postgres is the easiest direct move because current test auth/RLS uses Supabase primitives. Vanilla Postgres remains possible with an auth adapter migration.
 
-The older repository reference to Supabase project `nfhejlqgvghzafrnmpsl` is now legacy evidence, not the active build/test target. Do not silently synchronize or merge its data into Botanic Creations.
+The older repository reference to Supabase project `nfhejlqgvghzafrnmpsl` is legacy evidence, not the active build/test target. Do not silently synchronize or merge its data into Botanic Creations.
 
 ## Current database release truth
 
-Verified:
+Verified from ChatGPT against Botanic Creations:
 - schema creation and migrations;
-- ChatGPT privileged read/write round trip;
+- privileged read/write round trip;
 - RLS enabled on all business-facing `maxx` tables;
-- private schema grants revoked from `public`, `anon`, `authenticated`;
+- RLS enabled on both `maxx_private` tables;
+- `public`, `anon` and `authenticated` have no `maxx_private` schema usage or table SELECT privilege;
+- `service_role` retains server-side table access;
 - no remaining unindexed foreign keys in `maxx` / `maxx_private` after the index migration;
-- no MAXX-specific finding appeared in the security-advisor result for the business-facing tables.
+- two authenticated synthetic users were mapped to two synthetic tenants inside a rollback-only transaction;
+- tenant A saw only tenant A and could not read or update tenant B's project;
+- tenant B saw only tenant B and could not read or update tenant A's project;
+- all synthetic auth users, organizations and projects were confirmed absent after rollback.
+
+The Supabase security advisor no longer reports the prior critical RLS-disabled finding for MAXX. It now reports `rls_enabled_no_policy` at INFO for the two `maxx_private` tables; that is intentional because they are server-only and have no client grants or client policies.
 
 Not yet release-proven:
-- authenticated two-tenant RLS denial;
 - public/webhook ingress contract;
 - Agent MAXX authenticated API access;
 - exact persisted approval revalidation immediately before consequential execution;
+- rejection => zero side effects;
+- repeated approval/execution => exactly one side effect;
 - owner-server export/restore rehearsal.
-
-Critical open security decision:
-- Supabase's table inspector flags RLS disabled on `maxx_private.integration_bindings` and `maxx_private.ingress_events`. These are intended service-role-only and direct anon/authenticated grants are already revoked, but the RLS warning must be explicitly resolved before production release.
 
 ## Other infrastructure observed
 
@@ -58,10 +64,9 @@ Critical open security decision:
 
 ## Immediate priorities
 
-1. Resolve the `maxx_private` RLS decision.
-2. Wire MAXX Migrations to the new `maxx` schemas through versioned backend contracts; never give the public site or Agent MAXX a service-role database key.
-3. Prove two authenticated tenants and cross-tenant RLS denial.
-4. Prove proposal → persisted approval → exact hash revalidation → exactly-once consequential execution → evidence.
-5. Build the Agent MAXX Portal ↔ MAXX Migrations capability matrix before moving code.
-6. Fix the public MACS website build in its own repo and keep it as a thin storefront/webhook client.
-7. Maintain an export/restore runbook and rehearse moving only MAXX-owned schemas/data to an owner-controlled server before declaring sovereignty complete.
+1. Wire MAXX Migrations to the new `maxx` schemas through versioned backend contracts; never give the public site or Agent MAXX a service-role database key.
+2. Implement and prove public/webhook ingress with bounded server-side validation and idempotency.
+3. Prove proposal → persisted approval → exact hash revalidation → exactly-once consequential execution → evidence, including rejection with zero side effects.
+4. Build the Agent MAXX Portal ↔ MAXX Migrations capability matrix before moving code.
+5. Fix the public MACS website build in its own repo and keep it as a thin storefront/webhook client.
+6. Rehearse exporting/restoring only MAXX-owned schemas/data to an owner-controlled server before declaring sovereignty complete.
