@@ -14,6 +14,7 @@ Last updated: 2026-08-12
 - Vercel `macs-agent-portal` project exists. During this audit one portal Vercel project check was green while another check reported an account/platform deployment block; do not call the portal production live from that evidence.
 - Vercel MAXX Migrations docs branch built green on both existing MAXX Migrations Vercel projects.
 - Connected Supabase currently exposes only `botanic-creations` in this session. Schemas include multiple isolated product schemas, but no MAXX-specific schema was observed. No database mutation was made during this portfolio pass.
+- The backend repository contains `apps/maxx-web/supabase/migrations/20260101000000_maxx_crm_core.sql`, whose header records a MAXX CRM schema as deployed to project ref `nfhejlqgvghzafrnmpsl` on 2026-07-04. That project is not exposed by the currently connected Supabase session, so its current existence/data/security state is **unverified here**. Reconcile it before creating any replacement MAXX database or schema.
 
 ## Important codebase discovery
 
@@ -28,7 +29,7 @@ Therefore the core backend phase is **consolidation, not greenfield duplication*
 3. Fix the public site's current TypeScript build blocker in its own bounded release slice.
 4. Reconcile public offer/pricing contract before GTM automation: current repo truth includes a $7,500 Washington Founding Launch while recent direction also uses a $497 diagnosis/front door.
 5. Audit the committed `.env` file in public `macs-agent-portal` without exposing contents; rotate any real credentials.
-6. Decide whether MAXX gets its own isolated Supabase schema inside Botanic Creations or a separate project before implementing data contracts.
+6. **First reconcile the previously deployed MAXX Supabase project `nfhejlqgvghzafrnmpsl`:** determine ownership, availability, schema/data, RLS and whether any runtime still points to it. Only then decide whether to reuse/migrate it, create an isolated MAXX schema in an approved shared project, or create a dedicated project. Never create a second source of truth by default.
 7. Build the Agent MAXX Portal ↔ MAXX Migrations capability matrix before moving code.
 8. Audit `maxx-craft` and spy-scape against MAXX Migrations for code extraction, not parallel control planes.
 9. Benchmark the social stack end to end: Research → editorial → video → Postiz → metrics.
