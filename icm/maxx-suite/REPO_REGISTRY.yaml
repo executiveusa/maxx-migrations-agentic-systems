@@ -1,0 +1,92 @@
+version: 3
+last_inspected: 2026-08-12
+canonical_backend: executiveusa/maxx-migrations-agentic-systems
+core:
+  - repo: executiveusa/macsdigitalmedia
+    role: public_storefront
+    status: core
+    next: reconcile current offer/copy and port approved founder-led flow design into this repo only
+  - repo: executiveusa/maxx-migrations-agentic-systems
+    role: sovereign_backend
+    status: core
+    next: compare existing backend modules with the tested control plane in macs-agent-portal, consolidate instead of rebuilding, then prove tenant/data/approval/evidence runtime
+  - repo: executiveusa/macs-agent-portal
+    role: agent_maxx_interface
+    status: core_with_backend_overlap
+    next: audit tracked env risk; preserve portal UX and client SDK; inventory tested control-plane modules for extraction/consolidation into canonical backend
+products:
+  - repo: executiveusa/maxx-clipz
+    role: short_form_video_factory
+    suite_role: PRODUCT
+    status: product_candidate
+    engineering_posture: FORK
+    portfolio_action: USE
+  - repo: executiveusa/postiz-maxx-clipz
+    role: social_distribution_engine
+    suite_role: CAPABILITY
+    status: capability_candidate
+    engineering_posture: WRAP
+    portfolio_action: USE
+  - repo: executiveusa/MAXX-Research
+    role: deep_research_agent
+    suite_role: CAPABILITY
+    status: capability_candidate
+    engineering_posture: WRAP
+    portfolio_action: USE
+  - repo: executiveusa/Agentic-AIGC-MAXX-EDITS
+    role: generative_video_engine
+    suite_role: INCUBATOR
+    status: capability_candidate_pending_benchmark
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
+  - repo: executiveusa/MAXX-Video-Agent
+    role: video_understand_edit_remake_engine
+    suite_role: INCUBATOR
+    status: capability_candidate_pending_benchmark
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
+  - repo: executiveusa/maxx-coze-studio
+    role: visual_agent_workflow_studio
+    suite_role: INCUBATOR
+    status: internal_tool_candidate
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
+  - repo: executiveusa/maxx-craft
+    role: wordpress_to_next_migration_engine
+    suite_role: LEGACY
+    status: overlap_candidate
+    engineering_posture: STUDY_ONLY
+    portfolio_action: MERGE
+  - repo: executiveusa/maxxiescraper
+    role: mixed_research_scraping_frontend
+    suite_role: INCUBATOR
+    status: salvage_audit_required
+    engineering_posture: STUDY_ONLY
+    portfolio_action: PARK
+legacy_incubator:
+  - repo: executiveusa/spy-scape-mustang-maXx
+    role: legacy_agent_maxx_smart_site_and_lead_desk
+    suite_role: LEGACY
+    status: salvage_source
+    engineering_posture: STUDY_ONLY
+    portfolio_action: MERGE
+  - repo: executiveusa/maxxclipz
+    role: old_static_maxxclipz_placeholder
+    suite_role: LEGACY
+    status: likely_archive
+    engineering_posture: DISCARD
+    portfolio_action: ARCHIVE
+  - repo: executiveusa/maxx-casino-portal
+    role: unrelated_lovable_flowise_experiment
+    suite_role: QUARANTINE
+    status: quarantine_non_core
+    engineering_posture: DISCARD
+    portfolio_action: ARCHIVE
+platform_capabilities:
+  - name: home_team_model_lab
+    role: local_open_model_evaluation
+    suite_role: CAPABILITY
+    status: active_research
+    engineering_posture: WRAP
+    portfolio_action: USE
+    context: icm/maxx-suite/02_products/home-team-model-lab/CONTEXT.md

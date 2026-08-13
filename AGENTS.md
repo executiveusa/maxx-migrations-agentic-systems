@@ -28,7 +28,12 @@ Inspect before changing. Reuse before adding. Specify before building. Make one 
 
 - Public storefront: executiveusa/macsdigitalmedia
 - Private ICM/execution brain: this repository
+- Agent MAXX interface: executiveusa/macs-agent-portal
 - Do not create another competing MAXX control plane without an explicit architecture decision.
+
+## MAXX suite / product routing
+
+When evaluating a MAXX product, repository, model, workflow, integration, major feature, partnership idea, salvage/merge decision, or other high-level product strategy, load `icm/maxx-suite/00_router/CONTEXT.md` and then only the smallest relevant context folder. New product/idea/workflow decisions must pass `icm/maxx-suite/04_product-pipeline/SKILL.md` before build work. Do not autoload the entire suite catalog.
 
 ## Immediate safety invariant
 
