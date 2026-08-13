@@ -1,0 +1,62 @@
+version: 1
+last_inspected: 2026-08-12
+canonical_backend: executiveusa/maxx-migrations-agentic-systems
+core:
+  - repo: executiveusa/macsdigitalmedia
+    role: public_storefront
+    status: core
+    next: reconcile current offer/copy and port approved founder-led flow design into this repo only
+  - repo: executiveusa/maxx-migrations-agentic-systems
+    role: sovereign_backend
+    status: core
+    next: isolate MAXX domain modules and prove tenant/data/approval/evidence runtime
+  - repo: executiveusa/macs-agent-portal
+    role: agent_maxx_interface
+    status: core
+    next: security audit, then connect to backend through tenant-scoped API/context contracts
+products:
+  - repo: executiveusa/maxx-clipz
+    role: short_form_video_factory
+    status: product_candidate
+    disposition: USE
+  - repo: executiveusa/postiz-maxx-clipz
+    role: social_distribution_engine
+    status: capability_candidate
+    disposition: USE
+  - repo: executiveusa/MAXX-Research
+    role: deep_research_agent
+    status: capability_candidate
+    disposition: USE
+  - repo: executiveusa/Agentic-AIGC-MAXX-EDITS
+    role: generative_video_engine
+    status: capability_candidate
+    disposition: STUDY_AND_WRAP
+  - repo: executiveusa/MAXX-Video-Agent
+    role: video_understand_edit_remake_engine
+    status: capability_candidate
+    disposition: STUDY_AND_WRAP
+  - repo: executiveusa/maxx-coze-studio
+    role: visual_agent_workflow_studio
+    status: internal_tool_candidate
+    disposition: STUDY
+  - repo: executiveusa/maxx-craft
+    role: wordpress_to_next_migration_engine
+    status: overlap_candidate
+    disposition: EXTRACT_AND_MERGE
+  - repo: executiveusa/maxxiescraper
+    role: mixed_research_scraping_frontend
+    status: salvage_audit_required
+    disposition: PARK
+legacy_incubator:
+  - repo: executiveusa/spy-scape-mustang-maXx
+    role: legacy_agent_maxx_smart_site_and_lead_desk
+    status: salvage_source
+    disposition: EXTRACT_AND_MERGE
+  - repo: executiveusa/maxxclipz
+    role: old_static_maxxclipz_placeholder
+    status: likely_archive
+    disposition: ARCHIVE_AFTER_ASSET_CHECK
+  - repo: executiveusa/maxx-casino-portal
+    role: unrelated_lovable_flowise_experiment
+    status: quarantine_non_core
+    disposition: ARCHIVE_OR_SEPARATE_BRAND
