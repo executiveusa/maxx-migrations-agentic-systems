@@ -36,11 +36,20 @@ Repo: `macs-agent-portal`
 Outcome: determine whether tracked `.env` content is placeholder or exposed credential material without copying values into ICM/chat.
 Decision: rotate/remove/history remediation if real secrets exist.
 
-### 4. MAXX data boundary
+### 4. Reconcile the existing MAXX data boundary
 System: Supabase / backend
-Outcome: choose an owner-controlled, isolated data boundary.
-Current evidence: connected `botanic-creations` has many isolated schemas but no observed MAXX schema.
-Decision: isolated MAXX schema in approved shared project vs. dedicated project. Then design RLS/tenant tests before migration.
+Outcome: establish the real current source of truth before creating or migrating anything.
+Current evidence:
+- connected `botanic-creations` has many isolated schemas but no observed MAXX schema;
+- backend migration `apps/maxx-web/supabase/migrations/20260101000000_maxx_crm_core.sql` records the `maxx_` CRM schema as deployed to project ref `nfhejlqgvghzafrnmpsl` on 2026-07-04;
+- that project is not available through the currently connected Supabase session, so its current state is unverified.
+Inspect:
+- project ownership/access and whether it still exists;
+- schema/migration drift;
+- actual data and active runtime references;
+- RLS/tenant semantics and credentials;
+- export/backup path.
+Decision: `REUSE | MIGRATE | RETIRE` the existing MAXX database. Only after that decision may an agent propose an isolated shared schema or dedicated replacement project. Never create a second source of truth by default.
 
 ## P1 — Revenue and distribution engine
 
