@@ -74,42 +74,59 @@ Neither the public site nor Agent MAXX receives the Supabase `service_role` key.
 
 - `create_maxx_portable_core_v1`
 - `index_maxx_portable_core_v1`
+- `harden_maxx_private_rls_v1`
 
-A ChatGPT smoke workflow was successfully written and read back after these migrations.
+A ChatGPT smoke workflow was successfully written and read back after the core/index migrations.
+
+## Private-schema security decision — resolved
+
+`maxx_private.integration_bindings` and `maxx_private.ingress_events` now have RLS enabled.
+
+Current direct-access boundary:
+- `public`: no schema usage / no table access;
+- `anon`: no schema usage / no table access;
+- `authenticated`: no schema usage / no table access;
+- `service_role`: server-side table access retained.
+
+No anon/authenticated RLS policies are defined on `maxx_private`. Supabase therefore reports `rls_enabled_no_policy` at INFO. That is intentional for these server-only tables and is not the former critical RLS-disabled condition.
+
+The applied hardening migration is source-controlled at:
+`apps/maxx-web/supabase/migrations/20260813024716_harden_maxx_private_rls_v1.sql`.
+
+## Authenticated tenant-isolation proof
+
+A rollback-only live test was executed against Botanic Creations using two synthetic `auth.users`, two synthetic organizations and one project per organization.
+
+Verified:
+1. tenant A saw exactly one organization: tenant A;
+2. tenant A could not read tenant B's project;
+3. tenant A's attempted update against tenant B's project affected zero rows;
+4. tenant B saw exactly one organization: tenant B;
+5. tenant B could not read tenant A's project;
+6. tenant B's attempted update against tenant A's project affected zero rows;
+7. the transaction rolled back and follow-up checks confirmed zero synthetic users, organizations or projects remained.
+
+The regression test is source-controlled at:
+`apps/maxx-web/supabase/tests/maxx_tenant_isolation.sql`.
 
 ## Proof boundary
 
-The connector smoke test proves privileged database round-trip only. It does not prove end-user RLS or consequential-action execution safety.
+The following are now proven in the temporary database:
+- privileged ChatGPT database round trip;
+- business-table RLS enabled;
+- private-table RLS and grant boundary;
+- two-tenant authenticated read/write isolation for organizations/projects.
 
 Release gates still required:
 
-1. authenticated user A belongs to tenant A;
-2. authenticated user B belongs to tenant B;
-3. A cannot read/write B and B cannot read/write A;
-4. proposal has no side effect before approval;
-5. rejection causes zero side effects;
-6. every consequential action revalidates the exact persisted approval/action hash immediately before execution;
-7. a repeated approval/execution request produces one side effect only;
-8. evidence and audit records survive restart;
-9. export/restore to an owner-controlled server is rehearsed.
-
-## Open `maxx_private` RLS decision
-
-Supabase's table inspector flags RLS disabled on:
-
-- `maxx_private.integration_bindings`
-- `maxx_private.ingress_events`
-
-Direct access for `public`, `anon` and `authenticated` has already been revoked and these tables are intended to be service-role/server-only. However, Supabase still classifies disabled RLS as critical.
-
-Pending explicit approval, the remediation proposed by the Supabase inspector is:
-
-```sql
-ALTER TABLE maxx_private.integration_bindings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE maxx_private.ingress_events ENABLE ROW LEVEL SECURITY;
-```
-
-If enabled with no client policies, direct anon/authenticated access remains blocked; server/service-role behavior must be tested before release. Do not add permissive browser policies to these tables.
+1. public/webhook ingress is validated, rate-bounded and idempotent;
+2. Agent MAXX authenticates through a versioned backend API rather than receiving a service-role key;
+3. proposal has no side effect before approval;
+4. rejection causes zero side effects;
+5. every consequential action revalidates the exact persisted approval/action hash immediately before execution;
+6. repeated approval/execution requests produce one side effect only;
+7. evidence and audit records survive restart;
+8. export/restore to an owner-controlled server is rehearsed.
 
 ## Later move to MAXX's own server
 
