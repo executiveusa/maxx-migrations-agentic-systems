@@ -3,12 +3,12 @@ import type { ReactNode } from "react";
 import { AppShell } from "@/components/app-shell/AppShell";
 import { ToastProvider } from "@/components/ui/Toast";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    default: "Maxx CRM",
-    template: "%s — Maxx CRM",
+    default: "Revenue Capture OS",
+    template: "%s — Revenue Capture OS",
   },
 };
 
