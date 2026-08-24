@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
-import { MissedCallSnapshot } from "@/components/dashboard/MissedCallSnapshot";
 
 export const metadata: Metadata = { title: "Inbox" };
 
@@ -20,26 +19,24 @@ export default function InboxPage() {
         <Card>
           <CardHeader
             title="One inbox, not five apps"
-            description="Web, SMS, WhatsApp, email, and phone should converge here as each channel is connected. Unconnected channels stay clearly marked instead of pretending to be live."
+            description="Web, SMS, WhatsApp, email, and phone converge here as each channel is actually connected. Unconnected channels stay clearly marked instead of pretending to be live."
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <Channel label="Web" state="Ready for intake" />
-            <Channel label="SMS" state="Via configured provider" />
-            <Channel label="WhatsApp" state="Connect when needed" />
-            <Channel label="Email" state="Connect when needed" />
-            <Channel label="Phone" state="Missed-call recovery available" />
+            <Channel label="Web" state="Intake supported" />
+            <Channel label="SMS" state="Provider connection required" />
+            <Channel label="WhatsApp" state="Not assumed connected" />
+            <Channel label="Email" state="Not assumed connected" />
+            <Channel label="Phone" state="Voice/recovery routes available" />
           </div>
         </Card>
-
-        <MissedCallSnapshot />
 
         <Card>
           <CardHeader
             title="Popebot handles the complexity"
-            description="The owner can ask who needs a reply, which conversations are tied to high-value opportunities, or what can be followed up automatically."
+            description="Ask who needs a reply, which conversations are tied to high-value opportunities, or what can be followed up automatically."
           />
           <p className="text-sm text-muted">
-            Consequential sends and actions remain behind the existing MAXX approval boundary. Routine approved workflows can be automated without turning the owner into middleware.
+            This surface does not manufacture a fake unified message feed before the channel adapters are wired. Consequential sends remain behind the MAXX approval boundary; routine approved workflows can run without turning the owner into middleware.
           </p>
         </Card>
       </div>
