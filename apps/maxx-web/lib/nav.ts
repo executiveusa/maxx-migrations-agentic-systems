@@ -4,12 +4,24 @@ export interface NavItem {
   icon: string;
 }
 
+/**
+ * Client navigation is intentionally small. Advanced capabilities remain
+ * available through Popebot, deep links, and the operator/admin surfaces.
+ * A business owner should not need to understand MAXX internals to get value.
+ */
 export const appNavItems: NavItem[] = [
-  { href: "/app", label: "Dashboard", icon: "grid" },
+  { href: "/app", label: "Home", icon: "grid" },
+  { href: "/app/revenue", label: "Money", icon: "chart" },
+  { href: "/app/pipeline", label: "Pipeline", icon: "kanban" },
+  { href: "/app/inbox", label: "Inbox", icon: "inbox" },
+  { href: "/app/settings", label: "Settings", icon: "settings" },
+];
+
+/** Operator routes are deliberately separate from the client navigation. */
+export const operatorNavItems: NavItem[] = [
   { href: "/app/command-center", label: "Mission Control", icon: "grid" },
   { href: "/app/projects", label: "Projects", icon: "kanban" },
   { href: "/app/contacts", label: "Contacts", icon: "users" },
-  { href: "/app/pipeline", label: "Pipeline", icon: "kanban" },
   { href: "/app/forms", label: "Forms", icon: "form" },
   { href: "/app/workflows", label: "Workflows", icon: "workflow" },
   { href: "/app/community", label: "Community", icon: "community" },
@@ -18,7 +30,6 @@ export const appNavItems: NavItem[] = [
   { href: "/app/missed-calls", label: "Missed Calls", icon: "phone" },
   { href: "/app/migrations", label: "Migrations", icon: "globe" },
   { href: "/app/agents", label: "AI Agents", icon: "agent" },
-  { href: "/app/settings", label: "Settings", icon: "settings" },
 ];
 
 export const publicNavItems: NavItem[] = [
