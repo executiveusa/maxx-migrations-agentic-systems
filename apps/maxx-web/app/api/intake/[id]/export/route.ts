@@ -3,9 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { id: string } };
+type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, { params }: Params) {
+  const { id } = await params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,7 +18,7 @@ export async function GET(_request: Request, { params }: Params) {
   }
 
   const { data, error } = await supabase.rpc("maxx_export_intake_context", {
-    p_submission_id: params.id,
+    p_submission_id: id,
   });
 
   if (error) {
@@ -33,7 +34,7 @@ export async function GET(_request: Request, { params }: Params) {
     status: 200,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      "Content-Disposition": `attachment; filename="maxx-intake-${params.id}.json"`,
+      "Content-Disposition": `attachment; filename="maxx-intake-${id}.json"`,
       "Cache-Control": "no-store",
     },
   });
