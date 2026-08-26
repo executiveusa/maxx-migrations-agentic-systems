@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   verify:
-    name: lint · typecheck · unit · build
+    name: lint · typecheck · unit · audit · build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -50,6 +50,9 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Production build
         run: npm run build
