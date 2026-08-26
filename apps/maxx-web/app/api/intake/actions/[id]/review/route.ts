@@ -3,9 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { id: string } };
+type Params = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   let body: unknown;
   try {
     body = await request.json();
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   const { data, error } = await supabase.rpc("maxx_review_action_proposal", {
-    p_proposal_id: params.id,
+    p_proposal_id: id,
     p_decision: decision,
   });
 
