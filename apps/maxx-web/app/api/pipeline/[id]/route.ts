@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { opportunitySchema } from "@/lib/validation/opportunity";
 import { getStore } from "@/lib/data/store";
 import { isSeedMode } from "@/lib/data/mode";
 import { getCurrentOrgId, getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
@@ -37,7 +36,6 @@ function mapOpportunityRow(row: {
   };
 }
 
-/** Partial opportunity schema for PATCH requests — stageId required for moves, others optional. */
 const patchOpportunitySchema = z.object({
   stageId: z.string().min(1, "Stage is required to move this deal."),
   title: z.string().min(2, "Give this opportunity a name.").optional(),
@@ -46,17 +44,16 @@ const patchOpportunitySchema = z.object({
   pipelineId: z.string().min(1).optional(),
 });
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+type RouteContext = { params: Promise<{ id: string }> };
+
+export async function PATCH(request: NextRequest, { params }: RouteContext) {
+  const { id } = await params;
   const body = await request.json();
   const parsed = patchOpportunitySchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid opportunity data." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -90,7 +87,6 @@ export async function PATCH(
     const supabase = getSupabaseClient();
     const orgId = getCurrentOrgId();
 
-    // Build update object with snake_case keys
     const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (parsed.data.stageId !== undefined) updateData.stage_id = parsed.data.stageId;
     if (parsed.data.title !== undefined) updateData.title = parsed.data.title;
@@ -117,11 +113,8 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function DELETE(_request: NextRequest, { params }: RouteContext) {
+  const { id } = await params;
 
   if (isSeedMode()) {
     const store = getStore();
