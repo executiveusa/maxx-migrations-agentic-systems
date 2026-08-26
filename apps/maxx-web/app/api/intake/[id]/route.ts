@@ -3,9 +3,10 @@ import { getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-clie
 
 export const dynamic = "force-dynamic";
 
-type Params = { params: { id: string } };
+type Params = { params: Promise<{ id: string }> };
 
 export async function GET(request: NextRequest, { params }: Params) {
+  const { id } = await params;
   const receiptToken = request.nextUrl.searchParams.get("receipt");
   if (!receiptToken) {
     return NextResponse.json({ error: "receipt is required." }, { status: 400 });
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const { data: submission, error } = await supabase
       .from("maxx_intake_submissions")
       .select("id, status, receipt_token, created_at, updated_at")
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("receipt_token", receiptToken)
       .single();
 
