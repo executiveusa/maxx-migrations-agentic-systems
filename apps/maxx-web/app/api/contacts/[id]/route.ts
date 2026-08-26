@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { contactSchema } from "@/lib/validation/contact";
 import { getStore } from "@/lib/data/store";
 import { isSeedMode } from "@/lib/data/mode";
@@ -40,17 +39,16 @@ function mapContactRow(row: {
 /** Partial contact schema for PATCH requests — all fields optional. */
 const partialContactSchema = contactSchema.partial();
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+type RouteContext = { params: Promise<{ id: string }> };
+
+export async function PATCH(request: NextRequest, { params }: RouteContext) {
+  const { id } = await params;
   const body = await request.json();
   const parsed = partialContactSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid contact data." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -86,7 +84,6 @@ export async function PATCH(
     const supabase = getSupabaseClient();
     const orgId = getCurrentOrgId();
 
-    // Build update object with snake_case keys only from provided fields
     const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (parsed.data.firstName !== undefined) updateData.first_name = parsed.data.firstName;
     if (parsed.data.lastName !== undefined) updateData.last_name = parsed.data.lastName;
@@ -107,9 +104,7 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: supabaseErrorStatus(error) });
     }
 
-    // Handle tag updates if provided
     if (parsed.data.tags !== undefined) {
-      // Delete existing tags
       const { error: deleteError } = await supabase
         .from("maxx_contact_tags")
         .delete()
@@ -118,7 +113,6 @@ export async function PATCH(
         return NextResponse.json({ error: deleteError.message }, { status: supabaseErrorStatus(deleteError) });
       }
 
-      // Insert new tags
       if (parsed.data.tags.length > 0) {
         const { error: insertError } = await supabase
           .from("maxx_contact_tags")
@@ -136,11 +130,8 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function DELETE(_request: NextRequest, { params }: RouteContext) {
+  const { id } = await params;
 
   if (isSeedMode()) {
     const store = getStore();
