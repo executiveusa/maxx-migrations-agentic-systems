@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-08-10",
+  "scope": "MACS public marketing funnel and Stage 00 intake entry",
+  "framework": "Next.js 14 App Router",
+  "styling": "Tailwind CSS with CSS-variable brand tokens",
+  "public_home_entry": "apps/maxx-web/app/page.tsx",
+  "public_navigation": "apps/maxx-web/components/landing/MainNav.tsx",
+  "public_footer": "apps/maxx-web/components/landing/Footer.tsx",
+  "intake_surfaces": [
+    "apps/maxx-web/app/audit/page.tsx",
+    "apps/maxx-web/public/intake/index.html"
+  ],
+  "intake_backend": [
+    "apps/maxx-web/app/api/intake/route.ts",
+    "apps/maxx-web/app/api/intake/receipt/[token]/route.ts"
+  ],
+  "operator_surface": "apps/maxx-web/app/app/client-zero/page.tsx",
+  "client_zero_schema": "apps/maxx-web/supabase/migrations/20260810014500_client_zero_intake.sql",
+  "design_system_truth": {
+    "display_font": "Cormorant Garamond",
+    "body_font": "DM Sans",
+    "existing_accent": "green",
+    "authenticated_app_theme": "dark",
+    "marketing_theme_scope": "marketing-shell overrides only; /app remains on existing tokens"
+  },
+  "brownfield_findings": {
+    "old_homepage_section_count": 15,
+    "old_primary_nav_choices": ["How It Works", "Features", "Pricing", "App", "Migration Audit"],
+    "old_pricing_choices_before_diagnosis": 3,
+    "known_sticky_header_issue": "A prior merged UX audit removed backdrop blur from sticky public navigation because of ghosting/compositing behavior. New Look preserves the solid header behavior.",
+    "live_supabase_client_zero_proof": "not complete; do not market as complete"
+  },
+  "preserve": [
+    "authenticated /app functionality",
+    "legacy feature routes",
+    "legacy pricing/how-it-works routes",
+    "Stage 00 116-question intake",
+    "Client Zero approval/evidence code",
+    "privacy and terms routes"
+  ]
+}

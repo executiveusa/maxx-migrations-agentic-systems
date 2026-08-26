@@ -1,0 +1,84 @@
+{
+  "generated_at": "2026-08-10",
+  "capabilities": [
+    {
+      "capability_id": "start-vibe-audit",
+      "domain_object": "audit_intake",
+      "user_outcome": "Start diagnosis from one plain-language business bottleneck",
+      "backend_operation": "client-side route to /audit, then Stage 00 local context handoff",
+      "required_inputs": ["bottleneck"],
+      "permissions": ["public"],
+      "side_effect": false,
+      "reversible": true,
+      "human_gate": "none",
+      "ui_surface": "homepage command field and /audit guided pre-intake",
+      "classification": "CHAT-CALLABLE",
+      "evidence": [
+        "apps/maxx-web/components/landing/new-look/AuditCommand.tsx",
+        "apps/maxx-web/app/audit/page.tsx"
+      ]
+    },
+    {
+      "capability_id": "continue-stage00-intake",
+      "domain_object": "company_brain",
+      "user_outcome": "Continue the full business intake without re-entering the first decisions",
+      "backend_operation": "existing /intake/ Stage 00 intake surface",
+      "required_inputs": ["company_name", "bottleneck", "outcome_90"],
+      "permissions": ["public entry; production persistence subject to configured runtime"],
+      "side_effect": true,
+      "reversible": true,
+      "human_gate": "client submits the intake",
+      "ui_surface": "/intake/",
+      "classification": "CHAT + SUPPORTING VIEW",
+      "evidence": [
+        "apps/maxx-web/public/intake/index.html",
+        "apps/maxx-web/app/api/intake/route.ts"
+      ]
+    },
+    {
+      "capability_id": "check-intake-receipt",
+      "domain_object": "evidence_receipt",
+      "user_outcome": "Check proof state without exposing the private intake payload",
+      "backend_operation": "GET /api/intake/receipt/[token]",
+      "required_inputs": ["receipt_token"],
+      "permissions": ["receipt holder"],
+      "side_effect": false,
+      "reversible": true,
+      "human_gate": "none",
+      "ui_surface": "Stage 00 receipt check",
+      "classification": "CHAT + SUPPORTING VIEW",
+      "evidence": ["apps/maxx-web/app/api/intake/receipt/[token]/route.ts"]
+    },
+    {
+      "capability_id": "review-client-zero-action",
+      "domain_object": "action_proposal",
+      "user_outcome": "Approve or reject a consequential proposed action",
+      "backend_operation": "authenticated proposal review RPC",
+      "required_inputs": ["proposal_id", "decision"],
+      "permissions": ["owner", "operator", "reviewer"],
+      "side_effect": true,
+      "reversible": "bounded test action only; rollback contract exists",
+      "human_gate": "required",
+      "ui_surface": "/app/client-zero",
+      "classification": "HUMAN-APPROVAL REQUIRED",
+      "evidence": [
+        "apps/maxx-web/app/app/client-zero/page.tsx",
+        "apps/maxx-web/supabase/migrations/20260810014500_client_zero_intake.sql"
+      ]
+    },
+    {
+      "capability_id": "export-client-context",
+      "domain_object": "icm_export",
+      "user_outcome": "Export the client company-brain and evidence bundle",
+      "backend_operation": "authorized export RPC / route",
+      "required_inputs": ["authorized tenant membership"],
+      "permissions": ["authorized operator"],
+      "side_effect": false,
+      "reversible": true,
+      "human_gate": "authenticated access",
+      "ui_surface": "Client Zero operator surface",
+      "classification": "ADMIN ONLY",
+      "evidence": ["apps/maxx-web/supabase/migrations/20260810014500_client_zero_intake.sql"]
+    }
+  ]
+}
