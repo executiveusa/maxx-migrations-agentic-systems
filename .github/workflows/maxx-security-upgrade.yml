@@ -1,0 +1,46 @@
+name: MAXX Security Upgrade
+
+on:
+  push:
+    branches:
+      - chore/maxx-security-audit
+    paths:
+      - ".github/workflows/maxx-security-upgrade.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout security branch
+        uses: actions/checkout@v6
+        with:
+          ref: chore/maxx-security-audit
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/maxx-web/package-lock.json
+
+      - name: Upgrade secured runtime and lint stack
+        working-directory: apps/maxx-web
+        run: |
+          npm install next@16.3.3 react@19.2.8 react-dom@19.2.8
+          npm install --save-dev eslint@latest eslint-config-next@16.3.3 @types/react@latest @types/react-dom@latest postcss@latest
+          npm audit fix
+
+      - name: Commit generated package metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/maxx-web/package.json apps/maxx-web/package-lock.json
+          if git diff --cached --quiet; then
+            echo "No dependency metadata changes to commit."
+          else
+            git commit -m "fix(maxx-web): upgrade vulnerable runtime dependencies"
+            git push origin HEAD:chore/maxx-security-audit
+          fi
