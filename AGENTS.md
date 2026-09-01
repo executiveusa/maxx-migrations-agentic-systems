@@ -35,6 +35,10 @@ Inspect before changing. Reuse before adding. Specify before building. Make one 
 
 When evaluating a MAXX product, repository, model, workflow, integration, major feature, partnership idea, salvage/merge decision, or other high-level product strategy, load `icm/maxx-suite/00_router/CONTEXT.md` and then only the smallest relevant context folder. New product/idea/workflow decisions must pass `icm/maxx-suite/04_product-pipeline/SKILL.md` before build work. Do not autoload the entire suite catalog.
 
+## Site transformation routing
+
+When asked to audit, reposition, redesign, rebuild, improve, migrate, or relaunch a website, load `icm/site-transformation-protocol/00_router/CONTEXT.md`. A write-capable agent must pass `icm/site-transformation-protocol/WALK_TEST.md` before transformation work. Client-specific truth and phase state live under `icm/clients/<client>/`; do not copy the canonical protocol into each client and let it drift.
+
 ## Immediate safety invariant
 
 A consequential tool call may be proposed before approval but must not execute until a persisted approval matching the exact action is revalidated immediately before execution.
