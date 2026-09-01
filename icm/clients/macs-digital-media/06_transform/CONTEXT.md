@@ -12,8 +12,8 @@ Quality bar: live `wearecollins.com` for structural discipline, restraint, proof
 - ARCHITECT — six-beat homepage, sitemap, CTA direction, and page-template starting architecture are approved in `WIREFRAME.md`.
 - PROVE — minimum Phase 04 gate PASSED in `ASSET_MANIFEST.md`; unsupported claims remain prohibited.
 - WALK TEST — corrected self-routing test PASSED in `WALK_TEST_RESULT.md` after literal path-resolution verification.
-- DESIGN — IN PROGRESS. A Phase 05 visual prototype/system exists on the public repo rebuild branch and must be reviewed/approved before it can authorize Phase 06.
-- BUILD — BLOCKED. The current public rebuild branch is classified as a design prototype until the Phase 05 human/authority check is recorded.
+- DESIGN — ACTIVE / OWNER AUTHORIZED. `DESIGN_GATE.md` records permission to enter Phase 05, create three divergent territories, design tokens, art sources, and high-fidelity prototypes. Final territory selection is still required before broad Phase 06 implementation.
+- BUILD — BROAD IMPLEMENTATION BLOCKED until one Phase 05 territory is selected/approved. Prototype work on a non-production branch is permitted by `DESIGN_GATE.md`.
 - GAUNTLET — not started; client viewports live in `GAUNTLET_CONFIG.md`.
 - LEARN — not started.
 
@@ -25,16 +25,21 @@ Quality bar: live `wearecollins.com` for structural discipline, restraint, proof
 - `EVIDENCE.md`
 - `ASSET_MANIFEST.md`
 - `WALK_TEST_RESULT.md`
+- `DESIGN_GATE.md`
 - `GAUNTLET_CONFIG.md`
+- `../../../site-transformation-protocol/05_design/DESIGN_DOCTRINE.md`
 - MACS public repository current state
-- uploaded/live COLLINS research audit
+- owner-supplied COLLINS-level website design protocol
+- owner-supplied HEART & SOUL design doctrine
 
 ## Immediate next gate
 
-1. Owner/architect reviews the Phase 05 visual prototype against `WIREFRAME.md`, `DECISIONS.md`, and the COLLINS structural bar.
-2. Record explicit Phase 05 visual-direction approval or required changes.
-3. Only after approval may the prototype be reclassified as Phase 06 build work and proceed to full templates/pages/Gauntlet.
+1. Produce three materially different Phase 05 creative territories: restrained, expressive, experimental.
+2. Each territory must include governing idea, grid, typography behavior, color logic, imagery/art direction, motion, navigation, signature moment, risks, commercial advantage, and prototype evidence.
+3. Owner/architect selects one direction.
+4. Record the selected territory and visual-system approval.
+5. Only then reclassify the selected prototype as Phase 06 build work and scale implementation.
 
 ## Human check
 
-Material offer names, public founder claims outside existing approval, client proof, pricing, Phase 05 visual-direction approval, production promotion, and domain/DNS changes remain owner decisions.
+Material offer names, public founder claims outside existing approval, client proof, pricing, final creative-territory selection, production promotion, and domain/DNS changes remain owner decisions.
