@@ -7,29 +7,34 @@ Quality bar: live `wearecollins.com` for structural discipline, restraint, proof
 
 ## Current phase state
 
-- TRUTH — substantially evidenced by live-site/repo audit; remaining deployment/assets checks tracked in `EVIDENCE.md`.
-- POSITION — core business direction approved; program names remain working names until copy lock.
-- ARCHITECT — six-beat homepage and initial sitemap are the approved starting wireframe in `WIREFRAME.md`.
-- PROVE — incomplete; real founder/client/work assets must be assembled before final visual design.
-- DESIGN — not started under this protocol.
-- BUILD — blocked until walk test passes and Phase 04 proof minimum is satisfied.
-- GAUNTLET — not started.
+- TRUTH — substantially evidenced by live-site/repo audit; remaining deployment checks tracked in `EVIDENCE.md`.
+- POSITION — core business direction approved; Program names remain working names until copy lock.
+- ARCHITECT — six-beat homepage, sitemap, CTA direction, and page-template starting architecture are approved in `WIREFRAME.md`.
+- PROVE — minimum Phase 04 gate PASSED in `ASSET_MANIFEST.md`; unsupported claims remain prohibited.
+- WALK TEST — corrected self-routing test PASSED in `WALK_TEST_RESULT.md` after literal path-resolution verification.
+- DESIGN — IN PROGRESS. A Phase 05 visual prototype/system exists on the public repo rebuild branch and must be reviewed/approved before it can authorize Phase 06.
+- BUILD — BLOCKED. The current public rebuild branch is classified as a design prototype until the Phase 05 human/authority check is recorded.
+- GAUNTLET — not started; client viewports live in `GAUNTLET_CONFIG.md`.
 - LEARN — not started.
 
-## Inputs
+## Inputs / gate receipts
+
 - `DECISIONS.md`
 - `PRD.md`
 - `WIREFRAME.md`
 - `EVIDENCE.md`
+- `ASSET_MANIFEST.md`
+- `WALK_TEST_RESULT.md`
+- `GAUNTLET_CONFIG.md`
 - MACS public repository current state
 - uploaded/live COLLINS research audit
 
 ## Immediate next gate
 
-1. Pass the canonical vendor-neutral agent walk test.
-2. Complete the minimum Phase 04 proof pack for hero, Work, father/son story, and Built Here.
-3. Start visual-system/build work only after those gates.
+1. Owner/architect reviews the Phase 05 visual prototype against `WIREFRAME.md`, `DECISIONS.md`, and the COLLINS structural bar.
+2. Record explicit Phase 05 visual-direction approval or required changes.
+3. Only after approval may the prototype be reclassified as Phase 06 build work and proceed to full templates/pages/Gauntlet.
 
 ## Human check
 
-Material offer names, public founder claims, client proof, pricing, production promotion, and domain/DNS changes remain owner decisions.
+Material offer names, public founder claims outside existing approval, client proof, pricing, Phase 05 visual-direction approval, production promotion, and domain/DNS changes remain owner decisions.
