@@ -44,12 +44,26 @@ export class TwilioProvider implements TelephonyProvider {
         },
       );
 
+      const text = await response.text();
       if (!response.ok) {
-        const body = await response.text();
-        return { success: false, status: "failed", message: `Twilio API error: ${body}` };
+        // Avoid returning the provider response wholesale: it can contain phone numbers or account metadata.
+        return { success: false, status: "failed", message: `Twilio API error (${response.status}).` };
       }
 
-      return { success: true, status: "sent", message: `SMS sent to ${request.toNumber} via Twilio.` };
+      let sid: string | undefined;
+      try {
+        const parsed = JSON.parse(text) as { sid?: string };
+        sid = parsed.sid;
+      } catch {
+        sid = undefined;
+      }
+
+      return {
+        success: true,
+        status: "sent",
+        message: `SMS accepted by Twilio for delivery.`,
+        providerMessageId: sid,
+      };
     } catch (error) {
       return {
         success: false,
