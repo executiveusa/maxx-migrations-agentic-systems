@@ -2,11 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { CookieSerializeOptions } from "cookie";
 
-/**
- * Server-side Supabase auth client for Phase 2+.
- * Uses the session cookie populated by middleware.
- * This client respects RLS policies via the user's JWT in the session.
- */
+/** Server-side Supabase auth client using the current session cookie. */
 export async function getSupabaseAuth() {
   const cookieStore = await cookies();
 
@@ -20,22 +16,16 @@ export async function getSupabaseAuth() {
         },
         setAll(cookiesToSet: Array<{ name: string; value: string; options: CookieSerializeOptions }>) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
-            });
+            cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
           } catch {
-            // Ignore cookie errors in read-only contexts (like generateMetadata)
+            // Read-only server component; middleware owns refresh cookie writes.
           }
         },
       },
-    }
+    },
   );
 }
 
-/**
- * Extract the current authenticated user from the session.
- * Returns null if not authenticated.
- */
 export async function getCurrentUser() {
   const supabase = await getSupabaseAuth();
   const {
@@ -45,27 +35,50 @@ export async function getCurrentUser() {
 }
 
 /**
- * Extract the organization ID from the current user's metadata.
- * Set during signup via user_metadata.org_id.
- * Throws if not authenticated or org_id not in metadata.
+ * Resolve the active tenant from persisted membership, not user-controlled metadata.
+ * A metadata org_id may select among memberships, but never grants membership itself.
  */
 export async function getCurrentOrgId(): Promise<string> {
-  const user = await getCurrentUser();
-  if (!user) {
-    throw new Error("Not authenticated");
-  }
+  const supabase = await getSupabaseAuth();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
 
-  const orgId = (user.user_metadata?.org_id as string | undefined) ?? null;
-  if (!orgId) {
-    throw new Error("Organization ID not found in user metadata");
-  }
+  const { data: memberships, error } = await supabase
+    .from("maxx_organization_members")
+    .select("organization_id, role")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(`Organization membership lookup failed: ${error.message}`);
+  if (!memberships?.length) throw new Error("No organization membership found for this user");
 
-  return orgId;
+  const hintedOrgId = user.user_metadata?.org_id as string | undefined;
+  if (hintedOrgId && memberships.some((row) => row.organization_id === hintedOrgId)) {
+    return hintedOrgId;
+  }
+  if (memberships.length === 1) return memberships[0].organization_id;
+
+  throw new Error("Multiple organization memberships found. Select an active organization before continuing.");
 }
 
-/**
- * Sign out the current user by clearing their session.
- */
+export async function getCurrentMembership() {
+  const supabase = await getSupabaseAuth();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not authenticated");
+  const orgId = await getCurrentOrgId();
+  const { data, error } = await supabase
+    .from("maxx_organization_members")
+    .select("organization_id, user_id, role")
+    .eq("organization_id", orgId)
+    .eq("user_id", user.id)
+    .single();
+  if (error) throw new Error(`Membership lookup failed: ${error.message}`);
+  return data;
+}
+
 export async function signOut() {
   const supabase = await getSupabaseAuth();
   await supabase.auth.signOut();
