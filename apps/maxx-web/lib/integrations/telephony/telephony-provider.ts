@@ -1,6 +1,8 @@
 export interface SendSmsRequest {
   toNumber: string;
   body: string;
+  /** Tenant-owned sending number. Falls back to TWILIO_PHONE_NUMBER for single-number installs. */
+  fromNumber?: string;
 }
 
 export interface SendSmsResult {
