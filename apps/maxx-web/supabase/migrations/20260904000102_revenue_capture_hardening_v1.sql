@@ -9,11 +9,11 @@ drop index if exists public.maxx_sms_messages_provider_message_idx;
 create unique index if not exists maxx_sms_messages_provider_message_idx
   on public.maxx_sms_messages(provider, provider_message_id);
 
--- One economic entry per provider-native source. This prevents duplicate Stripe lifecycle
--- events from counting the same payment more than once.
+-- One economic entry per provider-native source. NULL provider/source rows remain repeatable
+-- because PostgreSQL unique indexes treat NULL values as distinct.
+drop index if exists public.maxx_value_ledger_provider_source_idx;
 create unique index if not exists maxx_value_ledger_provider_source_idx
-  on public.maxx_value_ledger_entries(organization_id, entry_type, source_provider, source_ref)
-  where source_provider is not null and source_ref is not null;
+  on public.maxx_value_ledger_entries(organization_id, entry_type, source_provider, source_ref);
 
 create table if not exists public.maxx_attribution_touchpoints (
   id uuid primary key default gen_random_uuid(),
