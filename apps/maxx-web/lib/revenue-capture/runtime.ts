@@ -63,10 +63,6 @@ export function stableCorrelationKey(parts: Array<string | null | undefined>): s
   return createHash("sha256").update(material).digest("hex");
 }
 
-/**
- * Resolve a webhook to a tenant using a resource the provider actually targeted.
- * Never falls back to NEXT_PUBLIC_DEMO_ORG_ID or mock organization state.
- */
 export async function resolveTenantByPhoneNumber(toNumber: string): Promise<TenantBinding | null> {
   const supabase = getSupabaseClient();
   const normalized = normalizePhone(toNumber);
@@ -77,16 +73,11 @@ export async function resolveTenantByPhoneNumber(toNumber: string): Promise<Tena
     .select("organization_id, number")
     .eq("number", normalized)
     .maybeSingle();
-
   if (phoneError) throw new Error(`Phone tenant lookup failed: ${phoneError.message}`);
   if (!phone?.organization_id) return null;
 
   const [{ data: org, error: orgError }, { data: connection, error: connectionError }] = await Promise.all([
-    supabase
-      .from("maxx_organizations")
-      .select("id, name")
-      .eq("id", phone.organization_id)
-      .single(),
+    supabase.from("maxx_organizations").select("id, name").eq("id", phone.organization_id).single(),
     supabase
       .from("maxx_integration_connections")
       .select("id, status")
@@ -94,7 +85,6 @@ export async function resolveTenantByPhoneNumber(toNumber: string): Promise<Tena
       .eq("provider", "twilio")
       .maybeSingle(),
   ]);
-
   if (orgError) throw new Error(`Organization lookup failed: ${orgError.message}`);
   if (connectionError) throw new Error(`Twilio connection lookup failed: ${connectionError.message}`);
 
@@ -105,7 +95,6 @@ export async function resolveTenantByPhoneNumber(toNumber: string): Promise<Tena
   };
 }
 
-/** Resolve a provider account to a tenant for providers that identify an account rather than a phone number. */
 export async function resolveTenantByProviderAccount(
   provider: string,
   externalAccountId: string,
@@ -165,32 +154,43 @@ export async function recordProviderEvent(input: RecordProviderEventInput) {
       .eq("id", input.connectionId)
       .eq("organization_id", input.organizationId);
   }
-
   return data;
 }
 
 export async function recordValueLedgerEntry(input: ValueLedgerInput) {
   const supabase = getSupabaseClient();
-  const { data, error } = await supabase
-    .from("maxx_value_ledger_entries")
-    .insert({
-      organization_id: input.organizationId,
-      contact_id: input.contactId ?? null,
-      opportunity_id: input.opportunityId ?? null,
-      provider_event_id: input.providerEventId ?? null,
-      entry_type: input.entryType,
-      amount_cents: Math.trunc(input.amountCents),
-      currency: input.currency ?? "USD",
-      confidence: input.confidence,
-      source_provider: input.sourceProvider ?? null,
-      source_ref: input.sourceRef ?? null,
-      attribution_model: input.attributionModel ?? null,
-      attribution_reason: input.attributionReason ?? null,
-      evidence: input.evidence ?? {},
-      occurred_at: input.occurredAt ?? new Date().toISOString(),
-    })
-    .select("id")
-    .single();
+  const row = {
+    organization_id: input.organizationId,
+    contact_id: input.contactId ?? null,
+    opportunity_id: input.opportunityId ?? null,
+    provider_event_id: input.providerEventId ?? null,
+    entry_type: input.entryType,
+    amount_cents: Math.trunc(input.amountCents),
+    currency: input.currency ?? "USD",
+    confidence: input.confidence,
+    source_provider: input.sourceProvider ?? null,
+    source_ref: input.sourceRef ?? null,
+    attribution_model: input.attributionModel ?? null,
+    attribution_reason: input.attributionReason ?? null,
+    evidence: input.evidence ?? {},
+    occurred_at: input.occurredAt ?? new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  if (input.sourceProvider && input.sourceRef) {
+    const { data, error } = await supabase
+      .from("maxx_value_ledger_entries")
+      .upsert(row, {
+        onConflict: "organization_id,entry_type,source_provider,source_ref",
+        ignoreDuplicates: false,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(`Value Ledger persistence failed: ${error.message}`);
+    return data;
+  }
+
+  const { data, error } = await supabase.from("maxx_value_ledger_entries").insert(row).select("id").single();
   if (error) throw new Error(`Value Ledger persistence failed: ${error.message}`);
   return data;
 }
