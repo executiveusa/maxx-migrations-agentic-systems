@@ -31,6 +31,14 @@ Inspect before changing. Reuse before adding. Specify before building. Make one 
 - Agent MAXX interface: executiveusa/macs-agent-portal
 - Do not create another competing MAXX control plane without an explicit architecture decision.
 
+## Commercial / growth routing
+
+When asked to improve revenue, leads, conversion, positioning, offers, sales language, customer acquisition, growth systems, productization, launch strategy, or commercial experiments, read `docs/icm/MONEY_MODELS.md` and route the work through `icm/growth-engine/SKILL.md`.
+
+Public commercial strategy has exactly four buckets: **Reset, Momentum, Scale, Launch**. Internal labels such as Client Zero, Built Here, R&D, product names, or labs are proof/capability labels, not additional public buckets.
+
+Material commercial hypotheses should be recorded through `icm/growth-engine/experiments/TEMPLATE.md` and judged by observed evidence rather than attention metrics alone.
+
 ## MAXX suite / product routing
 
 When evaluating a MAXX product, repository, model, workflow, integration, major feature, partnership idea, salvage/merge decision, or other high-level product strategy, load `icm/maxx-suite/00_router/CONTEXT.md` and then only the smallest relevant context folder. New product/idea/workflow decisions must pass `icm/maxx-suite/04_product-pipeline/SKILL.md` before build work. Do not autoload the entire suite catalog.
@@ -38,6 +46,8 @@ When evaluating a MAXX product, repository, model, workflow, integration, major 
 ## Site transformation routing
 
 When asked to audit, reposition, redesign, rebuild, improve, migrate, or relaunch a website, load `icm/site-transformation-protocol/00_router/CONTEXT.md`. A write-capable agent must pass `icm/site-transformation-protocol/WALK_TEST.md` before transformation work. Client-specific truth and phase state live under `icm/clients/<client>/`; do not copy the canonical protocol into each client and let it drift.
+
+For commercial copy/offer decisions inside a site transformation, the Site Transformation Protocol governs the transformation workflow while the Four-Bucket Growth Engine governs the commercial classification, outcome, offer, CTA, and experiment logic. Neither bypasses the Human ↔ Machine Contract.
 
 ## Immediate safety invariant
 
