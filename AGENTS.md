@@ -6,13 +6,20 @@ This repository is the canonical private ICM and agentic execution brain behind 
 
 Before meaningful work:
 
-1. Read docs/icm/HUMAN_MACHINE_CONTRACT.md.
-2. Read docs/icm/ICM_CORE.md.
-3. Read CLAUDE.md and the relevant docs/openspec specification.
-4. Inspect the actual current code/state.
-5. Declare MODE, OUTCOME, TARGET, CONSTRAINTS, PROOF, and COMMERCIAL VALUE.
+1. Read `docs/icm/HUMAN_MACHINE_CONTRACT.md`.
+2. Read `docs/icm/FEDERATION_CONTRACT.md`.
+3. Read `docs/icm/ICM_CORE.md`.
+4. Read `CLAUDE.md` and the relevant docs/openspec specification.
+5. Inspect the actual current code/state.
+6. Declare MODE, OUTCOME, TARGET, CONSTRAINTS, PROOF, COMMERCIAL VALUE, AUTHORITY, and ROLLBACK.
 
 The Human ↔ Machine Contract outranks repository-local convenience rules. No model-specific prompt or legacy execution instruction may weaken human authority gates, tenant isolation, evidence requirements, secret handling, rollback, or customer sovereignty.
+
+## ICM definition and walk rule
+
+ICM means **Interpretable Context Methodology**. Folder structure is the routing architecture; stage contracts name exact inputs/process/outputs/human checks; plain-text artifacts and canonical records carry inspectable state.
+
+Every agent must be able to cold-walk the system through `icm/federation/CONTEXT.md`. No agent may claim the three-repository system passes its walk test until the Motion Gate in `icm/federation/WALK_TEST.md` has current evidence. Documentation/build presence is not motion.
 
 ## Operating posture
 
@@ -26,10 +33,19 @@ Inspect before changing. Reuse before adding. Specify before building. Make one 
 
 ## Canonical repo boundary
 
-- Public storefront: executiveusa/macsdigitalmedia
+- Public storefront: `executiveusa/macsdigitalmedia`
 - Private ICM/execution brain: this repository
-- Agent MAXX interface: executiveusa/macs-agent-portal
+- Agent MAXX interface: `executiveusa/macs-agent-portal`
+- Cross-repo authority/call graph: `docs/icm/FEDERATION_CONTRACT.md`
 - Do not create another competing MAXX control plane without an explicit architecture decision.
+
+## Commercial / growth routing
+
+When asked to improve revenue, leads, conversion, positioning, offers, sales language, customer acquisition, growth systems, productization, launch strategy, or commercial experiments, read `docs/icm/MONEY_MODELS.md` and route the work through `icm/growth-engine/SKILL.md`.
+
+Public commercial strategy has exactly four buckets: **Reset, Momentum, Scale, Launch**. Internal labels such as Client Zero, Built Here, R&D, product names, or labs are proof/capability labels, not additional public buckets.
+
+Material commercial hypotheses should be recorded through `icm/growth-engine/experiments/TEMPLATE.md` and judged by observed evidence rather than attention metrics alone.
 
 ## MAXX suite / product routing
 
@@ -38,6 +54,8 @@ When evaluating a MAXX product, repository, model, workflow, integration, major 
 ## Site transformation routing
 
 When asked to audit, reposition, redesign, rebuild, improve, migrate, or relaunch a website, load `icm/site-transformation-protocol/00_router/CONTEXT.md`. A write-capable agent must pass `icm/site-transformation-protocol/WALK_TEST.md` before transformation work. Client-specific truth and phase state live under `icm/clients/<client>/`; do not copy the canonical protocol into each client and let it drift.
+
+For commercial copy/offer decisions inside a site transformation, the Site Transformation Protocol governs the transformation workflow while the Four-Bucket Growth Engine governs the commercial classification, outcome, offer, CTA, and experiment logic. Neither bypasses the Human ↔ Machine Contract.
 
 ## Immediate safety invariant
 

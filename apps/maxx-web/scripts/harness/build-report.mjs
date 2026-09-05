@@ -11,6 +11,7 @@ const CHECKS = [
   { id: "copy", script: "scripts/harness/copy-audit.mjs" },
   { id: "env", script: "scripts/harness/env-audit.mjs" },
   { id: "artifacts", script: "scripts/harness/artifact-audit.mjs" },
+  { id: "federation", script: "scripts/harness/federation-contract.mjs" },
 ];
 
 console.log("Running full harness and generating build report\n");
@@ -36,7 +37,10 @@ const report = {
 };
 
 mkdirSync("../../ops/reports/harness", { recursive: true });
-writeFileSync("../../ops/reports/harness/build-report.json", JSON.stringify(report, null, 2) + "\n");
+writeFileSync(
+  "../../ops/reports/harness/build-report.json",
+  JSON.stringify(report, null, 2) + "\n"
+);
 
 const md = [
   "# Build Harness Report",
@@ -62,6 +66,8 @@ const md = [
 writeFileSync("../../ops/reports/harness/build-report.md", md);
 
 console.log(`\nOverall: ${report.overallStatus.toUpperCase()}`);
-console.log("Report written to ops/reports/harness/build-report.json and build-report.md");
+console.log(
+  "Report written to ops/reports/harness/build-report.json and build-report.md"
+);
 
 process.exit(allPassed ? 0 : 1);

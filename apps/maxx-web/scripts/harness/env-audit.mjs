@@ -23,7 +23,9 @@ const REQUIRED_VARS = [
 ];
 
 const text = readFileSync(".env.example", "utf8");
-const lines = text.split("\n").filter((l) => l.trim() && !l.trim().startsWith("#"));
+const lines = text
+  .split("\n")
+  .filter((l) => l.trim() && !l.trim().startsWith("#"));
 
 let failed = false;
 
@@ -38,7 +40,11 @@ for (const key of REQUIRED_VARS) {
 const SUSPICIOUS_VALUE = /=.{16,}/;
 for (const line of lines) {
   const [, value] = line.split("=");
-  if (value && SUSPICIOUS_VALUE.test(line) && !/^(true|false)$/i.test(value.trim())) {
+  if (
+    value &&
+    SUSPICIOUS_VALUE.test(line) &&
+    !/^(true|false)$/i.test(value.trim())
+  ) {
     console.log(`  ✗ ${line} looks like it may contain a real secret value.`);
     failed = true;
   }
@@ -48,5 +54,7 @@ if (failed) {
   console.error("\nenv-audit failed.");
   process.exit(1);
 } else {
-  console.log("\nenv-audit passed: all required variables are documented and no real secrets detected.");
+  console.log(
+    "\nenv-audit passed: all required variables are documented and no real secrets detected."
+  );
 }

@@ -13,7 +13,12 @@ export function walkFiles(dir, extensions = SOURCE_EXTENSIONS) {
 
   function walk(current) {
     for (const entry of readdirSync(current)) {
-      if (entry === "node_modules" || entry === ".next" || entry.startsWith(".")) continue;
+      if (
+        entry === "node_modules" ||
+        entry === ".next" ||
+        entry.startsWith(".")
+      )
+        continue;
       const full = join(current, entry);
       const stats = statSync(full);
       if (stats.isDirectory()) {
@@ -78,10 +83,16 @@ export const REQUIRED_APP_ROUTES = [
   "app/app/settings/billing/page.tsx",
 ];
 
-export const REQUIRED_ROUTES = [...REQUIRED_PUBLIC_ROUTES, ...REQUIRED_APP_ROUTES];
+export const REQUIRED_ROUTES = [
+  ...REQUIRED_PUBLIC_ROUTES,
+  ...REQUIRED_APP_ROUTES,
+];
 
 export const REQUIRED_API_ROUTES = [
   "app/api/health/route.ts",
+  "app/api/system/health/route.ts",
+  "app/api/system/manifest/route.ts",
+  "app/api/system/route/route.ts",
   "app/api/contacts/route.ts",
   "app/api/pipeline/route.ts",
   "app/api/forms/route.ts",

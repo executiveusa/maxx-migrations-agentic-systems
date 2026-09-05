@@ -36,14 +36,17 @@ function routeMatches(path) {
   for (const known of knownRoutes) {
     const knownSegments = known.split("/").filter(Boolean);
     if (knownSegments.length !== segments.length) continue;
-    const matches = knownSegments.every((seg, i) => seg === "*" || seg === segments[i]);
+    const matches = knownSegments.every(
+      (seg, i) => seg === "*" || seg === segments[i]
+    );
     if (matches) return true;
   }
   return false;
 }
 
 const EXTERNAL_OR_SPECIAL = /^(https?:|mailto:|tel:|#)/;
-const hrefLiteral = /href\s*[:=]\s*(?:"([^"]+)"|'([^']+)'|\{`([^`]*)`\}|\{"([^"]+)"\})/g;
+const hrefLiteral =
+  /href\s*[:=]\s*(?:"([^"]+)"|'([^']+)'|\{`([^`]*)`\}|\{"([^"]+)"\})/g;
 
 let brokenLinks = 0;
 let deadAnchors = 0;
@@ -58,7 +61,9 @@ for (const dir of SOURCE_DIRS) {
       const raw = match[1] ?? match[2] ?? match[3] ?? match[4] ?? "";
 
       if (raw === "#" || raw === "") {
-        console.log(`  ✗ ${relative(file)} — dead anchor href (${JSON.stringify(raw)})`);
+        console.log(
+          `  ✗ ${relative(file)} — dead anchor href (${JSON.stringify(raw)})`
+        );
         deadAnchors += 1;
         continue;
       }
@@ -70,7 +75,11 @@ for (const dir of SOURCE_DIRS) {
         const withWildcard = `${prefix}*`.replace(/\/{2,}/g, "/");
         checkedLinks += 1;
         if (!routeMatches(withWildcard.split("?")[0])) {
-          console.log(`  ✗ ${relative(file)} — no route matches dynamic link prefix "${prefix}"`);
+          console.log(
+            `  ✗ ${relative(
+              file
+            )} — no route matches dynamic link prefix "${prefix}"`
+          );
           brokenLinks += 1;
         }
         continue;
@@ -80,18 +89,26 @@ for (const dir of SOURCE_DIRS) {
       if (!pathOnly.startsWith("/")) continue;
       checkedLinks += 1;
       if (!routeMatches(pathOnly)) {
-        console.log(`  ✗ ${relative(file)} — "${raw}" does not resolve to a known route`);
+        console.log(
+          `  ✗ ${relative(file)} — "${raw}" does not resolve to a known route`
+        );
         brokenLinks += 1;
       }
     }
   }
 }
 
-console.log(`\nChecked ${checkedLinks} internal link(s) against ${knownRoutes.size} known route(s).`);
+console.log(
+  `\nChecked ${checkedLinks} internal link(s) against ${knownRoutes.size} known route(s).`
+);
 
 if (brokenLinks > 0 || deadAnchors > 0) {
-  console.error(`link-check failed: ${brokenLinks} broken link(s), ${deadAnchors} dead anchor(s).`);
+  console.error(
+    `link-check failed: ${brokenLinks} broken link(s), ${deadAnchors} dead anchor(s).`
+  );
   process.exit(1);
 } else {
-  console.log("link-check passed: no broken internal links or dead anchors found.");
+  console.log(
+    "link-check passed: no broken internal links or dead anchors found."
+  );
 }
