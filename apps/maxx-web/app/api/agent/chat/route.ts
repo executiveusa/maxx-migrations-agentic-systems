@@ -4,6 +4,7 @@ import type { MessageParam } from "@anthropic-ai/sdk/resources/messages";
 import { getCurrentOrgId } from "@/lib/auth/supabase-auth";
 import { selectModel, isWriteTool, type ChatMessage } from "@/lib/agents/chat-router";
 import { getToolDefinitions, executeTool, type ToolName } from "@/lib/agents/tools";
+import { persistWriteProposal } from "@/lib/agents/approval";
 
 interface RequestBody { messages: ChatMessage[] }
 
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest): Promise<Response> {
           }));
 
           const tools = getToolDefinitions();
-          let loopMessages = [...anthropicMessages];
+          const loopMessages = [...anthropicMessages];
           let continueLoop = true;
 
           while (continueLoop) {
@@ -61,11 +62,20 @@ export async function POST(request: NextRequest): Promise<Response> {
 
               assistantContent.push({ type: "tool_use", id: block.id, name: block.name, input: block.input });
               if (isWriteTool(block.name)) {
+                const proposal = await persistWriteProposal({
+                  organizationId: orgId,
+                  toolName: block.name as ToolName,
+                  toolInput: block.input,
+                  idempotencyKey: `popebot:${block.id}`,
+                });
                 controller.enqueue(`data: ${JSON.stringify({
                   type: "tool_call_pending",
                   toolId: block.id,
                   toolName: block.name,
                   toolInput: block.input,
+                  proposalId: proposal.proposalId,
+                  actionHash: proposal.actionHash,
+                  expiresAt: proposal.expiresAt ?? null,
                 })}\n\n`);
                 controller.enqueue(`data: ${JSON.stringify({ type: "done", reason: "awaiting_approval" })}\n\n`);
                 controller.close();
