@@ -57,7 +57,8 @@ export async function getCurrentOrgId(): Promise<string> {
   if (hintedOrgId && memberships.some((row) => row.organization_id === hintedOrgId)) {
     return hintedOrgId;
   }
-  if (memberships.length === 1) return memberships[0].organization_id;
+  const onlyMembership = memberships.length === 1 ? memberships[0] : undefined;
+  if (onlyMembership) return onlyMembership.organization_id;
 
   throw new Error("Multiple organization memberships found. Select an active organization before continuing.");
 }
