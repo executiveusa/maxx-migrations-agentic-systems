@@ -12,8 +12,8 @@ vi.mock("@anthropic-ai/sdk", () => ({
   },
 }));
 
-vi.mock("@/lib/data/supabase-client", () => ({
-  getCurrentOrgId: () => "org_test",
+vi.mock("@/lib/auth/supabase-auth", () => ({
+  getCurrentOrgId: async () => "org_test",
 }));
 
 vi.mock("@/lib/agents/tools", () => ({
@@ -49,9 +49,7 @@ describe("agent human approval gate", () => {
     const request = new NextRequest("http://localhost/api/agent/chat", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        messages: [{ role: "user", content: "Create this contact" }],
-      }),
+      body: JSON.stringify({ messages: [{ role: "user", content: "Create this contact" }] }),
     });
 
     const response = await POST(request);
