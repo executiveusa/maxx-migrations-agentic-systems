@@ -75,6 +75,73 @@ Every offer must answer five questions in plain language:
 
 Do not sell labor as the offer. Package a repeatable result and the process that produces it.
 
+## Boring revenue model
+
+Prefer boring recurring problems over impressive technology.
+
+The strongest starting point is usually a task the business already pays a person to do, repeatedly forgets to do, does too slowly, or handles inconsistently. The automation is valuable because the underlying job already has an economic consequence.
+
+Start with the money path:
+
+1. recover cash already owed
+2. recover leads already acquired
+3. stop losing inbound demand
+4. improve response and conversion
+5. create additional qualified demand
+6. only then add volume and broader automation
+
+Examples of high-value wedges:
+
+- overdue invoice follow-up
+- missed-call capture / receptionist
+- speed-to-lead
+- lead reactivation
+- website lead qualification
+- personalized outbound
+- content repurposing
+- inbox triage when founder attention is the bottleneck
+
+The same system can belong to different buckets depending on the present business condition. Do not classify by technology.
+
+### Offer ladder
+
+**Level 1 — Wedge:** solve one narrow recurring problem with visible value and low implementation friction.
+
+**Level 2 — Money-facing system:** connect the automation directly to acquisition, conversion, cash recovery, retention, or owner time.
+
+**Level 3 — Integrated revenue engine:** combine only components that have already shown evidence, typically capture -> qualify -> respond -> book -> reactivate -> follow up -> collect -> report.
+
+Do not sell the full machine first unless the client already has enough evidence and urgency to justify it.
+
+### Value-before-hours rule
+
+Price recommendations should begin with business value, baseline, risk, and ongoing optimization burden rather than implementation hours alone.
+
+Collect the client's own numbers first:
+
+- lead volume
+- conversion rate
+- average customer value or gross profit when known
+- missed calls / unworked leads
+- unpaid invoice value
+- manual hours spent
+- implementation risk
+- maintenance burden
+
+Never invent ROI. Never present a speculative value estimate as measured proof.
+
+### Existing-value-first rule
+
+Prefer, in order:
+
+1. existing demand over creating new demand
+2. existing leads over buying new leads
+3. existing unpaid cash over speculative pipeline
+4. integrating with current tools over replacing them
+5. one repeatable job over a broad transformation
+
+Read `icm/growth-engine/boring-revenue/SKILL.md` when the task involves automation offers, lead recovery, response systems, receptionist systems, outbound, invoice recovery, or productizing repetitive business work.
+
 ## Conversion model
 
 Copy and calls must move a decision, not display expertise.
@@ -132,6 +199,8 @@ Every experiment must record:
 - sales
 - revenue
 - gross profit when known
+- recovered cash when relevant
+- manual time saved when relevant
 - time to first useful result
 - evidence link
 - decision: kill / keep / improve / scale
@@ -159,6 +228,7 @@ This model synthesizes principles from:
 - Marty Neumeier, *Brand A-Z*: differentiation, customer journey, customer vision, touchpoints, brand as a coordinated system.
 - `blader/humanizer`: remove formulaic AI-writing patterns, filler, false contrasts, inflated language, and unsupported claims.
 - `virgiliojr94/book-to-skill`: extract reusable frameworks, principles, techniques, anti-patterns, and voice calibration instead of creating book summaries.
+- MACS source transcript on boring AI automations: recurring jobs, foot-in-the-door wedges, money-facing systems, human-in-the-loop approval, demos, value-based pricing, and expansion into a systemized lead engine.
 
 ## Guardrails
 
