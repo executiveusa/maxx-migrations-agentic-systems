@@ -54,16 +54,18 @@ async function resolveTenant(event: StripeEvent, object: StripeObject) {
 }
 
 function paymentAmount(object: StripeObject): number | null {
-  const value = object.amount_total ?? object.amount_received ?? object.amount;
+  const value = object.amount_received ?? object.amount_total ?? object.amount;
   return typeof value === "number" && Number.isFinite(value) ? Math.trunc(value) : null;
 }
 
-function isPaymentEvent(type: string): boolean {
-  return new Set([
-    "checkout.session.completed",
-    "payment_intent.succeeded",
-    "charge.succeeded",
-  ]).has(type);
+/**
+ * Stripe can emit Checkout, PaymentIntent, and Charge lifecycle events for one purchase.
+ * Keep all signed events as evidence, but create the economic ledger entry only from the
+ * successful PaymentIntent. Stripe documents a PaymentIntent as the payment lifecycle
+ * object that typically maps to one cart/session, while retries can create multiple Charges.
+ */
+function shouldCreatePaymentLedgerEntry(type: string): boolean {
+  return type === "payment_intent.succeeded";
 }
 
 export async function POST(request: NextRequest) {
@@ -133,7 +135,7 @@ export async function POST(request: NextRequest) {
   });
 
   const amountCents = paymentAmount(object);
-  if (isPaymentEvent(event.type) && amountCents !== null) {
+  if (shouldCreatePaymentLedgerEntry(event.type) && amountCents !== null) {
     await recordValueLedgerEntry({
       organizationId: tenant.organizationId,
       contactId,
@@ -147,11 +149,11 @@ export async function POST(request: NextRequest) {
       sourceRef: object.id ?? event.id,
       attributionModel: opportunityId ? "explicit_opportunity_metadata" : "provider_payment_only",
       attributionReason: opportunityId
-        ? "Stripe payment carried a MAXX opportunity id in signed provider metadata."
-        : "Payment is verified, but no opportunity-level attribution was supplied.",
+        ? "Stripe PaymentIntent carried a MAXX opportunity id in signed provider metadata."
+        : "PaymentIntent success is verified, but no opportunity-level attribution was supplied.",
       evidence: {
         stripeEventId: event.id,
-        stripeObjectId: object.id ?? null,
+        paymentIntentId: object.id ?? null,
         signatureValidated: true,
       },
       occurredAt,
