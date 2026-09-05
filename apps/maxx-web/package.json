@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "walk:revenue-capture": "node scripts/revenue-capture-walk-test.mjs",
     "harness:preflight": "node scripts/harness/preflight.mjs",
     "harness:no-stubs": "node scripts/harness/no-stubs.mjs",
     "harness:routes": "node scripts/harness/route-audit.mjs",
@@ -22,7 +23,7 @@
     "harness:browser": "node scripts/harness/browser-verify.mjs",
     "harness:client-zero": "node scripts/harness/client-zero-proof.mjs",
     "harness:all": "node scripts/harness/run-all.mjs",
-    "verify:full": "npm run lint && npm run typecheck && npm run test && npm run build && npm run harness:all"
+    "verify:full": "npm run lint && npm run typecheck && npm run test && npm run walk:revenue-capture && npm run build && npm run harness:all"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.28.0",
