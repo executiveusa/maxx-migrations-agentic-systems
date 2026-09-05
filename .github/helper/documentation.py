@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from urllib.parse import urlparse
@@ -42,28 +41,7 @@ def contains_documentation_link(body: str) -> bool:
     return any(is_documentation_link(word) for line in body.splitlines() for word in line.split())
 
 
-def event_pull_request(number: str):
-    event_path = os.environ.get("GITHUB_EVENT_PATH")
-    if not event_path or not os.path.exists(event_path):
-        return None
-
-    try:
-        with open(event_path, encoding="utf-8") as handle:
-            event = json.load(handle)
-    except (OSError, ValueError):
-        return None
-
-    pull_request = event.get("pull_request")
-    if not pull_request:
-        return None
-
-    if str(pull_request.get("number", event.get("number", ""))) != str(number):
-        return None
-
-    return pull_request
-
-
-def api_pull_request(number: str):
+def check_pull_request(number: str) -> "tuple[int, str]":
     repository = os.environ.get("GITHUB_REPOSITORY", "executiveusa/maxx-migrations-agentic-systems")
     headers = {"Accept": "application/vnd.github+json"}
     token = os.environ.get("GITHUB_TOKEN")
@@ -76,15 +54,9 @@ def api_pull_request(number: str):
         timeout=15,
     )
     if not response.ok:
-        return None
-    return response.json()
-
-
-def check_pull_request(number: str) -> "tuple[int, str]":
-    payload = event_pull_request(number) or api_pull_request(number)
-    if not payload:
         return 0, "Skipping documentation checks: pull-request metadata is unavailable to this workflow."
 
+    payload = response.json()
     title = (payload.get("title") or "").lower().strip()
     head_sha = (payload.get("head") or {}).get("sha")
     body = (payload.get("body") or "").lower()
