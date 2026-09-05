@@ -6,13 +6,20 @@ This repository is the canonical private ICM and agentic execution brain behind 
 
 Before meaningful work:
 
-1. Read docs/icm/HUMAN_MACHINE_CONTRACT.md.
-2. Read docs/icm/ICM_CORE.md.
-3. Read CLAUDE.md and the relevant docs/openspec specification.
-4. Inspect the actual current code/state.
-5. Declare MODE, OUTCOME, TARGET, CONSTRAINTS, PROOF, and COMMERCIAL VALUE.
+1. Read `docs/icm/HUMAN_MACHINE_CONTRACT.md`.
+2. Read `docs/icm/FEDERATION_CONTRACT.md`.
+3. Read `docs/icm/ICM_CORE.md`.
+4. Read `CLAUDE.md` and the relevant docs/openspec specification.
+5. Inspect the actual current code/state.
+6. Declare MODE, OUTCOME, TARGET, CONSTRAINTS, PROOF, COMMERCIAL VALUE, AUTHORITY, and ROLLBACK.
 
 The Human ↔ Machine Contract outranks repository-local convenience rules. No model-specific prompt or legacy execution instruction may weaken human authority gates, tenant isolation, evidence requirements, secret handling, rollback, or customer sovereignty.
+
+## ICM definition and walk rule
+
+ICM means **Interpretable Context Methodology**. Folder structure is the routing architecture; stage contracts name exact inputs/process/outputs/human checks; plain-text artifacts and canonical records carry inspectable state.
+
+Every agent must be able to cold-walk the system through `icm/federation/CONTEXT.md`. No agent may claim the three-repository system passes its walk test until the Motion Gate in `icm/federation/WALK_TEST.md` has current evidence. Documentation/build presence is not motion.
 
 ## Operating posture
 
@@ -26,9 +33,10 @@ Inspect before changing. Reuse before adding. Specify before building. Make one 
 
 ## Canonical repo boundary
 
-- Public storefront: executiveusa/macsdigitalmedia
+- Public storefront: `executiveusa/macsdigitalmedia`
 - Private ICM/execution brain: this repository
-- Agent MAXX interface: executiveusa/macs-agent-portal
+- Agent MAXX interface: `executiveusa/macs-agent-portal`
+- Cross-repo authority/call graph: `docs/icm/FEDERATION_CONTRACT.md`
 - Do not create another competing MAXX control plane without an explicit architecture decision.
 
 ## Commercial / growth routing
