@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 const mocks = vi.hoisted(() => ({
   createMessage: vi.fn(),
   executeTool: vi.fn(),
+  persistWriteProposal: vi.fn(),
 }));
 
 vi.mock("@anthropic-ai/sdk", () => ({
@@ -21,28 +22,33 @@ vi.mock("@/lib/agents/tools", () => ({
   executeTool: mocks.executeTool,
 }));
 
+vi.mock("@/lib/agents/approval", () => ({
+  persistWriteProposal: mocks.persistWriteProposal,
+}));
+
 import { POST } from "@/app/api/agent/chat/route";
 
 describe("agent human approval gate", () => {
   beforeEach(() => {
     mocks.createMessage.mockReset();
     mocks.executeTool.mockReset();
+    mocks.persistWriteProposal.mockReset();
+    mocks.persistWriteProposal.mockResolvedValue({
+      proposalId: "proposal_test_1",
+      actionHash: "abc123hash",
+      status: "proposed",
+      expiresAt: "2026-09-06T00:00:00Z",
+    });
   });
 
-  it("fails closed when the model proposes a write tool", async () => {
+  it("persists the exact write proposal and fails closed before execution", async () => {
     mocks.createMessage.mockResolvedValue({
-      content: [
-        {
-          type: "tool_use",
-          id: "tool_write_1",
-          name: "create_contact",
-          input: {
-            firstName: "Test",
-            lastName: "Person",
-            email: "test@example.com",
-          },
-        },
-      ],
+      content: [{
+        type: "tool_use",
+        id: "tool_write_1",
+        name: "create_contact",
+        input: { firstName: "Test", lastName: "Person", email: "test@example.com" },
+      }],
       stop_reason: "tool_use",
     });
 
@@ -55,7 +61,6 @@ describe("agent human approval gate", () => {
     const response = await POST(request);
     const reader = response.body?.getReader();
     let stream = "";
-
     expect(reader).toBeDefined();
     while (reader) {
       const { done, value } = await reader.read();
@@ -64,9 +69,14 @@ describe("agent human approval gate", () => {
     }
 
     expect(response.status).toBe(200);
-    expect(stream).toContain('"type":"tool_call_pending"');
+    expect(mocks.persistWriteProposal).toHaveBeenCalledWith(expect.objectContaining({
+      organizationId: "org_test",
+      toolName: "create_contact",
+      idempotencyKey: "popebot:tool_write_1",
+    }));
+    expect(stream).toContain('"proposalId":"proposal_test_1"');
+    expect(stream).toContain('"actionHash":"abc123hash"');
     expect(stream).toContain('"reason":"awaiting_approval"');
     expect(mocks.executeTool).not.toHaveBeenCalled();
-    expect(mocks.createMessage).toHaveBeenCalledTimes(1);
   });
 });
