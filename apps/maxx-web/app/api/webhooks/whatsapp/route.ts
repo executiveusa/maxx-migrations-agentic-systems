@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseClient } from "@/lib/data/supabase-client";
 import { verifyWhatsAppSignature } from "@/lib/integrations/whatsapp";
 import {
   recordProviderEvent,
@@ -118,9 +117,5 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  if (results.length === 0) {
-    const supabase = getSupabaseClient();
-    void supabase;
-  }
   return NextResponse.json({ received: true, events: results.length });
 }
