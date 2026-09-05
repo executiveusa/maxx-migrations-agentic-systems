@@ -30,8 +30,8 @@ export function verifyResendWebhook(input: {
     .split(" ")
     .map((part) => part.trim())
     .filter(Boolean)
-    .map((part) => part.includes(",") ? part.split(",", 2)[1] : part)
-    .filter(Boolean);
+    .map((part) => (part.includes(",") ? (part.split(",", 2)[1] ?? "") : part))
+    .filter((candidate): candidate is string => candidate.length > 0);
   return candidates.some((candidate) => safeEqual(expected, candidate));
 }
 
