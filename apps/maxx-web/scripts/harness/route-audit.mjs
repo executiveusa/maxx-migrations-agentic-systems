@@ -16,5 +16,7 @@ if (missing > 0) {
   console.error(`\nroute-audit failed: ${missing} required route(s) missing.`);
   process.exit(1);
 } else {
-  console.log(`\nroute-audit passed: all ${REQUIRED_ROUTES.length} required routes exist.`);
+  console.log(
+    `\nroute-audit passed: all ${REQUIRED_ROUTES.length} required routes exist.`
+  );
 }

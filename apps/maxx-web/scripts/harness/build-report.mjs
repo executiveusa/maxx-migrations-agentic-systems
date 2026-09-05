@@ -39,7 +39,7 @@ const report = {
 mkdirSync("../../ops/reports/harness", { recursive: true });
 writeFileSync(
   "../../ops/reports/harness/build-report.json",
-  JSON.stringify(report, null, 2) + "\n",
+  JSON.stringify(report, null, 2) + "\n"
 );
 
 const md = [
@@ -67,7 +67,7 @@ writeFileSync("../../ops/reports/harness/build-report.md", md);
 
 console.log(`\nOverall: ${report.overallStatus.toUpperCase()}`);
 console.log(
-  "Report written to ops/reports/harness/build-report.json and build-report.md",
+  "Report written to ops/reports/harness/build-report.json and build-report.md"
 );
 
 process.exit(allPassed ? 0 : 1);

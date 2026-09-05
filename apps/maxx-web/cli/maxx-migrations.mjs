@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 
-const API = (process.env.MAXX_MIGRATIONS_URL || "http://127.0.0.1:3000").replace(/\/$/, "");
+const API = (
+  process.env.MAXX_MIGRATIONS_URL || "http://127.0.0.1:3000"
+).replace(/\/$/, "");
 const API_KEY = process.env.MAXX_MIGRATIONS_API_KEY;
 
 function usage() {
-  console.log(`MAXX Migrations CLI\n\nUsage:\n  maxx-migrations health\n  maxx-migrations manifest\n  maxx-migrations route <business condition>\n\nEnvironment:\n  MAXX_MIGRATIONS_URL       MAXX Migrations web/API base URL\n  MAXX_MIGRATIONS_API_KEY   machine credential\n`);
+  console.log(
+    `MAXX Migrations CLI\n\nUsage:\n  maxx-migrations health\n  maxx-migrations manifest\n  maxx-migrations route <business condition>\n\nEnvironment:\n  MAXX_MIGRATIONS_URL       MAXX Migrations web/API base URL\n  MAXX_MIGRATIONS_API_KEY   machine credential\n`
+  );
 }
 
 async function call(path, options = {}) {
@@ -18,7 +22,10 @@ async function call(path, options = {}) {
     },
   });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || `MAXX Migrations returned ${response.status}`);
+  if (!response.ok)
+    throw new Error(
+      payload.error || `MAXX Migrations returned ${response.status}`
+    );
   return payload;
 }
 
@@ -41,13 +48,15 @@ try {
           body: JSON.stringify({ condition }),
         }),
         null,
-        2,
-      ),
+        2
+      )
     );
   } else {
     throw new Error(`Unknown command: ${command}`);
   }
 } catch (error) {
-  console.error(`MAXX Migrations: ${error instanceof Error ? error.message : String(error)}`);
+  console.error(
+    `MAXX Migrations: ${error instanceof Error ? error.message : String(error)}`
+  );
   process.exitCode = 1;
 }

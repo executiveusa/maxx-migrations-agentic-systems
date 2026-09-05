@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-const API = (process.env.MAXX_MIGRATIONS_URL || "http://127.0.0.1:3000").replace(/\/$/, "");
+const API = (
+  process.env.MAXX_MIGRATIONS_URL || "http://127.0.0.1:3000"
+).replace(/\/$/, "");
 const API_KEY = process.env.MAXX_MIGRATIONS_API_KEY;
 let buffer = "";
 
@@ -15,7 +17,10 @@ async function call(path, options = {}) {
     },
   });
   const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || `MAXX Migrations returned ${response.status}`);
+  if (!response.ok)
+    throw new Error(
+      payload.error || `MAXX Migrations returned ${response.status}`
+    );
   return payload;
 }
 
@@ -57,17 +62,20 @@ async function handle(message) {
         tools: [
           {
             name: "maxx_migrations_health",
-            description: "Check the canonical MAXX Migrations/ICM backend machine surface.",
+            description:
+              "Check the canonical MAXX Migrations/ICM backend machine surface.",
             inputSchema: { type: "object", properties: {} },
           },
           {
             name: "maxx_migrations_manifest",
-            description: "Read the canonical three-repository federation, ICM authority, evidence states, and public commercial buckets.",
+            description:
+              "Read the canonical three-repository federation, ICM authority, evidence states, and public commercial buckets.",
             inputSchema: { type: "object", properties: {} },
           },
           {
             name: "maxx_migrations_route",
-            description: "Route a business condition to Reset, Momentum, Scale, or Launch and return the canonical ICM context path.",
+            description:
+              "Route a business condition to Reset, Momentum, Scale, or Launch and return the canonical ICM context path.",
             inputSchema: {
               type: "object",
               properties: { condition: { type: "string" } },
@@ -95,12 +103,16 @@ async function handle(message) {
         await call("/api/system/route", {
           method: "POST",
           body: JSON.stringify({ condition }),
-        }),
+        })
       );
     }
     throw new Error(`Unknown MAXX Migrations tool: ${name}`);
   }
-  return { jsonrpc: "2.0", id, error: { code: -32601, message: `Method not found: ${method}` } };
+  return {
+    jsonrpc: "2.0",
+    id,
+    error: { code: -32601, message: `Method not found: ${method}` },
+  };
 }
 
 process.stdin.setEncoding("utf8");
@@ -119,7 +131,10 @@ process.stdin.on("data", async (chunk) => {
       write({
         jsonrpc: "2.0",
         id: message?.id ?? null,
-        error: { code: -32000, message: error instanceof Error ? error.message : String(error) },
+        error: {
+          code: -32000,
+          message: error instanceof Error ? error.message : String(error),
+        },
       });
     }
   }

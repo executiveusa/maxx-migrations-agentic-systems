@@ -31,13 +31,21 @@ for (const bucket of ["reset", "momentum", "scale", "launch"]) {
 }
 
 const auth = readFileSync("lib/system/machine-auth.ts", "utf8");
-if (!auth.includes("timingSafeEqual") || !auth.includes("x-maxx-migrations-api-key")) {
-  console.error("machine federation auth must be timing-safe and use the dedicated header");
+if (
+  !auth.includes("timingSafeEqual") ||
+  !auth.includes("x-maxx-migrations-api-key")
+) {
+  console.error(
+    "machine federation auth must be timing-safe and use the dedicated header"
+  );
   failed = true;
 }
 
 const manifest = readFileSync("app/api/system/manifest/route.ts", "utf8");
-if (!manifest.includes("motionGate") || !manifest.includes("requiredBeforeWalkPass")) {
+if (
+  !manifest.includes("motionGate") ||
+  !manifest.includes("requiredBeforeWalkPass")
+) {
   console.error("manifest must expose the motion-before-walk gate");
   failed = true;
 }
@@ -59,4 +67,6 @@ if (failed) {
   process.exit(1);
 }
 
-console.log("federation-contract passed: API, CLI, MCP, ICM and motion gate are structurally wired");
+console.log(
+  "federation-contract passed: API, CLI, MCP, ICM and motion gate are structurally wired"
+);
