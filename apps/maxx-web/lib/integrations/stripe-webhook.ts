@@ -14,7 +14,10 @@ export function verifyStripeWebhook(rawBody: string, signatureHeader: string | n
 
   const parts = signatureHeader.split(",").map((part) => part.trim().split("=", 2));
   const timestamp = parts.find(([key]) => key === "t")?.[1];
-  const signatures = parts.filter(([key]) => key === "v1").map(([, value]) => value).filter(Boolean);
+  const signatures = parts
+    .filter(([key]) => key === "v1")
+    .map(([, value]) => value ?? "")
+    .filter((value): value is string => value.length > 0);
   if (!timestamp || signatures.length === 0) return { valid: false, reason: "Malformed Stripe signature" };
 
   const timestampSeconds = Number(timestamp);
