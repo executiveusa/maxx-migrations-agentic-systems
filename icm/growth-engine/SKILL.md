@@ -84,6 +84,23 @@ Then run a Humanizer pass:
 - remove unsupported claims
 - replace abstract nouns with concrete consequences where possible
 
+## Boring revenue systems
+
+When the task is about repetitive business work, lead recovery, response speed, missed calls, invoice recovery, outbound, receptionist systems, content repurposing, or productizing automation, read `boring-revenue/SKILL.md`.
+
+Default rule: prefer the boring recurring job closest to money over a technically impressive build.
+
+Use this order when choosing the first experiment:
+
+1. recover cash already owed
+2. recover leads already acquired
+3. stop losing inbound demand
+4. improve response and conversion
+5. create additional qualified demand
+6. then automate broader scale
+
+A narrow wedge should earn the right to become a larger system through evidence.
+
 ## Bucket execution
 
 ### Reset
