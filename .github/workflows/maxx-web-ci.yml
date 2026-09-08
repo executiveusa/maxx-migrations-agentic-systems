@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "apps/maxx-web/**"
+      - "icm/revenue-capture-os/**"
       - ".github/workflows/maxx-web-ci.yml"
   push:
     branches:
@@ -11,6 +12,7 @@ on:
       - main
     paths:
       - "apps/maxx-web/**"
+      - "icm/revenue-capture-os/**"
       - ".github/workflows/maxx-web-ci.yml"
 
 permissions:
@@ -22,7 +24,7 @@ concurrency:
 
 jobs:
   verify:
-    name: lint · typecheck · unit · audit · build
+    name: lint · typecheck · unit · walk · audit · build
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -50,6 +52,9 @@ jobs:
 
       - name: Unit tests
         run: npm run test
+
+      - name: Revenue Capture ICM walk test
+        run: npm run walk:revenue-capture
 
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=high

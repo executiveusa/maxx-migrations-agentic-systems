@@ -24,7 +24,7 @@ export class TwilioProvider implements TelephonyProvider {
 
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
-    const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+    const fromNumber = request.fromNumber || process.env.TWILIO_PHONE_NUMBER;
     const auth = Buffer.from(`${accountSid}:${authToken}`).toString("base64");
 
     try {
@@ -44,12 +44,25 @@ export class TwilioProvider implements TelephonyProvider {
         },
       );
 
+      const text = await response.text();
       if (!response.ok) {
-        const body = await response.text();
-        return { success: false, status: "failed", message: `Twilio API error: ${body}` };
+        return { success: false, status: "failed", message: `Twilio API error (${response.status}).` };
       }
 
-      return { success: true, status: "sent", message: `SMS sent to ${request.toNumber} via Twilio.` };
+      let sid: string | undefined;
+      try {
+        const parsed = JSON.parse(text) as { sid?: string };
+        sid = parsed.sid;
+      } catch {
+        sid = undefined;
+      }
+
+      return {
+        success: true,
+        status: "sent",
+        message: "SMS accepted by Twilio for delivery.",
+        providerMessageId: sid,
+      };
     } catch (error) {
       return {
         success: false,
