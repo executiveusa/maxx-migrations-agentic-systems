@@ -55,6 +55,7 @@ export const HONEST_DISCLOSURES = [
   /\bdoes not manufacture a fake\b/i,
   /\bwithout fake\b/i,
   /\brefuse fake completion\b/i,
+  /"fake proof claims"/i,
 ];
 export function isBannedSourceLine(line, { name, pattern }) {
   if (!pattern.test(line)) return false;
