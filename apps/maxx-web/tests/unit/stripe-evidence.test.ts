@@ -1,0 +1,7 @@
+import { describe,expect,it } from "vitest";
+import { resolveStripeTenant,stripeEconomicEntry } from "@/lib/revenue-capture/stripe-evidence";
+describe("Stripe economic evidence",()=>{
+  it("requires an account binding rather than trusting organization metadata",async()=>{const lookup=async()=>({organizationId:"org_a",connectionId:"conn_a"});expect(await resolveStripeTenant(null,"org_a",lookup)).toBeNull();await expect(resolveStripeTenant("acct_a","org_b",lookup)).rejects.toThrow("conflicts");expect(await resolveStripeTenant("acct_a","org_a",lookup)).toEqual({organizationId:"org_a",connectionId:"conn_a"});});
+  it("only records successful payment and refund economic objects",()=>{expect(stripeEconomicEntry("payment_intent.succeeded",{id:"pi_1",amount_received:1000,currency:"usd"})).toEqual({entryType:"payment",amountCents:1000,currency:"USD",sourceRef:"pi_1"});expect(stripeEconomicEntry("refund.updated",{id:"re_1",amount:200,currency:"usd",status:"succeeded"})).toEqual({entryType:"refund",amountCents:200,currency:"USD",sourceRef:"re_1"});expect(stripeEconomicEntry("charge.refunded",{id:"ch_1",amount:200,currency:"usd"})).toBeNull();expect(stripeEconomicEntry("refund.created",{id:"re_1",amount:200,currency:"usd",status:"pending"})).toBeNull();});
+  it("rejects malformed amounts rather than inventing payment totals",()=>{expect(()=>stripeEconomicEntry("payment_intent.succeeded",{id:"pi_1",amount:1000,currency:"usd"})).toThrow("Invalid Stripe");});
+});

@@ -19,6 +19,7 @@ export const appNavItems: NavItem[] = [
 
 /** Operator routes are deliberately separate from the client navigation. */
 export const operatorNavItems: NavItem[] = [
+  { href: "/app/operations", label: "Fleet", icon: "chart" },
   { href: "/app/command-center", label: "Mission Control", icon: "grid" },
   { href: "/app/projects", label: "Projects", icon: "kanban" },
   { href: "/app/contacts", label: "Contacts", icon: "users" },
