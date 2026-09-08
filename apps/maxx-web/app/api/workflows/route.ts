@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { workflowSchema } from "@/lib/validation/workflow";
 import { getStore } from "@/lib/data/store";
 import { isSeedMode } from "@/lib/data/mode";
-import { getCurrentOrgId, getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { resolveAuthorizedOrgId, tenantErrorResponse } from "@/lib/auth/tenant";
 import { currentOrganization } from "@/lib/mock-data/organizations";
 import type { Workflow, WorkflowStep, WorkflowStepType } from "@/lib/types/workflows";
 
@@ -79,8 +80,8 @@ export async function GET() {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
     const { data, error } = await supabase
       .from("maxx_workflows")
       .select("*, maxx_workflow_steps(*), maxx_workflow_runs(*)")
@@ -94,7 +95,7 @@ export async function GET() {
     const workflows = (data ?? []).map(mapWorkflowRow);
     return NextResponse.json({ workflows });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }
 
@@ -132,8 +133,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
     const { name, description, templateId, steps } = parsed.data;
 
     const { data: workflowRow, error } = await supabase
@@ -175,6 +176,6 @@ export async function POST(request: NextRequest) {
     const workflow = mapWorkflowRow({ ...workflowRow, maxx_workflow_steps: insertedSteps, maxx_workflow_runs: [] });
     return NextResponse.json({ workflow }, { status: 201 });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { opportunitySchema } from "@/lib/validation/opportunity";
 import { getStore } from "@/lib/data/store";
 import { isSeedMode } from "@/lib/data/mode";
-import { getCurrentOrgId, getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { resolveAuthorizedOrgId, tenantErrorResponse } from "@/lib/auth/tenant";
 import type { Opportunity } from "@/lib/types/pipeline";
 
 /** Maps a maxx_opportunities row (+ joined maxx_contacts) to the API's Opportunity shape. */
@@ -67,8 +68,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
 
     // Build query with filters
     let query = supabase
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
     const total = count ?? 0;
     return NextResponse.json({ opportunities, total, offset, limit });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }
 
@@ -129,8 +130,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
     const { pipelineId, stageId, contactId, title, value } = parsed.data;
 
     const { data: contact, error: contactError } = await supabase
@@ -167,6 +168,6 @@ export async function POST(request: NextRequest) {
     const opportunity = mapOpportunityRow({ ...data, maxx_contacts: contact ?? null });
     return NextResponse.json({ opportunity }, { status: 201 });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }
