@@ -8,7 +8,9 @@ import {
   isBannedSourceLine,
 } from "./_shared.mjs";
 
-console.log("Scanning app/, components/, and lib/ for banned stub/placeholder content");
+console.log(
+  "Scanning app/, components/, and lib/ for banned stub/placeholder content"
+);
 let violations = 0;
 for (const dir of SOURCE_DIRS) {
   for (const file of walkFiles(dir)) {
@@ -16,7 +18,11 @@ for (const dir of SOURCE_DIRS) {
     lines.forEach((line, index) => {
       for (const rule of BANNED_PATTERNS) {
         if (isBannedSourceLine(line, rule)) {
-          console.log(`  ✗ ${relative(file)}:${index + 1} — "${rule.name}" — ${line.trim().slice(0, 100)}`);
+          console.log(
+            `  ✗ ${relative(file)}:${index + 1} — "${rule.name}" — ${line
+              .trim()
+              .slice(0, 100)}`
+          );
           violations += 1;
         }
       }
@@ -24,7 +30,11 @@ for (const dir of SOURCE_DIRS) {
   }
 }
 if (violations > 0) {
-  console.error(`\nno-stubs failed: ${violations} banned pattern match(es) found.`);
+  console.error(
+    `\nno-stubs failed: ${violations} banned pattern match(es) found.`
+  );
   process.exit(1);
 }
-console.log("\nno-stubs passed: no banned stub/placeholder patterns found in app/, components/, or lib/.");
+console.log(
+  "\nno-stubs passed: no banned stub/placeholder patterns found in app/, components/, or lib/."
+);
