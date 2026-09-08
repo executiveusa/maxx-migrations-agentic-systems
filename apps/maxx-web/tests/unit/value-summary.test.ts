@@ -4,14 +4,14 @@ const row = (entry_type: string, amount_cents: number, currency = "USD", confide
 describe("Value Ledger economics", () => {
   it("does not count a booking and recovery as three payments", () => {
     const result = summarizeValueLedger([row("booked_revenue",10000),row("recovered_revenue",10000),row("payment",10000),row("refund",2000)]);
-    expect(result[0].totalsCents.VERIFIED).toBe(8000);
-    expect(result[0].bookedCents.VERIFIED).toBe(10000);
-    expect(result[0].recoveredCents.VERIFIED).toBe(10000);
+    expect(result[0]?.totalsCents.VERIFIED).toBe(8000);
+    expect(result[0]?.bookedCents.VERIFIED).toBe(10000);
+    expect(result[0]?.recoveredCents.VERIFIED).toBe(10000);
   });
   it("does not turn leads, costs or estimates into verified cash", () => {
     const result = summarizeValueLedger([row("lead_value",50000),row("cost",1000),row("payment",2000,"USD","ESTIMATED")]);
-    expect(result[0].totalsCents.VERIFIED).toBe(0);
-    expect(result[0].totalsCents.ESTIMATED).toBe(2000);
+    expect(result[0]?.totalsCents.VERIFIED).toBe(0);
+    expect(result[0]?.totalsCents.ESTIMATED).toBe(2000);
   });
   it("keeps currencies separate", () => {
     const result = summarizeValueLedger([row("payment",100,"USD"),row("payment",200,"MXN")]);

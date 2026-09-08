@@ -30,9 +30,11 @@ export async function GET() {
     if (connectionError) throw new Error(connectionError.message);
     const currencies = summarizeValueLedger(ledger);
     const pipelineByCurrency = moneyByCurrency(opportunities);
-    const currency = currencies.length === 1 && Object.keys(pipelineByCurrency).every((key) => key === currencies[0].currency)
-      ? currencies[0].currency : currencies.length === 0 && Object.keys(pipelineByCurrency).length <= 1
-        ? Object.keys(pipelineByCurrency)[0] ?? "USD" : null;
+    const onlyCurrency = currencies.length === 1 ? currencies[0]?.currency ?? null : null;
+    const pipelineCurrencies = Object.keys(pipelineByCurrency);
+    const currency = onlyCurrency && pipelineCurrencies.every((key) => key === onlyCurrency)
+      ? onlyCurrency : currencies.length === 0 && pipelineCurrencies.length <= 1
+        ? pipelineCurrencies[0] ?? "USD" : null;
     const selected = currency ? singleCurrency(currencies, currency) : null;
     const attention = [...opportunities].sort((a, b) => a.updated_at.localeCompare(b.updated_at)).slice(0, 3).map((row) => ({
       id: row.id, title: row.title, valueCents: Number(row.value_cents ?? 0), currency: row.currency ?? "USD", updatedAt: row.updated_at,
