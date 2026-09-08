@@ -101,6 +101,10 @@ Use this order when choosing the first experiment:
 
 A narrow wedge should earn the right to become a larger system through evidence.
 
+## Restaurant workflow
+
+For restaurant growth, catering, retention, customer reactivation or monthly content operations, load `restaurant-growth/CONTEXT.md` and then its `SKILL.md`. Use its Show and Tell™ procedure for the existing Monday/Wednesday/Friday social rhythm. This is a niche workflow under the four buckets, not another public category. Preserve the approved MACS copy and the existing Art of Reduction skill. The restaurant workflow is documentation-only until its live motion and authority gates are verified.
+
 ## Bucket execution
 
 ### Reset
