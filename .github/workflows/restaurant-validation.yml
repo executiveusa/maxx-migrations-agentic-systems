@@ -1,0 +1,44 @@
+name: Restaurant validation
+on:
+  pull_request:
+    paths:
+      - 'icm/growth-engine/**'
+      - 'apps/maxx-web/**'
+      - '.github/workflows/restaurant-validation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install application dependencies
+        working-directory: apps/maxx-web
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Run actual application verification
+        working-directory: apps/maxx-web
+        env:
+          CI: 'true'
+          MOCK_INTEGRATIONS: 'true'
+          NEXT_PUBLIC_AUTH_CONFIGURED: 'false'
+        run: npm run verify:full
+      - name: Check restaurant skill structure
+        run: |
+          test -f icm/growth-engine/restaurant-growth/CONTEXT.md
+          test -f icm/growth-engine/restaurant-growth/SKILL.md
+          test -f icm/growth-engine/restaurant-growth/SHOW_AND_TELL.md
+          test -f icm/growth-engine/restaurant-growth/EVIDENCE.md
+          grep -q 'restaurant-growth/SKILL.md' icm/growth-engine/SKILL.md
+          grep -q 'Status: PROPOSED' icm/growth-engine/restaurant-growth/SKILL.md
+      - name: Preserve test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restaurant-validation
+          path: ops/reports/harness/
+          if-no-files-found: ignore
