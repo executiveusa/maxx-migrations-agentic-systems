@@ -1,6 +1,6 @@
 ---
 name: macs-restaurant-growth
- description: Route restaurant growth through the existing MACS four-bucket engine, select one measurable intervention, and operate approved content and follow-up through the canonical ICM and Agent MAXX.
+description: Route restaurant growth through the existing MACS four-bucket engine, select one measurable intervention, and operate approved content and follow-up through the canonical ICM and Agent MAXX.
 ---
 
 # MACS Restaurant Growth
