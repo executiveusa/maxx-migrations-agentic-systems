@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { contactSchema } from "@/lib/validation/contact";
 import { getStore } from "@/lib/data/store";
 import { isSeedMode } from "@/lib/data/mode";
-import { getCurrentOrgId, getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { resolveAuthorizedOrgId, tenantErrorResponse } from "@/lib/auth/tenant";
 import type { Contact } from "@/lib/types/contacts";
 
 /** Maps a maxx_contacts row (+ joined maxx_contact_tags) to the API's Contact shape. */
@@ -81,8 +82,8 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
 
     const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (parsed.data.firstName !== undefined) updateData.first_name = parsed.data.firstName;
@@ -126,7 +127,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     const contact = mapContactRow(data);
     return NextResponse.json({ contact }, { status: 200 });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }
 
@@ -145,8 +146,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
 
     const { error } = await supabase
       .from("maxx_contacts")
@@ -160,6 +161,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
     return new NextResponse(null, { status: 204 });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }
