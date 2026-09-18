@@ -5,21 +5,18 @@
     "type": "git",
     "url": "git+https://github.com/executiveusa/maxx-migrations-agentic-systems.git"
   },
-  "homepage": "https://github.com/executiveusa/maxx-migrations-agentic-systems",
+  "homepage": "https://maxx-migrations-agentic-systems.vercel.app",
   "author": "Maxx Migrations",
   "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/executiveusa/maxx-migrations-agentic-systems/issues"
   },
   "scripts": {
-    "postinstall": "cd banking && yarn install",
-    "dev": "cd banking && yarn dev",
-    "build": "cd banking && yarn build"
-  },
-  "devDependencies": {
-    "next": "^14.2.18"
-  },
-  "dependencies": {
-    "onscan.js": "^1.5.2"
+    "dev": "npm --prefix apps/maxx-web run dev",
+    "build": "npm --prefix apps/maxx-web run build",
+    "lint": "npm --prefix apps/maxx-web run lint",
+    "typecheck": "npm --prefix apps/maxx-web run typecheck",
+    "test": "npm --prefix apps/maxx-web run test",
+    "verify": "npm --prefix apps/maxx-web run verify:full"
   }
 }
