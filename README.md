@@ -1,177 +1,93 @@
+# MAXX Migrations - Agentic Systems
 
-<div align="center">
-    <a href="https://frappe.io/erpnext">
-	<img src="./erpnext/public/images/v16/erpnext.svg" alt="ERPNext Logo" height="80px" width="80px"/>
-    </a>
-    <h2>ERPNext</h2>
-    <div align="center">
-        <p>Powerful, Intuitive and Open-Source ERP</p>
-    </div>
+**Sovereign AI migrations for mission-driven teams.** This is the MACS Digital Media migration suite: the Maxx Migrations web product plus the private ICM (Interpretable Context Methodology) and agentic execution brain behind MACS Digital Media.
 
-[![Learn on Frappe School](https://img.shields.io/badge/Frappe%20School-Learn%20ERPNext-blue?style=flat-square)](https://frappe.school)<br><br>
-[![CI](https://github.com/frappe/erpnext/actions/workflows/server-tests-mariadb.yml/badge.svg?event=schedule)](https://github.com/frappe/erpnext/actions/workflows/server-tests-mariadb.yml)
-[![docker pulls](https://img.shields.io/docker/pulls/frappe/erpnext.svg)](https://hub.docker.com/r/frappe/erpnext)
+This repository started life as a fork of ERPNext, and the old README described only that fork. That is why the repo looked like an ERP project. The active product is described below; the ERPNext code is retained legacy (see the last section).
 
-</div>
+## The three-repo MACS system
 
-<div align="center">
-	<img src="./erpnext/public/images/v16/hero_image.png" alt="ERPNext Hero Image"/>
-</div>
+Per `icm/maxx-suite/README.md`:
 
-<div align="center">
-	<a href="https://erpnext-demo.frappe.cloud/api/method/erpnext_demo.erpnext_demo.auth.login_demo">Live Demo</a>
-	-
-	<a href="https://frappe.io/erpnext">Website</a>
-	-
-	<a href="https://docs.frappe.io/erpnext/">Documentation</a>
-</div>
+| Repo | Job |
+| --- | --- |
+| `executiveusa/macsdigitalmedia` | Public MACS Digital Media storefront |
+| `executiveusa/maxx-migrations-agentic-systems` (this repo) | Canonical data, ICM, workflow, approval, evidence, migration and agentic backend |
+| `executiveusa/macs-agent-portal` | Agent MAXX customer/operator interface; calls this repo's backend as a control API |
 
-## ERPNext
+## What is real now
 
-100% Open-Source ERP System to help you run your business.
+### `apps/maxx-web` - the Maxx Migrations web app
 
-### Motivation
+Next.js 16 + Supabase, deployed on Vercel as a monorepo with root directory `apps/maxx-web` (see `docs/deployment/VERCEL_MONOREPO_FIX.md`).
 
-Running a business is a complex task - handling invoices, tracking stock, managing personnel, and other daily operations. In a market where software is sold separately to manage each of these tasks, ERPNext does all of the above and more, for free.
+Public marketing surface:
 
-### Key Features
+- `/`, `/how-it-works`, `/pricing`, `/work`, `/privacy`, `/terms`
+- `/features` with sub-pages: website-migration, ghl-import, missed-call-text-back, social-planner, workflows, community, courses
 
-- **Accounting**: All the tools you need to manage cash flow in one place, right from recording transactions to summarizing and analyzing financial reports.
-- **Order Management**: Track inventory levels, replenish stock, and manage sales orders, customers, suppliers, shipments, deliverables, and order fulfillment.
-- **Manufacturing**: Simplifies the production cycle, helps track material consumption, exhibits capacity planning, handles subcontracting, and more!
-- **Asset Management**: From purchase to disposal, IT infrastructure to equipment. Covers every branch of your organization, all in one centralized system.
-- **Projects**: Deliver both internal and external projects on time, budget and profitability. Track tasks, timesheets, and issues by project.
+Migration audit intake:
 
-<details open>
+- `/migration-audit` posts to `POST /api/migrations/extract` (lead capture). Approved audits become real migration jobs through `POST /api/migrations/jobs`.
 
-<summary>More</summary>
-	<img src="https://erpnext.com/files/v16_bom.png"/>
-	<img src="https://erpnext.com/files/v16_stock_summary.png"/>
-	<img src="https://erpnext.com/files/v16_job_card.png"/>
-	<img src="https://erpnext.com/files/v16_tasks.png"/>
-</details>
+Client workspace (MVP, under `/app`):
 
-### Under the Hood
+- contacts, pipeline, migrations, inbox, projects, revenue, workflows, agents, command-center, community, forms, import, missed-calls, social-planner, settings
 
-- [**Frappe Framework**](https://github.com/frappe/frappe): A full-stack web application framework written in Python and JavaScript. The framework provides a robust foundation for building web applications, including a database abstraction layer, user authentication, and a REST API.
+API surface (under `/api`):
 
-- [**Frappe UI**](https://github.com/frappe/frappe-ui): A Vue-based UI library, to provide a modern user interface. The Frappe UI library provides a variety of components that can be used to build single-page applications on top of the Frappe Framework.
+- agents, contacts, pipeline, migrations (extract, jobs), workflows, forms, community (posts, comments, dm), courses, social (posts, publish, schedule), missed-call text-back and Twilio (sms, voice, status), flywheel (launch, status, stop), health
 
-## Production Setup
+Agent interfaces:
 
-### Managed Hosting
+- CLI: `npm run maxx:cli` (`cli/maxx-migrations.mjs`)
+- MCP server: `npm run maxx:mcp` (`mcp/maxx-migrations-server.mjs`)
 
-You can try [Frappe Cloud](https://frappecloud.com), a simple, user-friendly, and sophisticated [open-source](https://github.com/frappe/press) platform to host Frappe applications reliably and securely.
+Verification:
 
-It handles installation, setup, upgrades, monitoring, maintenance, and support of your Frappe deployments. It is a fully featured developer platform with an ability to manage and control multiple Frappe deployments.
+- `npm run verify:full` = lint + typecheck + unit tests + production build + 12 harness checks (preflight, no-stubs, route audit, link check, API CRUD, copy audit, env audit, artifact audit, browser verify, client-zero proof, federation contract). CI enforces a production dependency audit and a client quality gate.
 
-<div>
-	<a href="https://erpnext-demo.frappe.cloud/app/home" target="_blank" rel="noopener noreferrer">
-		<picture>
-			<source media="(prefers-color-scheme: dark)" srcset="https://frappe.io/files/try-on-fc-white.png">
-			<img src="https://frappe.io/files/try-on-fc-black.png" alt="Try on Frappe Cloud" height="28" />
-		</picture>
-	</a>
-</div>
+Backend:
 
+- Supabase schema, auth, CRUD, agent chat and voice landed in July 2026 (PR #8). An authenticated, JWT-protected Agent MAXX backend with fail-closed tenant isolation and approval proofs landed across August-September 2026.
+- When auth is not configured the app runs in seed mode against an in-memory store, the workspace shows a visible sample-data demo banner, and API responses say which mode served the request.
 
-### Self-Hosted
-#### Docker
+### `icm/` - the ICM workflow library
 
-See [Frappe Docker Documentation](https://github.com/frappe/frappe_docker) for full documentation & FAQ on Docker setup
+ICM (Interpretable Context Methodology): the folder structure is the routing architecture; stage contracts name exact inputs, process, outputs, and human checks; plain-text artifacts carry inspectable state.
 
-#### Prerequisites
+- `icm/site-transformation-protocol/` - the canonical website migration workflow: TRUTH, POSITION, ARCHITECT, PROVE, DESIGN, BUILD, GAUNTLET, LEARN. Design is phase 5, not phase 1. Agents must pass its `WALK_TEST.md` before executing a transformation.
+- `icm/clients/macs-digital-media/` - Client Zero, the first client instance of the protocol.
+- `icm/growth-engine/` - the four-bucket commercial system: Reset, Momentum, Scale, Launch, plus experiment records judged by observed evidence.
+- `icm/maxx-suite/` - the MAXX portfolio router: which repo owns which job, what is core vs experimental, and the product-pipeline gate for new ideas.
+- `icm/federation/` - cross-repo contracts and the federation walk test (status is PASS only with current evidence).
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose v2](https://docs.docker.com/compose/)
-- [git](https://docs.github.com/en/get-started/getting-started-with-git/set-up-git)
+### Supporting folders
 
-> For Docker basics and best practices refer to Docker's [documentation](https://docs.docker.com)
+- `docs/` - operating docs: business intake SOP, Revenue Capture OS, deployment (Vercel monorepo, Flywheel VPS), QA, design, harness, client-zero rollback, final polish audit
+- `agencies/` - six agency workspaces: macs-digital, afromations, cheggie-media, kupuri-media, myweblane, pauli-effect
+- `skills/` - agent skill packs, loaded per task type
+- `beads/` - the BEADS protocol and checkpoints
+- `ops/` - Flywheel VPS setup and reports
+- `AGENTS.md`, `CLAUDE.md`, `agents.md` - the agent authority and workflow contracts for this repo
 
-### Try on your environment
+## Honest status
 
-> **⚠️ Disposable demo only**
->
-> **This setup is intended for quick evaluation. Expect to throw the environment away.** You will not be able to install custom apps to this setup. For production deployments, custom configurations, and detailed explanations, see the full documentation.
+Real and verified against the tree (September 2026):
 
-First clone the repo:
+- Everything above exists and builds; recent history is active (Next 16 security upgrade, authenticated Agent MAXX backend, ICM federation, restaurant workflow harness).
+- The product positioning in the live hero copy: "Sovereign AI migrations for mission-driven teams. One-time install. Owned code. Owned data. Optional AI partnership."
 
-```sh
-git clone https://github.com/frappe/frappe_docker
-cd frappe_docker
-```
+Stated plainly, not done yet:
 
-Then run:
+- The audit-intake endpoint (`/api/migrations/extract`) stores submissions in a process-lifetime store; its own contract notes Supabase write-through still has to be wired before the form is used for paid traffic.
+- The client workspace is an MVP: without configured auth it serves seeded sample data, labeled as such in the UI.
+- Voice is the preferred long-term command surface; current voice support is partial.
+- The federation walk test governs what the three-repo system may claim; documentation or build presence alone is not motion.
 
-```sh
-docker compose -f pwd.yml up -d
-```
-Wait for a couple of minutes for ERPNext site to be created or check the `create-site` container logs before opening browser on port `8080`. (username: `Administrator`, password: `admin`)
+## Legacy: the ERPNext fork
 
-See [Frappe Docker](https://github.com/frappe/frappe_docker/blob/main/docs/01-getting-started/03-arm64.md) for ARM based docker setup
+The repository root still contains the upstream ERPNext fork (`erpnext/`, `banking/`, `app.py`, `pyproject.toml`, and the original CI/config files). That code is retained history, not the active product, and the Vercel deployment builds only `apps/maxx-web`. Upstream ERPNext code remains under its original license (`license.txt`).
 
+## Working in this repo
 
-## Development Setup
-### Manual Install
-
-The Easy Way: our install script for bench will install all dependencies (e.g. MariaDB). See https://github.com/frappe/bench for more details.
-
-New passwords will be created for the ERPNext "Administrator" user, the MariaDB root user, and the Frappe user (the script displays the passwords and saves them to ~/frappe_passwords.txt).
-
-
-### Local
-
-To setup the repository locally follow the steps mentioned below:
-
-1. Setup bench by following the [Installation Steps](https://frappeframework.com/docs/user/en/installation) and start the server
-   ```
-   bench start
-   ```
-
-2. In a separate terminal window, run the following commands:
-   ```
-   # Create a new site
-   bench new-site erpnext.localhost
-   ```
-
-3. Get the ERPNext app and install it
-   ```
-   # Get the ERPNext app
-   bench get-app https://github.com/frappe/erpnext
-
-   # Install the app
-   bench --site erpnext.localhost install-app erpnext
-   ```
-
-4. Open the URL `http://erpnext.localhost:8000/app` in your browser, you should see the app running
-
-## Learning and Community
-
-1. [Frappe School](https://school.frappe.io) - Learn Frappe Framework and ERPNext from the various courses by the maintainers or from the community.
-2. [Official documentation](https://docs.erpnext.com/) - Extensive documentation for ERPNext.
-3. [Discussion Forum](https://discuss.frappe.io/c/erpnext/6) - Engage with the community of ERPNext users and service providers.
-4. [Telegram Group](https://erpnext_public.t.me) - Get instant help from huge community of users.
-
-
-## Contributing
-
-1. [Issue Guidelines](https://github.com/frappe/erpnext/wiki/Issue-Guidelines)
-2. [Report Security Vulnerabilities](https://erpnext.com/security)
-3. [Pull Request Requirements](https://github.com/frappe/erpnext/wiki/Contribution-Guidelines)
-4. [Translations](https://crowdin.com/project/frappe)
-
-
-## Logo and Trademark Policy
-
-Please read our [Logo and Trademark Policy](TRADEMARK_POLICY.md).
-
-<br />
-<br />
-<div align="center" style="padding-top: 0.75rem;">
-	<a href="https://frappe.io" target="_blank">
-		<picture>
-			<source media="(prefers-color-scheme: dark)" srcset="https://frappe.io/files/Frappe-white.png">
-			<img src="https://frappe.io/files/Frappe-black.png" alt="Frappe Technologies" height="28"/>
-		</picture>
-	</a>
-</div>
+Agents cold-start from `AGENTS.md`: read the ICM contracts, inspect the actual current state before changing anything, reuse before adding, make one verifiable slice at a time, and never claim production success without production evidence. Secrets are never committed; consequential writes require explicit approval.
