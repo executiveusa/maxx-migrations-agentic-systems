@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { contactSchema } from "@/lib/validation/contact";
 import { getStore } from "@/lib/data/store";
 import { isSeedMode } from "@/lib/data/mode";
-import { getCurrentOrgId, getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { resolveAuthorizedOrgId, tenantErrorResponse } from "@/lib/auth/tenant";
 import { currentOrganization } from "@/lib/mock-data/organizations";
 import type { Contact, ContactStatus, ContactSource } from "@/lib/types/contacts";
 
@@ -71,8 +72,8 @@ export async function GET(request: NextRequest) {
   // (see lib/data/supabase-client.ts for why the service-role client can't
   // rely on maxx_is_org_member RLS alone yet).
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
 
     // Build query with filters
     let query = supabase
@@ -100,7 +101,7 @@ export async function GET(request: NextRequest) {
     const total = count ?? 0;
     return NextResponse.json({ contacts, total, offset, limit });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }
 
@@ -138,8 +139,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
     const { tags, firstName, lastName, email, phone, status, source } = parsed.data;
 
     const { data, error } = await supabase
@@ -174,6 +175,6 @@ export async function POST(request: NextRequest) {
     const contact = mapContactRow({ ...data, maxx_contact_tags: tags.map((tag) => ({ tag })) });
     return NextResponse.json({ contact }, { status: 201 });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }

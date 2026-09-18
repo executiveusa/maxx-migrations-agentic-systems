@@ -5,9 +5,26 @@ Canonical runtime: executiveusa/maxx-migrations-agentic-systems
 
 ## Purpose
 
-ICM (Intelligent Context Management) is the model of the business that lets replaceable agents reason from shared, source-aware truth instead of starting from a blank chat.
+ICM means **Interpretable Context Methodology**: folder structure is agent architecture, routing files are small catalogs, stage contracts name exact inputs/process/outputs/human checks, and plain-text artifacts make working state inspectable.
 
-Agents are workers. ICM is durable organizational memory. Models and vendors are replaceable components.
+Within MAXX, ICM also carries the durable business context graph that lets replaceable agents reason from shared, source-aware truth instead of starting from a blank chat. The method is the structure; the context graph is the business truth stored and routed through that structure.
+
+Agents are workers. ICM is durable organizational memory and routing. Models, portals, vendors, CLIs and MCP clients are replaceable components.
+
+Read `docs/icm/FEDERATION_CONTRACT.md` for the three-repository ownership and machine-call boundary.
+
+## Structural invariants
+
+- One folder, one job.
+- Root entry files route; they do not carry the library.
+- Numbering encodes order where sequence matters.
+- Working folders carry explicit `CONTEXT.md` contracts.
+- Stable factory/reference material is separated from per-run product/output.
+- Intermediate outputs are inspectable edit surfaces.
+- Load only what the current step needs.
+- One home per fact; link instead of copy.
+- Files/canonical records carry state; generated indexes are not hand-maintained truth.
+- Reusable work is instantiated from templates rather than blank ad hoc structures.
 
 ## Minimum context graph
 
@@ -66,10 +83,18 @@ Consequential actions cannot execute until a matching approval is persisted and 
 
 ## Frontend contract
 
-The MACS Digital Media storefront communicates with MAXX through narrow authenticated APIs/events, never direct database/service-role access.
+The MACS Digital Media storefront and Agent MAXX communicate with MAXX Migrations through narrow authenticated contracts, never direct database/service-role access.
 
 Initial closed loop:
 
 inquiry → durable client-scoped record → diagnosis → proposed action → human approval if consequential → execution → evidence → learning/export
 
 This loop is the Client Zero proof target before broader autonomous capabilities.
+
+## Motion before walk-test pass
+
+A structurally correct ICM is not enough to call the full product wired. Before a federation walk test can pass, at least one intended path must produce motion:
+
+`surface -> handler -> transport -> canonical owner -> observable result -> evidence`
+
+See `icm/federation/WALK_TEST.md`.

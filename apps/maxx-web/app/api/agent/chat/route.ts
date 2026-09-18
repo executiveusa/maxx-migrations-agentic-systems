@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import type { MessageParam } from "@anthropic-ai/sdk/resources/messages";
-import { getCurrentOrgId } from "@/lib/data/supabase-client";
+import { isSeedMode } from "@/lib/data/mode";
+import { currentOrganization } from "@/lib/mock-data/organizations";
+import { resolveAuthorizedOrgId, tenantErrorResponse } from "@/lib/auth/tenant";
 import { selectModel, isWriteTool, type ChatMessage } from "@/lib/agents/chat-router";
 import { getToolDefinitions, executeTool, type ToolName } from "@/lib/agents/tools";
 
@@ -34,7 +36,12 @@ export async function POST(request: NextRequest): Promise<Response> {
       return NextResponse.json({ error: "Messages must be an array" }, { status: 400 });
     }
 
-    const orgId = getCurrentOrgId();
+    let orgId: string;
+    try {
+      orgId = isSeedMode() ? currentOrganization.id : await resolveAuthorizedOrgId();
+    } catch (err) {
+      return tenantErrorResponse(err);
+    }
     const model = selectModel(messages);
     const apiModel = model === "haiku" ? "claude-haiku-4-5-20251001" : "claude-sonnet-5-20241022";
 

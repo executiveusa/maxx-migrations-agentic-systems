@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getStore } from "@/lib/data/store";
 import { isSeedMode } from "@/lib/data/mode";
-import { getCurrentOrgId, getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { getSupabaseClient, supabaseErrorStatus } from "@/lib/data/supabase-client";
+import { resolveAuthorizedOrgId, tenantErrorResponse } from "@/lib/auth/tenant";
 import type { Opportunity } from "@/lib/types/pipeline";
 
 /** Maps a maxx_opportunities row (+ joined maxx_contacts) to the API's Opportunity shape. */
@@ -84,8 +85,8 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
 
     const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (parsed.data.stageId !== undefined) updateData.stage_id = parsed.data.stageId;
@@ -109,7 +110,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
     const opportunity = mapOpportunityRow(data);
     return NextResponse.json({ opportunity }, { status: 200 });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }
 
@@ -128,8 +129,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
   }
 
   try {
+    const orgId = await resolveAuthorizedOrgId();
     const supabase = getSupabaseClient();
-    const orgId = getCurrentOrgId();
 
     const { error } = await supabase
       .from("maxx_opportunities")
@@ -143,6 +144,6 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
     return new NextResponse(null, { status: 204 });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    return tenantErrorResponse(err);
   }
 }

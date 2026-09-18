@@ -1,6 +1,11 @@
 import { existsSync } from "node:fs";
 import process from "node:process";
-import { REQUIRED_PUBLIC_ROUTES, walkFiles, readText, relative } from "./_shared.mjs";
+import {
+  REQUIRED_PUBLIC_ROUTES,
+  walkFiles,
+  readText,
+  relative,
+} from "./_shared.mjs";
 
 // Resolves `@/components/...` style imports to a real file path so
 // composition-only pages (a page.tsx that just arranges imported sections)
@@ -53,7 +58,8 @@ const COPY_BAN = [/\blorem\b/i, /coming soon/i, /placeholder(?![:=])/i];
 // discards the copy inside its props.
 function extractStringLiterals(text) {
   const literals = [];
-  const pattern = /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g;
+  const pattern =
+    /"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|`((?:[^`\\]|\\.)*)`/g;
   let match;
   while ((match = pattern.exec(text))) {
     const value = match[1] ?? match[2] ?? match[3] ?? "";
@@ -72,13 +78,19 @@ for (const route of REQUIRED_PUBLIC_ROUTES) {
 
   for (const pattern of [...GENERIC_AI_FILLER, ...COPY_BAN]) {
     if (pattern.test(copyText)) {
-      console.log(`  ✗ ${relative(route)} — matched banned/filler pattern: ${pattern}`);
+      console.log(
+        `  ✗ ${relative(route)} — matched banned/filler pattern: ${pattern}`
+      );
       violations += 1;
     }
   }
 
   if (copyText.length < 150) {
-    console.log(`  ✗ ${relative(route)} — suspiciously little copy (${copyText.length} chars across string literals)`);
+    console.log(
+      `  ✗ ${relative(route)} — suspiciously little copy (${
+        copyText.length
+      } chars across string literals)`
+    );
     violations += 1;
   }
 }

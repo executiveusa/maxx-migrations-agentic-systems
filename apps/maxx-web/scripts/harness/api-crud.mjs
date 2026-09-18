@@ -74,61 +74,96 @@ async function runTests() {
 
   // CONTACTS TESTS
   test("POST /api/contacts (create)", async () => {
-    const { status, data } = await makeRequest("POST", "/api/contacts", testContact);
+    const { status, data } = await makeRequest(
+      "POST",
+      "/api/contacts",
+      testContact
+    );
     if (status !== 201) throw new Error(`Expected 201, got ${status}`);
-    if (!data.contact || !data.contact.id) throw new Error("No contact ID returned");
+    if (!data.contact || !data.contact.id)
+      throw new Error("No contact ID returned");
     createdContactId = data.contact.id;
   });
 
   test("GET /api/contacts (list)", async () => {
     const { status, data } = await makeRequest("GET", "/api/contacts");
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.contacts)) throw new Error("contacts is not an array");
+    if (!Array.isArray(data.contacts))
+      throw new Error("contacts is not an array");
   });
 
   test("GET /api/contacts?offset=0&limit=10 (pagination)", async () => {
-    const { status, data } = await makeRequest("GET", "/api/contacts?offset=0&limit=10");
+    const { status, data } = await makeRequest(
+      "GET",
+      "/api/contacts?offset=0&limit=10"
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.contacts)) throw new Error("contacts is not an array");
-    if (typeof data.total !== "number") throw new Error("total is not a number");
-    if (typeof data.offset !== "number") throw new Error("offset is not a number");
-    if (typeof data.limit !== "number") throw new Error("limit is not a number");
+    if (!Array.isArray(data.contacts))
+      throw new Error("contacts is not an array");
+    if (typeof data.total !== "number")
+      throw new Error("total is not a number");
+    if (typeof data.offset !== "number")
+      throw new Error("offset is not a number");
+    if (typeof data.limit !== "number")
+      throw new Error("limit is not a number");
   });
 
   test("GET /api/contacts?status=lead (filter by status)", async () => {
-    const { status, data } = await makeRequest("GET", "/api/contacts?status=lead");
+    const { status, data } = await makeRequest(
+      "GET",
+      "/api/contacts?status=lead"
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.contacts)) throw new Error("contacts is not an array");
+    if (!Array.isArray(data.contacts))
+      throw new Error("contacts is not an array");
   });
 
   test("GET /api/contacts?source=manual (filter by source)", async () => {
-    const { status, data } = await makeRequest("GET", "/api/contacts?source=manual");
+    const { status, data } = await makeRequest(
+      "GET",
+      "/api/contacts?source=manual"
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.contacts)) throw new Error("contacts is not an array");
+    if (!Array.isArray(data.contacts))
+      throw new Error("contacts is not an array");
   });
 
   test("PATCH /api/contacts/:id (update)", async () => {
     if (!createdContactId) throw new Error("No contact ID from creation");
-    const { status, data } = await makeRequest("PATCH", `/api/contacts/${createdContactId}`, {
-      firstName: "Updated",
-    });
+    const { status, data } = await makeRequest(
+      "PATCH",
+      `/api/contacts/${createdContactId}`,
+      {
+        firstName: "Updated",
+      }
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (data.contact.firstName !== "Updated") throw new Error("firstName not updated");
+    if (data.contact.firstName !== "Updated")
+      throw new Error("firstName not updated");
   });
 
   test("PATCH /api/contacts/:id with tags", async () => {
     if (!createdContactId) throw new Error("No contact ID from creation");
-    const { status, data } = await makeRequest("PATCH", `/api/contacts/${createdContactId}`, {
-      tags: ["updated", "tag"],
-    });
+    const { status, data } = await makeRequest(
+      "PATCH",
+      `/api/contacts/${createdContactId}`,
+      {
+        tags: ["updated", "tag"],
+      }
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.contact.tags)) throw new Error("tags is not an array");
+    if (!Array.isArray(data.contact.tags))
+      throw new Error("tags is not an array");
   });
 
   test("PATCH /api/contacts/nonexistent (404)", async () => {
-    const { status } = await makeRequest("PATCH", "/api/contacts/nonexistent_id", {
-      firstName: "Test",
-    });
+    const { status } = await makeRequest(
+      "PATCH",
+      "/api/contacts/nonexistent_id",
+      {
+        firstName: "Test",
+      }
+    );
     if (status !== 404) throw new Error(`Expected 404, got ${status}`);
   });
 
@@ -138,64 +173,98 @@ async function runTests() {
     const opp = { ...testOpportunity, contactId: createdContactId };
     const { status, data } = await makeRequest("POST", "/api/pipeline", opp);
     if (status !== 201) throw new Error(`Expected 201, got ${status}`);
-    if (!data.opportunity || !data.opportunity.id) throw new Error("No opportunity ID returned");
+    if (!data.opportunity || !data.opportunity.id)
+      throw new Error("No opportunity ID returned");
     createdOpportunityId = data.opportunity.id;
   });
 
   test("GET /api/pipeline (list opportunities)", async () => {
     const { status, data } = await makeRequest("GET", "/api/pipeline");
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.opportunities)) throw new Error("opportunities is not an array");
+    if (!Array.isArray(data.opportunities))
+      throw new Error("opportunities is not an array");
   });
 
   test("GET /api/pipeline?offset=0&limit=10 (pagination)", async () => {
-    const { status, data } = await makeRequest("GET", "/api/pipeline?offset=0&limit=10");
+    const { status, data } = await makeRequest(
+      "GET",
+      "/api/pipeline?offset=0&limit=10"
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.opportunities)) throw new Error("opportunities is not an array");
-    if (typeof data.total !== "number") throw new Error("total is not a number");
+    if (!Array.isArray(data.opportunities))
+      throw new Error("opportunities is not an array");
+    if (typeof data.total !== "number")
+      throw new Error("total is not a number");
   });
 
   test("GET /api/pipeline?stageId=stage_1 (filter by stage)", async () => {
-    const { status, data } = await makeRequest("GET", "/api/pipeline?stageId=stage_1");
+    const { status, data } = await makeRequest(
+      "GET",
+      "/api/pipeline?stageId=stage_1"
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.opportunities)) throw new Error("opportunities is not an array");
+    if (!Array.isArray(data.opportunities))
+      throw new Error("opportunities is not an array");
   });
 
   test("GET /api/pipeline?pipelineId=pipe_123 (filter by pipeline)", async () => {
-    const { status, data } = await makeRequest("GET", "/api/pipeline?pipelineId=pipe_123");
+    const { status, data } = await makeRequest(
+      "GET",
+      "/api/pipeline?pipelineId=pipe_123"
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (!Array.isArray(data.opportunities)) throw new Error("opportunities is not an array");
+    if (!Array.isArray(data.opportunities))
+      throw new Error("opportunities is not an array");
   });
 
   test("PATCH /api/pipeline/:id (move deal to stage)", async () => {
-    if (!createdOpportunityId) throw new Error("No opportunity ID from creation");
-    const { status, data } = await makeRequest("PATCH", `/api/pipeline/${createdOpportunityId}`, {
-      stageId: "stage_2",
-    });
+    if (!createdOpportunityId)
+      throw new Error("No opportunity ID from creation");
+    const { status, data } = await makeRequest(
+      "PATCH",
+      `/api/pipeline/${createdOpportunityId}`,
+      {
+        stageId: "stage_2",
+      }
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
-    if (data.opportunity.stageId !== "stage_2") throw new Error("stageId not updated");
+    if (data.opportunity.stageId !== "stage_2")
+      throw new Error("stageId not updated");
   });
 
   test("PATCH /api/pipeline/:id with value update", async () => {
-    if (!createdOpportunityId) throw new Error("No opportunity ID from creation");
-    const { status, data } = await makeRequest("PATCH", `/api/pipeline/${createdOpportunityId}`, {
-      value: 7500,
-      title: "Updated Deal",
-    });
+    if (!createdOpportunityId)
+      throw new Error("No opportunity ID from creation");
+    const { status, data } = await makeRequest(
+      "PATCH",
+      `/api/pipeline/${createdOpportunityId}`,
+      {
+        value: 7500,
+        title: "Updated Deal",
+      }
+    );
     if (status !== 200) throw new Error(`Expected 200, got ${status}`);
     if (data.opportunity.value !== 7500) throw new Error("value not updated");
-    if (data.opportunity.title !== "Updated Deal") throw new Error("title not updated");
+    if (data.opportunity.title !== "Updated Deal")
+      throw new Error("title not updated");
   });
 
   test("DELETE /api/contacts/:id", async () => {
     if (!createdContactId) throw new Error("No contact ID from creation");
-    const { status } = await makeRequest("DELETE", `/api/contacts/${createdContactId}`);
+    const { status } = await makeRequest(
+      "DELETE",
+      `/api/contacts/${createdContactId}`
+    );
     if (status !== 204) throw new Error(`Expected 204, got ${status}`);
   });
 
   test("DELETE /api/pipeline/:id", async () => {
-    if (!createdOpportunityId) throw new Error("No opportunity ID from creation");
-    const { status } = await makeRequest("DELETE", `/api/pipeline/${createdOpportunityId}`);
+    if (!createdOpportunityId)
+      throw new Error("No opportunity ID from creation");
+    const { status } = await makeRequest(
+      "DELETE",
+      `/api/pipeline/${createdOpportunityId}`
+    );
     if (status !== 204) throw new Error(`Expected 204, got ${status}`);
   });
 
@@ -212,7 +281,9 @@ async function runTests() {
     }
   }
 
-  console.log(`\n${passed} passed, ${failed} failed out of ${tests.length} tests.`);
+  console.log(
+    `\n${passed} passed, ${failed} failed out of ${tests.length} tests.`
+  );
   return failed === 0;
 }
 
@@ -221,7 +292,9 @@ console.log(`Testing API at ${baseUrl}\n`);
 try {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 2000);
-  const response = await fetch(`${baseUrl}/api/health`, { signal: controller.signal });
+  const response = await fetch(`${baseUrl}/api/health`, {
+    signal: controller.signal,
+  });
   clearTimeout(timeout);
   if (!response.ok) {
     console.error(`Server returned ${response.status} on /api/health`);
