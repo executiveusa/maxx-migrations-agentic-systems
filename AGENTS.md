@@ -6,12 +6,14 @@ This repository is the canonical private ICM and agentic execution brain behind 
 
 Before meaningful work:
 
-1. Read `docs/icm/HUMAN_MACHINE_CONTRACT.md`.
-2. Read `docs/icm/FEDERATION_CONTRACT.md`.
-3. Read `docs/icm/ICM_CORE.md`.
-4. Read `CLAUDE.md` and the relevant docs/openspec specification.
+1. Read root `CONTEXT.md` — this is the universal ICM map.
+2. Read `docs/icm/HUMAN_MACHINE_CONTRACT.md`.
+3. Read `docs/icm/FEDERATION_CONTRACT.md` when work crosses repositories.
+4. Load only the smallest relevant context or specialized protocol.
 5. Inspect the actual current code/state.
 6. Declare MODE, OUTCOME, TARGET, CONSTRAINTS, PROOF, COMMERCIAL VALUE, AUTHORITY, and ROLLBACK.
+
+The universal working grammar is `01_orient -> 02_plan -> 03_work -> 04_verify -> 05_release -> 06_learn`. Specialized protocols plug into this grammar; they do not create a second operating architecture.
 
 The Human ↔ Machine Contract outranks repository-local convenience rules. No model-specific prompt or legacy execution instruction may weaken human authority gates, tenant isolation, evidence requirements, secret handling, rollback, or customer sovereignty.
 
