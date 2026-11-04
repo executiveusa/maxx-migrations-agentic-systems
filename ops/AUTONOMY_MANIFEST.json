@@ -39,6 +39,23 @@
       "scheduled_for": "2026-11-04T19:10:46Z",
       "recorded_status": "completed",
       "evidence": "ChatGPT Automations peek; read PR #37 and identified missing Instinct acknowledgment"
+    },
+    "external_monitor": {
+      "provider": "GitHub Actions",
+      "workflow": ".github/workflows/maxx-a2a-watch.yml",
+      "default_branch": "develop",
+      "activated_via_pr": "https://github.com/executiveusa/maxx-migrations-agentic-systems/pull/38",
+      "activation_commit_sha": "3c39f9d28cbed8e3da7e19f4862923520db1794b",
+      "cron": "*/10 * * * *",
+      "configured_on_default_branch": true,
+      "read_only": true,
+      "first_pr_smoke_run": {
+        "run_id": 41897434427,
+        "conclusion": "success"
+      },
+      "first_scheduled_run_verified": false,
+      "does_not_invoke_ai_models": true,
+      "github_schedule_best_effort": true
     }
   },
   "instinct": {
@@ -89,8 +106,8 @@
   "external_blockers": [
     "MACS-owned staging Supabase project unavailable via connected account",
     "Next.js staging runtime and app route not verified",
-    "Instinct authenticated A2A interface and scheduler not verified",
-    "Reviewer's authenticated account identity not verified"
+    "Reviewer's authenticated account identity not verified",
+    "Instinct authenticated A2A interface and its separate ten-minute worker scheduler not verified"
   ],
   "rollback": [
     "docs/client-zero/ROLLBACK.md",
