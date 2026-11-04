@@ -1,3 +1,7 @@
+> **MAXX Migrations fork notice (2026-11-04):** This repository also contains MACS's canonical ICM, client-governance contracts and the proposed portable MAXX SUITE client template. Start at [CONTEXT.md](CONTEXT.md), [AGENTS.md](AGENTS.md), [MAXX Suite](icm/maxx-suite/README.md) and [portable client template](icm/clients/_template/README.md). The ERPNext material below is inherited upstream content; it is not proof that the entire MAXX client platform is deployed. Preserve upstream GPLv3 obligations.
+
+---
+
 
 <div align="center">
     <a href="https://frappe.io/erpnext">
