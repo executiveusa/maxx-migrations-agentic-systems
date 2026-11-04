@@ -21,7 +21,7 @@ TRUSTED_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 
 def parse_message(body: str) -> dict | None:
     """Parse only a fenced, schema-identified message; never execute its contents."""
-    for match in re.finditer(r"```(?:json)?\s*(\{.*?\})\s*```", body or "", re.S):
+    for match in re.finditer(r"```(?:json)?\s*([\s\S]*?)\s*```", body or "", re.S):
         try:
             data = json.loads(match.group(1))
         except (json.JSONDecodeError, TypeError):
@@ -115,6 +115,7 @@ def summarize(pr: dict, comments: list[dict], now: datetime) -> dict:
     last_instinct = max((m["created_at"] for m in instinct if m["created_at"]), default=None)
     last_controller = max((m["created_at"] for m in controller if m["created_at"]), default=None)
     head = pr.get("head") or {}
+    instinct_age = age_minutes(last_instinct, now)
     return {
         "schema_version": "1",
         "project_id": PROJECT_ID,
@@ -130,10 +131,10 @@ def summarize(pr: dict, comments: list[dict], now: datetime) -> dict:
         "instinct": {
             "trusted_github_ack_claims": len(acks),
             "last_claimed_activity_at": last_instinct,
-            "minutes_since_claimed_activity": age_minutes(last_instinct, now),
+            "minutes_since_claimed_activity": instinct_age,
             "acknowledged_by_verified_instinct_transport": False,
             "ten_minute_worker_verified": False,
-            "needs_attention": not bool(acks) or (age_minutes(last_instinct, now) or 999999) > 30,
+            "needs_attention": not bool(acks) or instinct_age is None or instinct_age > 30,
         },
         "chatgpt_controller": {
             "last_github_controller_comment_at": last_controller,
