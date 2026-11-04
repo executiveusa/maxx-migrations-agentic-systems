@@ -69,6 +69,15 @@ class WatchTests(unittest.TestCase):
         report = watch.summarize(self.pr, [comment("a2a-ack/1", "instinct-execution-owner")], self.now)
         self.assertFalse(report["instinct"]["needs_attention"])
 
+    def test_zero_minute_fresh_claim(self):
+        report = watch.summarize(self.pr, [comment("a2a-ack/1", "instinct-execution-owner", created="2026-11-04T19:10:00Z")], self.now)
+        self.assertFalse(report["instinct"]["needs_attention"])
+
+    def test_nested_json_message(self):
+        payload = {"protocol": "a2a-status/1", "project_id": watch.PROJECT_ID, "message_id": "nested-1", "evidence": {"sha": "synthetic"}}
+        parsed = watch.parse_message("```json\n" + json.dumps(payload) + "\n```")
+        self.assertEqual(parsed["evidence"]["sha"], "synthetic")
+
     def test_invalid_timestamp_safe(self):
         self.assertIsNone(watch.age_minutes("not-a-time", self.now))
 
