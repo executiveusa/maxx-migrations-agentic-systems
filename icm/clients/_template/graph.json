@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "graph_id": "maxx-client-template-v1",
+  "authority": "MAXX canonical backend + tenant-scoped operational source systems",
+  "nodes": [
+    {
+      "id": "client",
+      "type": "tenant",
+      "path": "CONTEXT.md"
+    },
+    {
+      "id": "front_door",
+      "type": "interface",
+      "label": "Instinct external or MAXX portal fallback"
+    },
+    {
+      "id": "gateway",
+      "type": "contract",
+      "path": "_shared/CONTRACTS.md"
+    },
+    {
+      "id": "hermes",
+      "type": "orchestrator",
+      "path": "_shared/CONTRACTS.md"
+    },
+    {
+      "id": "paperclip",
+      "type": "scheduler",
+      "path": "_shared/CONTRACTS.md"
+    },
+    {
+      "id": "tools",
+      "type": "capability",
+      "path": "_shared/CONTRACTS.md"
+    },
+    {
+      "id": "postgres",
+      "type": "authority",
+      "path": "_shared/SECOND_BRAIN.md"
+    },
+    {
+      "id": "knowledge",
+      "type": "projection",
+      "path": "_shared/SECOND_BRAIN.md"
+    },
+    {
+      "id": "approvals",
+      "type": "policy",
+      "path": "04_approve/CONTEXT.md"
+    },
+    {
+      "id": "evidence",
+      "type": "record",
+      "path": "05_prove/CONTEXT.md"
+    },
+    {
+      "id": "cost",
+      "type": "ledger",
+      "path": "_shared/COST_POLICY.md"
+    },
+    {
+      "id": "intake",
+      "type": "stage",
+      "path": "01_intake/CONTEXT.md"
+    },
+    {
+      "id": "normalize",
+      "type": "stage",
+      "path": "02_normalize/CONTEXT.md"
+    },
+    {
+      "id": "isolate",
+      "type": "stage",
+      "path": "03_isolate/CONTEXT.md"
+    },
+    {
+      "id": "transform",
+      "type": "stage",
+      "path": "06_transform/CONTEXT.md"
+    },
+    {
+      "id": "repo_discovery",
+      "type": "audit",
+      "path": "_shared/REPO_DISCOVERY.md"
+    },
+    {
+      "id": "offer_playbooks",
+      "type": "skill",
+      "path": "_shared/OFFER_PLAYBOOKS.md"
+    }
+  ],
+  "edges": [
+    {
+      "from": "client",
+      "to": "intake",
+      "relation": "onboards_via"
+    },
+    {
+      "from": "intake",
+      "to": "normalize",
+      "relation": "provides_authorized_sources"
+    },
+    {
+      "from": "normalize",
+      "to": "isolate",
+      "relation": "requires_tenant_boundary"
+    },
+    {
+      "from": "front_door",
+      "to": "gateway",
+      "relation": "authenticated_intent"
+    },
+    {
+      "from": "gateway",
+      "to": "hermes",
+      "relation": "scoped_delegation"
+    },
+    {
+      "from": "hermes",
+      "to": "paperclip",
+      "relation": "assigns_bounded_tasks"
+    },
+    {
+      "from": "paperclip",
+      "to": "tools",
+      "relation": "invokes_allowed_capabilities"
+    },
+    {
+      "from": "tools",
+      "to": "approvals",
+      "relation": "checks_action_gate"
+    },
+    {
+      "from": "approvals",
+      "to": "evidence",
+      "relation": "produces_execution_receipt"
+    },
+    {
+      "from": "tools",
+      "to": "postgres",
+      "relation": "reads_authoritative_records"
+    },
+    {
+      "from": "postgres",
+      "to": "knowledge",
+      "relation": "projects_source_linked_context"
+    },
+    {
+      "from": "evidence",
+      "to": "cost",
+      "relation": "records_metered_usage"
+    },
+    {
+      "from": "evidence",
+      "to": "postgres",
+      "relation": "persists_proof"
+    },
+    {
+      "from": "transform",
+      "to": "offer_playbooks",
+      "relation": "loads_offer_workflow"
+    },
+    {
+      "from": "repo_discovery",
+      "to": "tools",
+      "relation": "proposes_reviewed_adapter"
+    }
+  ]
+}
