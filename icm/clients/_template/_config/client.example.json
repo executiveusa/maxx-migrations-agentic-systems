@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "tenant_id": "__CLIENT_SLUG__",
+  "display_name": "__CLIENT_NAME__",
+  "state": "not_onboarded",
+  "consent": {
+    "status": "not_recorded",
+    "authorized_sources": [],
+    "allowed_purposes": []
+  },
+  "front_door": {
+    "preferred": "instinct_external_manual",
+    "fallback": "maxx_portal",
+    "bridge_status": "disabled_pending_supported_api_and_consent"
+  },
+  "orchestration": {
+    "coordinator": "hermes",
+    "scheduler": "paperclip",
+    "adapter": "hermes_gateway",
+    "status": "not_connected"
+  },
+  "models": {
+    "provider_agnostic": true,
+    "primary_model": null,
+    "fallback_models": [],
+    "billing": "client_direct",
+    "keys": "secret_manager_only"
+  },
+  "integrations": {
+    "composio": {
+      "status": "not_connected",
+      "tenant_scoped": true
+    },
+    "maxx_tools": {
+      "status": "not_connected"
+    }
+  },
+  "data": {
+    "operational_authority": "maxx_postgres",
+    "knowledge_graph": "provenance_linked",
+    "vault": "second-brain",
+    "raw_exports_in_git": false,
+    "retention_days": null
+  },
+  "policy": {
+    "default_external_writes": "deny",
+    "requires_exact_action_approval": true,
+    "requires_tenant_isolation_test": true,
+    "independent_release_review": true
+  },
+  "costs": {
+    "currency": "USD",
+    "provider_markup_percent": 0,
+    "monthly_model_budget_usd": 0,
+    "hard_stop_on_budget": true,
+    "usage_receipts": "required"
+  },
+  "deployment": {
+    "mode": "not_deployed",
+    "hostinger_server_client_owned": true,
+    "backups": "not_verified",
+    "restore": "not_verified"
+  },
+  "first_job": {
+    "bucket": null,
+    "description": null,
+    "metric": null,
+    "baseline": null,
+    "acceptance": null
+  }
+}
