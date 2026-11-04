@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0",
+  "project_id": "executiveusa/maxx-migrations-agentic-systems:macs-client-zero",
+  "name": "MACS Client Zero pilot",
+  "classification": "USE",
+  "canonical_repository": "https://github.com/executiveusa/maxx-migrations-agentic-systems",
+  "default_branch": "develop",
+  "baseline_sha": "5d59935e1b88d0bd9a5174ddd9b99e48ff9dda54",
+  "control_branch": "feat/macs-client-zero-pilot-control",
+  "last_verified_control_sha": "789b11c63a21bb4ab5cd65430102548c32a3aae3",
+  "prd": {
+    "path": "docs/client-zero/PRD.md",
+    "version": "1.0",
+    "owner_scope_confirmed_on": "2026-11-04"
+  },
+  "decisions": "ops/DECISIONS.md",
+  "definition_of_done": "ops/ACCEPTANCE_MATRIX.md",
+  "reality": "ops/REPO_REALITY.md",
+  "execution_graph": "ops/EXECUTION_GRAPH.yaml",
+  "a2a": {
+    "kind": "github_pull_request_conversation",
+    "native_a2a_verified": false,
+    "issue_creation_attempt": "GitHub Issues disabled (HTTP 410)",
+    "url": "https://github.com/executiveusa/maxx-migrations-agentic-systems/pull/37",
+    "number": 37,
+    "first_handoff_comment_id": 6639610477,
+    "inbound_cursor": null,
+    "message_protocol_version": "1",
+    "ack_verified": false
+  },
+  "controller": {
+    "provider": "ChatGPT Automations",
+    "automation_id": "6aeb82f9ffa4819190d4e1429ee9a586",
+    "schedule": "FREQ=HOURLY",
+    "configured_enabled": true,
+    "verified_scheduled_invocation": false,
+    "last_verified_run": null
+  },
+  "instinct": {
+    "interface_verified": false,
+    "scheduler_id": null,
+    "target_cron": "*/10 * * * *",
+    "scheduler_configured": false,
+    "last_verified_scheduled_invocation": null,
+    "worker_identity": null,
+    "execution_environment": null
+  },
+  "durability": {
+    "current_store": "GitHub branch files and PR comments (control only)",
+    "worker_checkpoint_store": null,
+    "lease_verified": false,
+    "duplicate_suppression_verified": false,
+    "absurd_adopted": false
+  },
+  "state": "AWAITING_ACK",
+  "active_task": "CZ-01",
+  "work_graph": [
+    "CZ-01",
+    "CZ-02",
+    "CZ-03",
+    "CZ-04",
+    "CZ-05",
+    "CZ-06",
+    "CZ-07",
+    "CZ-08"
+  ],
+  "current_attempt": null,
+  "latest_accepted_sha": "5d59935e1b88d0bd9a5174ddd9b99e48ff9dda54",
+  "independent_review": {
+    "status": "NOT_RUN",
+    "reviewer_identity": null,
+    "signoff_sha": null
+  },
+  "approval_restrictions": {
+    "new_paid_inference_and_recurring_infra_usd": 0,
+    "real_client_data": false,
+    "external_sends": false,
+    "production_merge_or_deploy": false,
+    "secret_or_account_changes": false,
+    "destructive_database_actions": false,
+    "owner_release_approval_required": true,
+    "designated_action_reviewer": "Stacy (identity and tenant membership not verified)"
+  },
+  "external_blockers": [
+    "MACS-owned staging Supabase project unavailable via connected account",
+    "Next.js staging runtime and app route not verified",
+    "Instinct authenticated A2A interface and scheduler not verified",
+    "Reviewer's authenticated account identity not verified"
+  ],
+  "rollback": [
+    "docs/client-zero/ROLLBACK.md",
+    "Revert isolated branch or disable Client Zero routes; preserve evidence and unrelated records"
+  ],
+  "recovery": "Read this manifest and GitHub PR #37; verify actual branch/PR/scheduler state; deduplicate message IDs; never infer worker state from manifest alone; continue unblocked synthetic-only tasks.",
+  "last_reconciled_on": "2026-11-04"
+}
