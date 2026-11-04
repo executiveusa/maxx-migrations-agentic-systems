@@ -1,0 +1,92 @@
+schema_version: "1.0"
+project_id: "executiveusa/maxx-migrations-agentic-systems:macs-client-zero"
+prd: "docs/client-zero/PRD.md"
+acceptance: "ops/ACCEPTANCE_MATRIX.md"
+base_sha: "5d59935e1b88d0bd9a5174ddd9b99e48ff9dda54"
+state: "SPECIFYING"
+owner: "Instinct (only after verified A2A acknowledgment)"
+controller: "ChatGPT (independent)"
+human_release_authority: "MACS owner"
+new_paid_budget_usd: 0
+max_attempts_per_task: 3
+tasks:
+  - id: CZ-01
+    title: "Baseline and threat model"
+    deps: []
+    group: discovery
+    state: documented
+    agent: security-reviewer
+    files: ["apps/maxx-web/app/api/intake", "apps/maxx-web/supabase/migrations", "ops/REPO_REALITY.md"]
+    proof: ["Source review", "Threat model", "Baseline CI and runtime checks"]
+    acceptance: ["A01", "A02", "A03"]
+    rollback: "No production changes"
+  - id: CZ-02
+    title: "Public intake validation, atomicity and abuse controls"
+    deps: ["CZ-01"]
+    group: backend
+    state: pending
+    agent: backend-implementer
+    files: ["apps/maxx-web/app/api/intake/route.ts", "apps/maxx-web/lib/intake", "apps/maxx-web/supabase/migrations"]
+    proof: ["Oversize and rate-limit 429 tests", "Atomic failure injection", "Retry idempotency"]
+    acceptance: ["A01", "A02", "A08"]
+    rollback: "Revert isolated app/migration changes; preserve data"
+  - id: CZ-03
+    title: "Auth, tenant isolation and exact-payload approval"
+    deps: ["CZ-01"]
+    group: backend
+    state: blocked_external
+    blocked_on: ["Connect MACS-controlled Supabase staging project without changing credentials without approval"]
+    agent: security-implementer
+    files: ["apps/maxx-web/app/api/intake", "apps/maxx-web/supabase/migrations"]
+    proof: ["Two-tenant cross-access matrix", "Revoked/self-approval and digest tests"]
+    acceptance: ["A03", "A04", "A05", "A06"]
+    rollback: "Additive reversible migration; disable routes"
+  - id: CZ-04
+    title: "Evidence, export, rollback and UX"
+    deps: ["CZ-02", "CZ-03"]
+    group: product
+    state: pending
+    agent: frontend-and-qa
+    files: ["apps/maxx-web/components/client-zero", "apps/maxx-web/app/app/client-zero", "docs/client-zero/ROLLBACK.md"]
+    proof: ["Export checksum", "Browser viewport and keyboard tests", "Rollback rehearsal"]
+    acceptance: ["A07", "A09", "A11"]
+    rollback: "Revert UI; preserve exported evidence"
+  - id: CZ-05
+    title: "No-cost isolated staging and integration proof"
+    deps: ["CZ-02", "CZ-03", "CZ-04"]
+    group: infrastructure
+    state: blocked_external
+    blocked_on: ["Correct MACS staging Supabase access", "Owner-controlled no-cost Next.js staging configuration"]
+    agent: release-engineer
+    proof: ["Actual staging URL and deployed SHA", "Full end-to-end receipt and logs", "CI"]
+    acceptance: ["A01", "A03", "A05", "A06", "A10"]
+    rollback: "Disable preview routes and restore prior deployment"
+  - id: CZ-06
+    title: "Instinct interface and durable scheduler qualification"
+    deps: ["CZ-01"]
+    group: autonomy
+    state: blocked_external
+    blocked_on: ["Verified authenticated Instinct interface and authorized execution environment"]
+    agent: instinct-execution-owner
+    proof: ["a2a-ack/1", "Timed scheduler run", "Checkpoint/restart/duplicate/pause test"]
+    acceptance: ["A12", "A13"]
+    rollback: "Pause scheduler; keep MAXX portal fallback"
+  - id: CZ-07
+    title: "Independent acceptance and correction"
+    deps: ["CZ-05", "CZ-06"]
+    group: review
+    state: pending
+    agent: independent-reviewer
+    proof: ["Code diff and CI", "Reproduced security tests", "Issue review decision"]
+    acceptance: ["A10", "A14"]
+    rollback: "No release; create bounded correction tasks"
+  - id: CZ-08
+    title: "Owner-authorized release and production verification"
+    deps: ["CZ-07"]
+    group: release
+    state: protected
+    blocked_on: ["Explicit separate production authorization"]
+    agent: release-engineer
+    proof: ["Owner approval", "Exact production SHA", "Real flow smoke and rollback readiness"]
+    acceptance: ["A15"]
+    rollback: "Redeploy known-good revision; preserve database/evidence"
