@@ -7,7 +7,7 @@
   "default_branch": "develop",
   "baseline_sha": "5d59935e1b88d0bd9a5174ddd9b99e48ff9dda54",
   "control_branch": "feat/macs-client-zero-pilot-control",
-  "last_verified_control_sha": "789b11c63a21bb4ab5cd65430102548c32a3aae3",
+  "last_verified_control_sha": "02a2f4ee2ae94262abe5f4bc70f784839e73eddc",
   "prd": {
     "path": "docs/client-zero/PRD.md",
     "version": "1.0",
@@ -33,8 +33,13 @@
     "automation_id": "6aeb82f9ffa4819190d4e1429ee9a586",
     "schedule": "FREQ=HOURLY",
     "configured_enabled": true,
-    "verified_scheduled_invocation": false,
-    "last_verified_run": null
+    "verified_scheduled_invocation": true,
+    "last_verified_run": {
+      "run_id": "06e9c4fa-72a8-8332-a31d-ff6f1eec0b06",
+      "scheduled_for": "2026-11-04T19:10:46Z",
+      "recorded_status": "completed",
+      "evidence": "ChatGPT Automations peek; read PR #37 and identified missing Instinct acknowledgment"
+    }
   },
   "instinct": {
     "interface_verified": false,
@@ -92,5 +97,6 @@
     "Revert isolated branch or disable Client Zero routes; preserve evidence and unrelated records"
   ],
   "recovery": "Read this manifest and GitHub PR #37; verify actual branch/PR/scheduler state; deduplicate message IDs; never infer worker state from manifest alone; continue unblocked synthetic-only tasks.",
-  "last_reconciled_on": "2026-11-04"
+  "last_reconciled_on": "2026-11-04",
+  "durability_assessment": "ops/DURABILITY_ASSESSMENT.md"
 }
