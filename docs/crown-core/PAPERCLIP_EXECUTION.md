@@ -16,6 +16,9 @@ Paperclip manages work assignments, specialist heartbeats and run evidence only.
 - No release approval; new 4-stage offer is NOT the old $17,500 contract. Do not edit it silently.
 - Crown growth repo preview suppression and missing five CI source files unresolved. Do not push code there until deployment gate independently verified.
 
+## Scope boundary
+Crown & Core implementation and evidence belong to draft PR #39. The controller in PR #37 declined this extra scope; do not post, mirror or dispatch Crown tasks through the Client Zero mailbox. The existing 10-minute read-only watch is not proof of an authenticated Crown agent or a running 600-second Paperclip timer.
+
 ## Paperclip target
 One existing MACS company, one Crown & Core project. Instinct is single accountable manager; researchers, offer writer, engineer and independent security reviewer are event-driven assignees. A single 600-second Instinct heartbeat is a target, NOT evidence of activation. Existing GitHub 10m read-only watcher and hourly ChatGPT controller remain; no duplicate scheduler.
 
