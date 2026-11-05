@@ -1,0 +1,59 @@
+name: Bootstrap reviewed dependency lockfile
+on:
+  push:
+    branches: [feat/maxx-dependency-security-refresh-2026-11]
+permissions:
+  contents: write
+jobs:
+  generate:
+    if: github.repository == 'executiveusa/maxx-migrations-agentic-systems' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/maxx-web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Resolve lockfile only without executing npm install scripts
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+          const expected = {
+            next: '16.4.5',
+            zod: '4.6.7',
+            sharp: '0.35.5',
+            'source-map-js': '1.2.2'
+          };
+          for (const [name, version] of Object.entries(expected)) {
+            const got = lock.packages?.['node_modules/' + name]?.version;
+            if (got !== version) throw Error(name + ': expected ' + version + ', got ' + got);
+          }
+          if (lock.packages[''].dependencies.next !== pkg.dependencies.next ||
+              lock.packages[''].dependencies.zod !== pkg.dependencies.zod) {
+            throw Error('Root package dependencies are inconsistent with lockfile');
+          }
+          console.log('Verified patched versions, no arbitrary install scripts run');
+          NODE
+      - name: Commit generated lockfile only to isolated dependency branch
+        env:
+          GH_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "feat/maxx-dependency-security-refresh-2026-11"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo 'No generated lockfile changes'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "chore(security): lock reviewed patched dependency versions"
+          hdr="$(printf 'x-access-token:%s' "$GH_REPO_TOKEN" | base64 -w0)"
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $hdr" push origin HEAD:refs/heads/feat/maxx-dependency-security-refresh-2026-11
