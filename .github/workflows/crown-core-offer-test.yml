@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - "apps/maxx-web/lib/offers/**"
-      - "apps/maxx-web/tests/node/crown-core-offer.test.mjs"
+      - "apps/maxx-web/tests/node/crown-core-*.test.mjs"
       - "apps/maxx-web/app/api/offers/**"
       - "apps/maxx-web/supabase/migrations/20261104000000_maxx_offer_drafts.sql"
       - ".github/workflows/crown-core-offer-test.yml"
@@ -19,4 +19,4 @@ jobs:
         with:
           node-version: "22"
       - name: Run deterministic no-network offer tests
-        run: node --test apps/maxx-web/tests/node/crown-core-offer.test.mjs
+        run: node --test apps/maxx-web/tests/node/crown-core-*.test.mjs

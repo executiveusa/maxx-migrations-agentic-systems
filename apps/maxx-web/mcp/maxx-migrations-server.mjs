@@ -4,6 +4,8 @@ const API = (
   process.env.MAXX_MIGRATIONS_URL || "http://127.0.0.1:3000"
 ).replace(/\/$/, "");
 const API_KEY = process.env.MAXX_MIGRATIONS_API_KEY;
+// Optional short-lived agent JWT. Never substitute the general machine key for tenant auth.
+const OFFER_AGENT_TOKEN = process.env.MAXX_CROWN_AGENT_ACCESS_TOKEN;
 let buffer = "";
 
 async function call(path, options = {}) {
@@ -21,6 +23,21 @@ async function call(path, options = {}) {
     throw new Error(
       payload.error || `MAXX Migrations returned ${response.status}`
     );
+  return payload;
+}
+
+async function offerCall(path, options = {}) {
+  if (!OFFER_AGENT_TOKEN) throw new Error("Crown offer requires an authenticated agent token");
+  const response = await fetch(API + path, {
+    ...options,
+    headers: {
+      "content-type": "application/json",
+      authorization: "Bearer " + OFFER_AGENT_TOKEN,
+      ...(options.headers || {})
+    }
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.code || "Crown offer request failed: " + response.status);
   return payload;
 }
 
@@ -82,6 +99,57 @@ async function handle(message) {
               required: ["condition"],
             },
           },
+          ...(OFFER_AGENT_TOKEN ? [
+            {
+              name: "maxx_offer_list",
+              description: "List internal Crown & Core offers using the authenticated per-agent tenant token. Not a signed commercial offer.",
+              inputSchema: { type: "object", properties: {}, additionalProperties: false }
+            },
+            {
+              name: "maxx_audit_prepare",
+              description: "Prepare an internal source-grounded, unpriced Crown & Core Vibe Audit draft. No external effects. Requires verified tenant role.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  request_id: { type: "string", format: "uuid" },
+                  idempotency_key: { type: "string", minLength: 12, maxLength: 120 },
+                  business_name: { type: "string", const: "Crown & Core" },
+                  sources: { type: "array", items: {
+                    type: "object", properties: {
+                      id: { type: "string" }, url: { type: "string" }, retrieved_at: { type: "string" }
+                    }, required: ["id", "url"], additionalProperties: false
+                  } },
+                  findings: { type: "array", items: {
+                    type: "object", properties: {
+                      observation: { type: "string" }, recommendation: { type: "string" },
+                      priority: { type: "string", enum: ["high", "medium", "low"] },
+                      evidence_refs: { type: "array", items: { type: "string" } }
+                    }, required: ["observation", "recommendation"], additionalProperties: false
+                  } }
+                },
+                required: ["request_id", "idempotency_key", "business_name", "sources", "findings"],
+                additionalProperties: false
+              }
+            },
+            {
+              name: "maxx_proposal_prepare",
+              description: "Prepare an unpriced internal proposal from an independently reviewed Crown & Core audit.",
+              inputSchema: {
+                type: "object", properties: {
+                  request_id: { type: "string", format: "uuid" },
+                  idempotency_key: { type: "string", minLength: 12, maxLength: 120 },
+                  source_audit_id: { type: "string", format: "uuid" }
+                },
+                required: ["request_id", "idempotency_key", "source_audit_id"],
+                additionalProperties: false
+              }
+            },
+            {
+              name: "maxx_offer_status",
+              description: "Read tenant-isolated internal Crown & Core audit/proposal status.",
+              inputSchema: { type: "object", properties: {}, additionalProperties: false }
+            }
+          ] : []),
         ],
       },
     };
@@ -106,6 +174,14 @@ async function handle(message) {
         })
       );
     }
+    if (name === "maxx_offer_list") return toolResult(id, await offerCall("/api/offers/crown-core"));
+    if (name === "maxx_offer_status") return toolResult(id, await offerCall("/api/offers/crown-core/status"));
+    if (name === "maxx_audit_prepare") return toolResult(id, await offerCall("/api/offers/crown-core/audits", {
+      method: "POST", body: JSON.stringify(args)
+    }));
+    if (name === "maxx_proposal_prepare") return toolResult(id, await offerCall("/api/offers/crown-core/proposals", {
+      method: "POST", body: JSON.stringify(args)
+    }));
     throw new Error(`Unknown MAXX Migrations tool: ${name}`);
   }
   return {
