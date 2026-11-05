@@ -6,6 +6,7 @@ on:
       - "apps/maxx-web/tests/node/crown-core-*.test.mjs"
       - "apps/maxx-web/app/api/offers/**"
       - "apps/maxx-web/supabase/migrations/20261104000000_maxx_offer_drafts.sql"
+      - "ops/paperclip/**"
       - ".github/workflows/crown-core-offer-test.yml"
   workflow_dispatch:
 permissions:
