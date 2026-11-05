@@ -55,7 +55,13 @@ export function CrownOfferConsole(){
       setMessage("");
     }catch(error){setStatus(null);setMessage(error instanceof Error?error.message:"Unable to load drafts.");}
   },[]);
-  useEffect(()=>{void refresh();},[refresh]);
+  useEffect(()=>{
+    let active=true;
+    void api<Summary>("/api/offers/crown-core/status")
+      .then((result)=>{ if(active) setStatus(result); })
+      .catch((error)=>{ if(active) setMessage(error instanceof Error?error.message:"Unable to load drafts."); });
+    return ()=>{ active=false; };
+  },[]);
 
   async function createAudit(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
