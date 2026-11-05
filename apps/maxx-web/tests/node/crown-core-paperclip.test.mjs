@@ -21,7 +21,7 @@ test("bootstrap creates a project and issues once, then reuses them", async () =
   const fetchImpl=async(url,init)=>{
     const u=new URL(url);const path=u.pathname;
     assert.equal(init.headers.authorization,"Bearer scoped-board-token");
-    if(path==="/api/cli-auth/me")return response(200,{id:"board1",user:{id:"board1"}});
+    if(path==="/api/cli-auth/me")return response(200,{userId:"board1",companyIds:["macs"],source:"board_key"});
     if(path==="/api/companies/macs")return response(200,{id:"macs",name:"MACS"});
     if(path==="/api/agents/instinct")return response(200,{id:"instinct",companyId:"macs",status:"idle"});
     if(path==="/api/companies/macs/projects"){
@@ -53,7 +53,7 @@ test("bootstrap rejects wrong-company Instinct identity before creating anything
   const fetchImpl=async(url)=>{
     const path=new URL(url).pathname;
     if(path.startsWith("/api/companies/macs/projects"))touched=true;
-    const result=path==="/api/companies/macs"?{id:"macs"}:path==="/api/agents/instinct"?{id:"instinct",companyId:"other"}:{id:"board"};
+    const result=path==="/api/companies/macs"?{id:"macs"}:path==="/api/agents/instinct"?{id:"instinct",companyId:"other"}:{userId:"board1",companyIds:["macs"]};
     return new Response(JSON.stringify(result),{status:200});
   };
   await assert.rejects(()=>syncCrownProject({apply:true,apiUrl:"https://paperclip.example/",apiKey:"board",companyId:"macs",managerId:"instinct",fetchImpl}),/not an active agent/);
@@ -70,7 +70,40 @@ test("bootstrap refuses duplicate project markers",async()=>{
     ]);
     if(path==="/api/companies/macs")return response({id:"macs"});
     if(path==="/api/agents/instinct")return response({id:"instinct",companyId:"macs",status:"idle"});
-    return response({id:"board"});
+    return response({userId:"board1",companyIds:["macs"],source:"board_key"});
   };
   await assert.rejects(()=>syncCrownProject({apply:true,apiUrl:"https://paperclip.example/",apiKey:"board",companyId:"macs",managerId:"instinct",fetchImpl}),/Duplicate Crown project/);
+});
+
+test("board credential cannot bootstrap a company outside its membership",async()=>{
+  let touched=false;
+  const fetchImpl=async(url)=>{
+    const path=new URL(url).pathname;
+    if(path==="/api/cli-auth/me")return Response.json({userId:"board1",companyIds:["another-company"]});
+    touched=true;
+    return Response.json({id:"unrelated"});
+  };
+  await assert.rejects(()=>syncCrownProject({
+    apply:true,apiUrl:"https://paperclip.example/",apiKey:"scoped",companyId:"macs",managerId:"instinct",fetchImpl
+  }),/lacks an authenticated/);
+  assert.equal(touched,false);
+});
+
+test("existing named project without stable marker cannot be duplicated",async()=>{
+  let writes=0;
+  const fetchImpl=async(url,init)=>{
+    const path=new URL(url).pathname;
+    if(init.method==="POST")writes++;
+    if(path==="/api/cli-auth/me")return Response.json({userId:"board1",companyIds:["macs"]});
+    if(path==="/api/companies/macs")return Response.json({id:"macs"});
+    if(path==="/api/agents/instinct")return Response.json({id:"instinct",companyId:"macs",status:"idle"});
+    if(path==="/api/companies/macs/projects")return Response.json([{
+      id:"legacy-project",name:"Crown & Core — MACS Growth System",description:"Existing project"
+    }]);
+    throw Error("Unexpected call");
+  };
+  await assert.rejects(()=>syncCrownProject({
+    apply:true,apiUrl:"https://paperclip.example/",apiKey:"board",companyId:"macs",managerId:"instinct",fetchImpl
+  }),/reconcile before creating/);
+  assert.equal(writes,0);
 });

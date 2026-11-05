@@ -65,7 +65,10 @@ export async function syncCrownProject(options = {}) {
   }
 
   // A board identity, not an agent or a public user, must activate bootstrap.
-  await api("/api/cli-auth/me");
+  const board = await api("/api/cli-auth/me");
+  if (!board?.userId || !Array.isArray(board.companyIds) || !board.companyIds.includes(companyId)) {
+    throw new Error("Board token lacks an authenticated, active membership for the target company.");
+  }
   const company = await api("/api/companies/" + encodeURIComponent(companyId));
   if (company.id !== companyId) throw new Error("Paperclip company identity mismatch.");
   const manager = await api("/api/agents/" + encodeURIComponent(managerId));
@@ -75,12 +78,19 @@ export async function syncCrownProject(options = {}) {
 
   const projectPath = "/api/companies/" + encodeURIComponent(companyId) + "/projects";
   let projects = itemsOf(await api(projectPath));
-  let project = onlyOne(projects, (p) => (p.description || "").includes(MARKER), "Crown project");
+  function locateProject(list) {
+    const match = onlyOne(list, (p) => (p.description || "").includes(MARKER), "Crown project");
+    if (match) return match;
+    const collision = onlyOne(list, (p) => p.name === PROJECT.name, "named Crown project");
+    if (collision) throw new Error("Named Crown project exists without stable marker; reconcile before creating a duplicate.");
+    return null;
+  }
+  let project = locateProject(projects);
   let projectCreated = false;
   if (!project) {
     // Second read before the first mutation to reduce stale-read duplicates.
     projects = itemsOf(await api(projectPath));
-    project = onlyOne(projects, (p) => (p.description || "").includes(MARKER), "Crown project");
+    project = locateProject(projects);
     if (!project) {
       project = await api(projectPath, PROJECT);
       projectCreated = true;
