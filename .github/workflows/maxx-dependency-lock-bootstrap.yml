@@ -47,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$GITHUB_REF_NAME" = "feat/maxx-dependency-security-refresh-2026-11"
-          git add apps/maxx-web/package-lock.json
+          git add package-lock.json
           if git diff --cached --quiet; then
             echo 'No generated lockfile changes'
             exit 0
