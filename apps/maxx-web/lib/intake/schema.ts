@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export const intakePayloadSchema = z.object({
   schema_version: z.string().default("1.0"),
-  answers: z.record(z.unknown()).default({}),
-  icm: z.record(z.unknown()).default({}),
-  ontology: z.record(z.unknown()).default({}),
+  answers: z.record(z.string(), z.unknown()).default({}),
+  icm: z.record(z.string(), z.unknown()).default({}),
+  ontology: z.record(z.string(), z.unknown()).default({}),
   open_questions: z.array(z.unknown()).default([]),
-  evidence: z.union([z.record(z.unknown()), z.array(z.unknown())]).default({}),
+  evidence: z.union([z.record(z.string(), z.unknown()), z.array(z.unknown())]).default({}),
 });
 
 export type IntakePayload = z.infer<typeof intakePayloadSchema>;
