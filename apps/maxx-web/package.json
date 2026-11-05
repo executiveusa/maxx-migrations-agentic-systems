@@ -32,11 +32,11 @@
     "@hookform/resolvers": "^3.9.1",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.45.4",
-    "next": "^16.3.3",
+    "next": "16.4.5",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-hook-form": "^7.53.2",
-    "zod": "^3.23.8"
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.2",
@@ -53,5 +53,9 @@
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "overrides": {
+    "sharp": "0.35.5",
+    "source-map-js": "1.2.2"
   }
 }

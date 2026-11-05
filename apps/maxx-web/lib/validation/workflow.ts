@@ -18,7 +18,7 @@ export const workflowStepTypes = [
 export const workflowStepSchema = z.object({
   type: z.enum(workflowStepTypes),
   label: z.string().min(1, "Step label is required."),
-  config: z.record(z.string()).default({}),
+  config: z.record(z.string(), z.string()).default({}),
 });
 
 export const workflowSchema = z.object({
