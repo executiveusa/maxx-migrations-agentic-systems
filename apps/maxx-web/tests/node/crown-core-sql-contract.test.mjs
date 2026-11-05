@@ -22,3 +22,12 @@ test("public access is revoked and no client write table grant is present",()=>{
   assert.match(sql,/revoke all on public\.maxx_offer_draft_events from public, anon, authenticated/);
   assert.doesNotMatch(sql,/grant\s+(insert|update|delete)\s+on public\.maxx_offer_drafts\s+to\s+(anon|authenticated)/i);
 });
+
+test("review requires durable rationale and SHA256 uses PostgreSQL built-in",()=>{
+  assert.match(sql,/pg_catalog\.sha256\(/);
+  assert.doesNotMatch(sql,/extensions\.digest/);
+  assert.match(sql,/p_review_note text/);
+  assert.match(sql,/REVIEW_RATIONALE_REQUIRED/);
+  assert.match(sql,/review_note text null/);
+  assert.match(sql,/review_rationale_recorded/);
+});

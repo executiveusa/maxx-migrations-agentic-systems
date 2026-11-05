@@ -11,13 +11,14 @@ type Draft = {
   reviewed_at?:string|null;
   artifact?: {
     summary?:string;
-    findings?:Array<{id:string;observation:string;recommendation:string;priority:string;evidence_status:string}>;
+    sources?:Array<{id:string;url:string;provenance:string;independent_verification:boolean}>;
+    findings?:Array<{id:string;observation:string;recommendation:string;priority:string;evidence_status:string;evidence_refs?:string[]}>;
     limitations?:string[];
     priority_actions?:Array<{finding_id:string;recommendation:string;evidence_status:string}>;
     title?:string;
     price?:null;
   };
-  events?:Array<{event_type:string;created_at:string}>;
+  events?:Array<{event_type:string;created_at:string;review_note?:string|null}>;
 };
 type Summary = { drafts?:Draft[]; status?:string; code?:string };
 type Process = { id?:string; code?:string; status?:string };
@@ -46,6 +47,7 @@ export function CrownOfferConsole(){
   const [recommendation,setRecommendation]=useState("");
   const [priority,setPriority]=useState<"high"|"medium"|"low">("medium");
   const [message,setMessage]=useState("");
+  const [reviewNote,setReviewNote]=useState("");
   const [busy,setBusy]=useState(false);
 
   const refresh=useCallback(async()=>{
@@ -96,9 +98,11 @@ export function CrownOfferConsole(){
     setBusy(true);setMessage("");
     try{
       await api<Process>("/api/offers/crown-core/review",{
-        draft_id:selection.id,decision,expected_hash:selection.payload_hash
+        draft_id:selection.id,decision,expected_hash:selection.payload_hash,
+        review_note:reviewNote.trim()
       });
       await refresh();await selectDraft(selection.id);
+      setReviewNote("");
       setMessage(decision==="review"?"Internal evidence review recorded. This does NOT approve a client action or price.":"Rejected with zero external effects.");
     }catch(error){setMessage(error instanceof Error?error.message:"Review failed.");}
     finally{setBusy(false);}
@@ -194,20 +198,37 @@ export function CrownOfferConsole(){
         </div>
         <div className="flex flex-wrap gap-2">
           {selection.status==="draft"?<>
-            <button className={secondaryButton} disabled={busy} onClick={()=>void review("reject")}>Reject draft</button>
-            <button className={primaryButton} disabled={busy} onClick={()=>void review("review")}>Mark internally reviewed</button>
+            <button className={secondaryButton} disabled={busy||reviewNote.trim().length<25} onClick={()=>void review("reject")}>Reject draft</button>
+            <button className={primaryButton} disabled={busy||reviewNote.trim().length<25} onClick={()=>void review("review")}>Record independent review</button>
           </>:null}
           {selection.kind==="audit"&&selection.status==="reviewed"?
             <button className={primaryButton} disabled={busy} onClick={()=>void propose()}>Prepare unpriced proposal</button>:null}
         </div>
       </div>
+      {selection.status==="draft"?<label className="mt-4 block space-y-2 text-sm">
+        <span>Reviewer rationale (required, 25–1000 characters)</span>
+        <textarea className={inputStyle} maxLength={1000} rows={3}
+          value={reviewNote} onChange={e=>setReviewNote(e.target.value)}
+          placeholder="What evidence did you inspect, what remains unverified, and why accept or reject this draft?" />
+      </label>:null}
       <p className="mt-3 text-sm text-muted">{selection.artifact?.summary||selection.artifact?.title||"Internal artifact, not client-approved"}</p>
+      {(selection.artifact?.sources||[]).length>0?<div className="mt-4 rounded-md border border-border bg-bg p-4">
+        <h3 className="font-medium">Evidence references — caller-submitted, not independently verified</h3>
+        <ul className="mt-2 space-y-2">
+          {(selection.artifact?.sources||[]).map(source=><li key={source.id} className="break-all text-sm">
+            <span className="mr-2 text-muted">{source.id} · unverified</span>
+            <a className="text-accent underline" target="_blank" rel="noopener noreferrer"
+              href={source.url}>{source.url}</a>
+          </li>)}
+        </ul>
+      </div>:null}
       <div className="mt-4 space-y-3">
         {(selection.artifact?.findings||[]).map(f=>
           <article key={f.id} className="rounded-md border border-border bg-bg p-4">
             <p className="text-xs uppercase tracking-wide text-muted">{f.priority} priority · {f.evidence_status}</p>
             <h3 className="mt-2 text-base font-medium">{f.observation}</h3>
             <p className="mt-2 text-sm text-muted">Next step: {f.recommendation}</p>
+            <p className="mt-2 text-xs text-muted">Source IDs: {(f.evidence_refs||[]).join(", ")||"none — hypothesis"}</p>
           </article>
         )}
         {(selection.artifact?.priority_actions||[]).map(f=>
@@ -219,7 +240,7 @@ export function CrownOfferConsole(){
       </div>
       <h3 className="mt-6 text-base font-medium">Review trail</h3>
       <ul className="mt-2 space-y-1 text-sm text-muted">
-        {(selection.events||[]).map((e,i)=><li key={i}>{e.event_type} · {new Date(e.created_at).toLocaleString()}</li>)}
+        {(selection.events||[]).map((e,i)=><li key={i}>{e.event_type} · {new Date(e.created_at).toLocaleString()}{e.review_note?<> · Rationale: {e.review_note}</>:null}</li>)}
       </ul>
       <p className="mt-4 text-xs text-muted">Internal review is not permission to publish, advertise, change bookings, enter client contracts or spend money. The database enforces independent reviewer identity.</p>
     </section>:null}

@@ -18,7 +18,7 @@ export async function GET(request: NextRequest, { params }: Context) {
     if (error) rpcError(error);
     if (!data) throw new CrownApiError("NOT_FOUND", 404);
     const { data: events, error: eventError } = await client.from("maxx_offer_draft_events")
-      .select("event_type,actor_id,payload_hash,created_at")
+      .select("event_type,actor_id,payload_hash,review_note,created_at")
       .eq("tenant_id", tenant.id).eq("draft_id", id)
       .order("created_at",{ ascending: true }).limit(50);
     if (eventError) rpcError(eventError);

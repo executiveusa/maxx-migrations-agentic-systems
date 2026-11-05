@@ -1,6 +1,6 @@
 -- Crown & Core Vibe Audit: additive internal-only drafts; no action execution.
 -- Apply ONLY to an approved MACS-owned staging database. Requires Client Zero schema.
-create extension if not exists pgcrypto with schema extensions;
+-- Use PostgreSQL built-in pg_catalog.sha256; do not require pgcrypto placement.
 
 -- Privileged logic lives outside the exposed API schema.
 create schema if not exists maxx_internal;
@@ -36,6 +36,7 @@ create table if not exists public.maxx_offer_draft_events (
   event_type text not null check (event_type in ('created', 'reviewed', 'rejected')),
   actor_id uuid not null references auth.users(id) on delete restrict,
   payload_hash text not null,
+  review_note text null check (review_note is null or char_length(review_note) between 25 and 1000),
   created_at timestamptz not null default now()
 );
 create index if not exists maxx_offer_draft_events_idx
@@ -99,7 +100,7 @@ begin
 
   -- One logical writer per actor/tenant, including retry and rate-limit checks.
   perform pg_advisory_xact_lock(hashtextextended(p_tenant_id::text || ':' || v_actor::text, 0));
-  v_hash := encode(extensions.digest(convert_to(p_artifact::text,'UTF8'),'sha256'),'hex');
+  v_hash := encode(pg_catalog.sha256(convert_to(p_artifact::text,'UTF8')),'hex');
   select * into v_prior from public.maxx_offer_drafts
     where tenant_id = p_tenant_id and idempotency_key = p_idempotency_key;
   if found then
@@ -139,7 +140,8 @@ begin
 end; $$;
 
 create or replace function maxx_internal.maxx_review_offer_draft(
-  p_tenant_id uuid, p_draft_id uuid, p_decision text, p_expected_hash text
+  p_tenant_id uuid, p_draft_id uuid, p_decision text, p_expected_hash text,
+  p_review_note text
 ) returns jsonb
 language plpgsql security definer set search_path = ''
 as $$
@@ -157,6 +159,9 @@ begin
   end if;
   if p_decision not in ('review','reject') then
     raise exception 'INVALID_DECISION' using errcode = '22023';
+  end if;
+  if p_review_note is null or length(trim(p_review_note)) not between 25 and 1000 then
+    raise exception 'REVIEW_RATIONALE_REQUIRED' using errcode = '22023';
   end if;
   select * into v_draft from public.maxx_offer_drafts
     where id=p_draft_id and tenant_id=p_tenant_id for update;
@@ -178,21 +183,21 @@ begin
   update public.maxx_offer_drafts set status=v_next,reviewed_by=v_actor,reviewed_at=now()
     where id=v_draft.id;
   insert into public.maxx_offer_draft_events
-    (tenant_id,draft_id,event_type,actor_id,payload_hash)
-  values (p_tenant_id,v_draft.id,v_next,v_actor,v_draft.payload_hash);
+    (tenant_id,draft_id,event_type,actor_id,payload_hash,review_note)
+  values (p_tenant_id,v_draft.id,v_next,v_actor,v_draft.payload_hash,trim(p_review_note));
   return jsonb_build_object('id',v_draft.id,'status',v_next,
-                            'replayed',false,'external_side_effects',0);
+                            'replayed',false,'review_rationale_recorded',true,'external_side_effects',0);
 end; $$;
 
 -- Limit privileged RPCs to tenant-authenticated callers. The checks above
 -- are authoritative; the wrapper is NOT a second authorization bypass.
 revoke all on function maxx_internal.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
   from public, anon, authenticated;
-revoke all on function maxx_internal.maxx_review_offer_draft(uuid,uuid,text,text)
+revoke all on function maxx_internal.maxx_review_offer_draft(uuid,uuid,text,text,text)
   from public, anon, authenticated;
 grant execute on function maxx_internal.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
   to authenticated;
-grant execute on function maxx_internal.maxx_review_offer_draft(uuid,uuid,text,text)
+grant execute on function maxx_internal.maxx_review_offer_draft(uuid,uuid,text,text,text)
   to authenticated;
 
 -- PostgREST only needs unprivileged public invoker wrappers. Do not place
@@ -206,20 +211,21 @@ as $$
   select maxx_internal.maxx_create_offer_draft($1,$2,$3,$4,$5,$6);
 $$;
 create or replace function public.maxx_review_offer_draft(
-  p_tenant_id uuid, p_draft_id uuid, p_decision text, p_expected_hash text
+  p_tenant_id uuid, p_draft_id uuid, p_decision text, p_expected_hash text,
+  p_review_note text
 ) returns jsonb
 language sql security invoker set search_path = ''
 as $$
-  select maxx_internal.maxx_review_offer_draft($1,$2,$3,$4);
+  select maxx_internal.maxx_review_offer_draft($1,$2,$3,$4,$5);
 $$;
 
 revoke all on function public.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
   from public, anon, authenticated;
 grant execute on function public.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
   to authenticated;
-revoke all on function public.maxx_review_offer_draft(uuid,uuid,text,text)
+revoke all on function public.maxx_review_offer_draft(uuid,uuid,text,text,text)
   from public, anon, authenticated;
-grant execute on function public.maxx_review_offer_draft(uuid,uuid,text,text)
+grant execute on function public.maxx_review_offer_draft(uuid,uuid,text,text,text)
   to authenticated;
 
 -- Deliberately no seed of real client membership, no backfill and no public interface.
