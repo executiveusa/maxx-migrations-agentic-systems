@@ -1,0 +1,43 @@
+name: Crown Core PostgreSQL contract proof
+on:
+  pull_request:
+    paths:
+      - "apps/maxx-web/supabase/migrations/20261104000000_maxx_offer_drafts.sql"
+      - "apps/maxx-web/tests/sql/**"
+      - ".github/workflows/crown-core-postgres.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  isolated-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: local-test-only
+          POSTGRES_DB: crown_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d crown_ci"
+          --health-interval=3s
+          --health-timeout=3s
+          --health-retries=15
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: local-test-only
+      PGDATABASE: crown_ci
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Postgres client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Provision disposable synthetic Supabase identity and tenants
+        run: psql -X -v ON_ERROR_STOP=1 -f apps/maxx-web/tests/sql/crown-core-bootstrap.sql
+      - name: Apply Crown & Core migration to disposable Postgres 17 only
+        run: psql -X -v ON_ERROR_STOP=1 -f apps/maxx-web/supabase/migrations/20261104000000_maxx_offer_drafts.sql
+      - name: Prove real authorization, isolation, idempotency, review and limits
+        run: psql -X -v ON_ERROR_STOP=1 -f apps/maxx-web/tests/sql/crown-core-proof.sql

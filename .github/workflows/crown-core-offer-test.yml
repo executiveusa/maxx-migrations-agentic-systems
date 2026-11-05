@@ -1,0 +1,23 @@
+name: Crown Core internal offer unit proof
+on:
+  pull_request:
+    paths:
+      - "apps/maxx-web/lib/offers/**"
+      - "apps/maxx-web/tests/node/crown-core-*.test.mjs"
+      - "apps/maxx-web/app/api/offers/**"
+      - "apps/maxx-web/supabase/migrations/20261104000000_maxx_offer_drafts.sql"
+      - "ops/paperclip/**"
+      - ".github/workflows/crown-core-offer-test.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run deterministic no-network offer tests
+        run: node --test apps/maxx-web/tests/node/crown-core-*.test.mjs
