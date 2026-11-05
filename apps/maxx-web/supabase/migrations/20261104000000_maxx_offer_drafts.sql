@@ -2,6 +2,11 @@
 -- Apply ONLY to an approved MACS-owned staging database. Requires Client Zero schema.
 create extension if not exists pgcrypto with schema extensions;
 
+-- Privileged logic lives outside the exposed API schema.
+create schema if not exists maxx_internal;
+revoke all on schema maxx_internal from public, anon;
+grant usage on schema maxx_internal to authenticated;
+
 create table if not exists public.maxx_offer_drafts (
   id uuid primary key default gen_random_uuid(),
   tenant_id uuid not null references public.maxx_icm_tenants(id) on delete restrict,
@@ -54,11 +59,11 @@ create policy maxx_offer_event_select on public.maxx_offer_draft_events
   for select to authenticated using (public.maxx_is_icm_member(tenant_id));
 
 -- No INSERT/UPDATE/DELETE grants: the only write path is an authenticated, transactional RPC.
-create or replace function public.maxx_create_offer_draft(
+create or replace function maxx_internal.maxx_create_offer_draft(
   p_tenant_id uuid, p_kind text, p_artifact jsonb, p_idempotency_key text,
   p_request_id uuid, p_source_draft_id uuid default null
 ) returns jsonb
-language plpgsql security definer set search_path = pg_catalog, public, extensions, auth
+language plpgsql security definer set search_path = ''
 as $$
 declare
   v_actor uuid := auth.uid();
@@ -133,10 +138,10 @@ begin
     'payload_hash',v_hash,'replayed',false,'external_side_effects',0);
 end; $$;
 
-create or replace function public.maxx_review_offer_draft(
+create or replace function maxx_internal.maxx_review_offer_draft(
   p_tenant_id uuid, p_draft_id uuid, p_decision text, p_expected_hash text
 ) returns jsonb
-language plpgsql security definer set search_path = pg_catalog, public, extensions, auth
+language plpgsql security definer set search_path = ''
 as $$
 declare
   v_actor uuid := auth.uid();
@@ -179,12 +184,41 @@ begin
                             'replayed',false,'external_side_effects',0);
 end; $$;
 
+-- Limit privileged RPCs to tenant-authenticated callers. The checks above
+-- are authoritative; the wrapper is NOT a second authorization bypass.
+revoke all on function maxx_internal.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
+  from public, anon, authenticated;
+revoke all on function maxx_internal.maxx_review_offer_draft(uuid,uuid,text,text)
+  from public, anon, authenticated;
+grant execute on function maxx_internal.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
+  to authenticated;
+grant execute on function maxx_internal.maxx_review_offer_draft(uuid,uuid,text,text)
+  to authenticated;
+
+-- PostgREST only needs unprivileged public invoker wrappers. Do not place
+-- SECURITY DEFINER functions in the API exposed schema.
+create or replace function public.maxx_create_offer_draft(
+  p_tenant_id uuid, p_kind text, p_artifact jsonb, p_idempotency_key text,
+  p_request_id uuid, p_source_draft_id uuid default null
+) returns jsonb
+language sql security invoker set search_path = ''
+as $$
+  select maxx_internal.maxx_create_offer_draft($1,$2,$3,$4,$5,$6);
+$$;
+create or replace function public.maxx_review_offer_draft(
+  p_tenant_id uuid, p_draft_id uuid, p_decision text, p_expected_hash text
+) returns jsonb
+language sql security invoker set search_path = ''
+as $$
+  select maxx_internal.maxx_review_offer_draft($1,$2,$3,$4);
+$$;
+
 revoke all on function public.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
-  from public, anon;
+  from public, anon, authenticated;
 grant execute on function public.maxx_create_offer_draft(uuid,text,jsonb,text,uuid,uuid)
   to authenticated;
 revoke all on function public.maxx_review_offer_draft(uuid,uuid,text,text)
-  from public, anon;
+  from public, anon, authenticated;
 grant execute on function public.maxx_review_offer_draft(uuid,uuid,text,text)
   to authenticated;
 
