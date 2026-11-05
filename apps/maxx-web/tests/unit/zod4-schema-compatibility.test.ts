@@ -25,7 +25,7 @@ describe("Zod 4 schema migration boundaries", () => {
       name:"Test Workflow", description:"No real customer data",
       steps:[{type:"human_approval",label:"Owner approval"}],
     });
-    expect(parsed.steps[0].config).toEqual({});
+    expect(parsed.steps[0]?.config).toEqual({});
     expect(workflowSchema.safeParse({
       name:"Test Workflow", description:"Synthetic",
       steps:[{type:"send_email",label:"Send",config:{maxRetries:3}}],
