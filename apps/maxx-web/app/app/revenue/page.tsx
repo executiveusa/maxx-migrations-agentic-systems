@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { RevenueCockpit } from "@/components/revenue-capture/RevenueCockpit";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "Money" };
 
