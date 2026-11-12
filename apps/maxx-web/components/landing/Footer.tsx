@@ -4,6 +4,7 @@ const primary = [
   { href: "/work/macs-client-zero", label: "Client Zero" },
   { href: "/#system", label: "System" },
   { href: "/audit", label: "Start the Vibe Audit" },
+  { href: "/restaurant-growth", label: "Restaurant Revenue Proof" },
   { href: "/app", label: "Client login / demo" },
 ];
 
