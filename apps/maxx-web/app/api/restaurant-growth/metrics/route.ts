@@ -64,18 +64,19 @@ export async function GET(request: NextRequest) {
   const end = new Date();
   const begin = new Date(end.getTime() - days * 86_400_000);
   try {
+    const sandbox = process.env.MAXX_RESTAURANT_SQUARE_ENV !== "production";
     const payments = await readSquarePayments({
       accessToken: token, locationId: location,
-      begin: begin.toISOString(), end: end.toISOString(),
-      sandbox: process.env.MAXX_RESTAURANT_SQUARE_ENV !== "production",
+      begin: begin.toISOString(), end: end.toISOString(), sandbox,
     });
     return json({
-      status: "CONNECTED",
+      status: sandbox ? "SANDBOX_TEST_ONLY" : "CONNECTED",
+      environment: sandbox ? "sandbox" : "production",
       source: "square",
       period: { begin: begin.toISOString(), end: end.toISOString() },
       summary: summarizePayments(payments),
       integrations: { square: "CONNECTED", toast: "NOT_CONNECTED", clover: "NOT_CONNECTED", owner: "NOT_CONNECTED" },
-      note: "Read-only completed payments; not a causal estimate of marketing lift or verified food-only net sales.",
+      note: sandbox ? "TEST DATA ONLY — do not claim real restaurant transactions." : "Read-only completed payments; not a causal estimate of marketing lift or verified food-only net sales.",
     });
   } catch (error) {
     if (error instanceof ProviderReadError) return json({ status: "SOURCE_UNAVAILABLE", error: error.message }, 502);
