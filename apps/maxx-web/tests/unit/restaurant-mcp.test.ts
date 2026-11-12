@@ -35,8 +35,8 @@ describe("MCP Restaurant Proof tools", () => {
       { jsonrpc: "2.0", id: 3, method: "tools/call", params: { name: "macs_restaurant_read_receipts", arguments: { days: 7 } } },
     ]);
     expect(responses).toHaveLength(3);
-    const tools = (responses[1].result as {tools:{name:string}[]}).tools;
+    const tools = (responses[1]!.result as {tools:{name:string}[]}).tools;
     expect(tools.map(x => x.name)).toEqual(["macs_restaurant_read_receipts"]);
-    expect((responses[2].error as { code: number }).code).toBe(-32000);
+    expect((responses[2]!.error as { code: number }).code).toBe(-32000);
   });
 });
