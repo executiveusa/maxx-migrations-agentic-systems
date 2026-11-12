@@ -13,6 +13,7 @@
     "test:e2e": "playwright test",
     "maxx:cli": "node cli/maxx-migrations.mjs",
     "maxx:mcp": "node mcp/maxx-migrations-server.mjs",
+    "macs:restaurant:mcp": "node mcp/macs-restaurant.mjs",
     "harness:preflight": "node scripts/harness/preflight.mjs",
     "harness:no-stubs": "node scripts/harness/no-stubs.mjs",
     "harness:routes": "node scripts/harness/route-audit.mjs",
