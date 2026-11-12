@@ -1,0 +1,30 @@
+feature,area,priority,original_public_evidence,macs_state,notes
+Restaurant growth landing,Acquisition,must,Feast public home and Remy landing,implemented_draft,Original MACS page; screenshot gauntlet pending
+Clear primary CTA,Acquisition,must,Public product pages with one purchase/consult CTA,implemented_draft,MACS Vibe Audit is existing single action
+POS completed payment read,Revenue,must,Public Feast claims Toast/Square/Clover POS tracking,implemented_draft_square_only,Owner OAuth and real receipt test not done
+Cash-inclusive recorded receipts,Revenue,must,No direct Feast cash proof found; Square API mechanics,implemented_draft_unverified,Recorded cash only; no inferred campaign lift
+Refund and duplicate reconciliation,Revenue,must,Ordinary payment integrity requirement,implemented_draft,Verified offline unit tests only
+Causal incremental lift estimation,Revenue,should,Feast public analyses and separate baseline,not_built,Requires comparable baseline/control; no bogus ROAS
+Campaign code to order linkage,Revenue,must,Feast public campaign attribution,not_built,Order API or reconciled receipt code required
+Toast API adapter,Integrations,should,Feast public Toast support claim,not_built,Official API permissions and owner authorization needed
+Clover API adapter,Integrations,should,Feast public Clover support claim,not_built,Official API permissions and owner authorization needed
+Owner Ordersave export,Integrations,should,No Owner.com merchant API verified,not_built,Owner consent/contractual access only
+Multi-tenant client isolation,Security,must,MACS own Client Zero contract,partial_unverified,Existing session/org check needs independent two-tenant proof
+Human approval ledger,Authority,must,Public Remy owner approvals; MACS contract,existing_shared_unverified,Do not allow Popebot to approve own actions
+Popebot read-only analysis tool,Agent,must,Existing MACS Popebot chat and agent tool requirement,implemented_draft_not_registered,Runtime MCP invocation unverified
+Recruitment campaign setup,Creator operations,should,Remy public recruitment screenshot,not_built,No ad spend without separately approved Meta account
+Creator applications,Creator operations,must,Remy public application screenshot,not_built,Need creator consent and first-party applicant source
+Creator selection approve deny,Creator operations,must,Remy public approval card,not_built,Audited human decision; no sole AI decision
+Recurring visit slots,Creator operations,must,Remy public availability screenshot,not_built,Timezone capacity and cancellation required
+Creator scheduling messages,Creator operations,should,Remy public booking text screenshots,not_built,Consent opt-out delivery proof mandatory
+Creative brief and food-credit limits,Creator operations,must,Remy public creative brief screenshot,not_built,Approved menu and licensing rules
+Visit pass and staff check-in,Creator operations,should,Remy public check-in screenshot,not_built,Physical operator confirmation
+Content upload and review,Creator operations,must,Remy public content review screenshot,not_built,Rights and moderation plus durable storage
+Paid creator campaign activation,Ads,should,Remy public running-as-ads board,not_built,Meta permission and exact approval payload
+Creator payout,Finance,could,Remy public bonus/payout fields,not_built,No automated financial transactions
+Owner weekly reporting,Reporting,must,Public Feast weekly message/conversion story,partial_draft,Verified/attributed/estimated/unknown states
+Cashier code log,Reporting,should,MACS original cash proof improvement,not_built,Reconcile with POS totals and refund status
+Authentic content capture,Content,must,Existing MACS Show and Tell skill,procedure_only,Human capture and consent approval not automated
+Public case study claims,Sales,must,Competitor publishes vendor case studies,not_authorized,Only use real Bunna receipts with explicit approval
+Private competitor dashboard,Reference,skip,No lawful access to private Remy account,never_copy,Do not infer unauthenticated screens or private endpoints
+Competitor logos and UI assets,Reference,skip,Public screenshot reference only,never_copy,No third-party visual assets in MACS builds
