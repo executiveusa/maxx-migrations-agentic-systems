@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { RevenueCockpit } from "@/components/revenue-capture/RevenueCockpit";
+import Link from "next/link";
 
 export const metadata: Metadata = { title: "Money" };
 
@@ -16,6 +17,10 @@ export default function RevenuePage() {
 
       <div className="space-y-6">
         <RevenueCockpit showAttention={false} />
+        <Link href="/app/revenue/restaurant" className="block rounded-xl border border-border bg-surface p-5 transition-colors hover:bg-surface-2">
+          <strong className="text-accent">Restaurant Revenue Proof</strong>
+          <p className="mt-2 text-sm text-muted">Read recorded cash and card evidence from an approved POS connection. Bunna Client Zero stays gated until authorized.</p>
+        </Link>
 
         <Card>
           <CardHeader
