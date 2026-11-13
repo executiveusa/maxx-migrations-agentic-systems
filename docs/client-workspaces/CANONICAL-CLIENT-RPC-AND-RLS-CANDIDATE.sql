@@ -14,7 +14,7 @@ AS $$
       'organizationId', p.organization_id::text,
       'slug', p.slug,
       'name', p.name,
-      'role', pm.role,
+      'role', CASE WHEN m.role IN ('owner','admin') THEN m.role ELSE pm.role END,
       'status', p.status,
       'suggestedTasks', COALESCE((
         SELECT jsonb_agg(t.title ORDER BY t.position)
@@ -46,16 +46,17 @@ AS $$
       )
    ) ORDER BY p.name
  ), '[]'::jsonb)
- FROM maxx.project_memberships pm
- JOIN maxx.memberships m
-   ON m.organization_id = pm.organization_id
-  AND m.user_id = pm.user_id AND m.status = 'active'
- JOIN maxx.projects p
-   ON p.id = pm.project_id AND p.organization_id = pm.organization_id
+ FROM maxx.memberships m
  JOIN maxx.organizations o
-   ON o.id = p.organization_id AND o.status = 'active'
- WHERE pm.user_id = p_user_id
-   AND pm.status = 'active'
+   ON o.id = m.organization_id AND o.status = 'active'
+ JOIN maxx.projects p
+   ON p.organization_id = m.organization_id
+ LEFT JOIN maxx.project_memberships pm
+   ON pm.project_id = p.id
+  AND pm.organization_id = p.organization_id
+  AND pm.user_id = m.user_id AND pm.status='active'
+ WHERE m.user_id = p_user_id AND m.status='active'
+   AND (m.role IN ('owner','admin') OR pm.id IS NOT NULL)
    AND p.status IN ('active','paused','archived');
 $$;
 
