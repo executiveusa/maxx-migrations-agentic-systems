@@ -72,6 +72,12 @@ BEGIN
    RAISE EXCEPTION 'protected_workspace_cannot_be_archived' USING errcode='42501'; END IF;
 
  IF p_step='start' THEN
+   -- An abandoned three-step request must not block this client forever.
+   -- Only expired unconfirmed requests are cancelled; no project data moves.
+   UPDATE maxx.project_archive_requests SET state='cancelled'
+   WHERE project_id=v_project.id
+     AND state IN ('requested','confirmed_one','confirmed_two')
+     AND created_at<now()-interval '24 hours';
    IF v_project.status<>'active' THEN
      RAISE EXCEPTION 'only_active_client_can_be_archived' USING errcode='22023'; END IF;
    INSERT INTO maxx.project_archive_requests
@@ -81,6 +87,18 @@ BEGIN
        v_project.id::text || ':' || p_actor::text || ':' || transaction_timestamp()::text,
        'UTF8'),'sha256'),'hex'))
    RETURNING * INTO v_request;
+ ELSIF p_step='cancel' THEN
+   UPDATE maxx.project_archive_requests
+   SET state='cancelled'
+   WHERE id=p_request_id AND project_id=v_project.id
+     AND requested_by=p_actor
+     AND state IN ('requested','confirmed_one','confirmed_two')
+   RETURNING * INTO v_request;
+   IF NOT FOUND THEN RAISE EXCEPTION 'archive_request_cannot_cancel'
+     USING errcode='22023'; END IF;
+   RETURN jsonb_build_object('requestId',v_request.id,
+     'projectId',v_project.id,'state','cancelled',
+     'note','No client data was archived or deleted');
  ELSIF p_step='restore' THEN
    SELECT * INTO v_request FROM maxx.project_archive_requests
    WHERE id=p_request_id AND project_id=v_project.id
@@ -115,6 +133,21 @@ BEGIN
        WHERE id=v_request.id;
      v_request.state:='confirmed_two';
    ELSIF p_step='archive' AND v_request.state='confirmed_two' THEN
+     -- No archive while actual work remains active or pending owner decision.
+     IF EXISTS (
+       SELECT 1 FROM maxx.workflow_runs r
+       WHERE r.project_id=v_project.id
+         AND r.organization_id=v_project.organization_id
+         AND r.status IN ('queued','running','blocked','waiting_approval')
+     ) OR EXISTS (
+       SELECT 1 FROM maxx.approvals a
+       JOIN maxx.action_proposals ap ON ap.id=a.action_proposal_id
+       WHERE ap.project_id=v_project.id
+         AND ap.organization_id=v_project.organization_id
+         AND a.organization_id=v_project.organization_id
+         AND a.status='pending'
+     ) THEN RAISE EXCEPTION 'client_has_active_missions_or_approvals'
+       USING errcode='55000'; END IF;
      UPDATE maxx.projects SET status='archived',updated_at=now()
        WHERE id=v_project.id;
      UPDATE maxx.project_archive_requests SET state='archived',
