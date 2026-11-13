@@ -59,9 +59,12 @@ CREATE TABLE IF NOT EXISTS maxx.project_archive_requests (
   archived_at timestamptz,
   recovery_until timestamptz,
   restored_at timestamptz,
-  CHECK (recovery_until IS NULL OR (
-    archived_at IS NOT NULL AND recovery_until >= archived_at + interval '30 days'
-  ))
+  CHECK (
+    (state <> 'archived' AND (recovery_until IS NULL OR archived_at IS NOT NULL))
+    OR (state = 'archived' AND archived_at IS NOT NULL
+      AND recovery_until IS NOT NULL
+      AND recovery_until >= archived_at + interval '30 days')
+  )
 );
 ALTER TABLE maxx.project_archive_requests ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON maxx.project_archive_requests FROM PUBLIC, anon, authenticated;
