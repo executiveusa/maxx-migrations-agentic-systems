@@ -4,10 +4,17 @@
 -- Current legacy `maxx.projects` org RLS is too broad for client records.
 -- ALL existing query/writing surfaces must also enforce project identity.
 BEGIN;
+-- A composite key prevents a membership, prompt or archive row from referring
+-- to a project belonging to another organization. Mandatory on the final
+-- reviewed migration, even when the service role can bypass RLS.
+CREATE UNIQUE INDEX IF NOT EXISTS maxx_projects_org_id_id_unique
+ ON maxx.projects (organization_id,id);
 CREATE TABLE IF NOT EXISTS maxx.project_memberships (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id uuid NOT NULL REFERENCES maxx.organizations(id),
-  project_id uuid NOT NULL REFERENCES maxx.projects(id),
+  project_id uuid NOT NULL,
+  CONSTRAINT project_scope_fk FOREIGN KEY (organization_id, project_id)
+    REFERENCES maxx.projects(organization_id,id),
   user_id uuid NOT NULL REFERENCES auth.users(id),
   role text NOT NULL CHECK (role IN ('owner','admin','operator','reviewer','viewer')),
   status text NOT NULL DEFAULT 'active' CHECK (status IN ('active','suspended','revoked')),
@@ -24,7 +31,9 @@ REVOKE ALL ON maxx.project_memberships FROM PUBLIC, anon, authenticated;
 CREATE TABLE IF NOT EXISTS maxx.project_prompt_templates (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id uuid NOT NULL REFERENCES maxx.organizations(id),
-  project_id uuid NOT NULL REFERENCES maxx.projects(id),
+  project_id uuid NOT NULL,
+  CONSTRAINT project_scope_fk FOREIGN KEY (organization_id, project_id)
+    REFERENCES maxx.projects(organization_id,id),
   title text NOT NULL CHECK (length(title) BETWEEN 3 AND 300),
   provenance text NOT NULL DEFAULT 'operator_template',
   position integer NOT NULL CHECK (position BETWEEN 1 AND 20),
@@ -38,7 +47,9 @@ REVOKE ALL ON maxx.project_prompt_templates FROM PUBLIC, anon, authenticated;
 CREATE TABLE IF NOT EXISTS maxx.project_archive_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id uuid NOT NULL REFERENCES maxx.organizations(id),
-  project_id uuid NOT NULL REFERENCES maxx.projects(id),
+  project_id uuid NOT NULL,
+  CONSTRAINT project_scope_fk FOREIGN KEY (organization_id, project_id)
+    REFERENCES maxx.projects(organization_id,id),
   requested_by uuid NOT NULL REFERENCES auth.users(id),
   state text NOT NULL DEFAULT 'requested'
     CHECK (state IN ('requested','confirmed_one','confirmed_two','archived','restored','cancelled')),
