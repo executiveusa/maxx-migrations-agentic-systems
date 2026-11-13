@@ -16,6 +16,16 @@ AS $$
       'name', p.name,
       'role', CASE WHEN m.role IN ('owner','admin') THEN m.role ELSE pm.role END,
       'status', p.status,
+      'archiveRequestId', (
+        SELECT ar.id::text FROM maxx.project_archive_requests ar
+        WHERE ar.project_id=p.id AND ar.organization_id=p.organization_id
+          AND ar.state='archived' ORDER BY ar.archived_at DESC LIMIT 1
+      ),
+      'recoveryUntil', (
+        SELECT ar.recovery_until FROM maxx.project_archive_requests ar
+        WHERE ar.project_id=p.id AND ar.organization_id=p.organization_id
+          AND ar.state='archived' ORDER BY ar.archived_at DESC LIMIT 1
+      ),
       'suggestedTasks', COALESCE((
         SELECT jsonb_agg(t.title ORDER BY t.position)
         FROM maxx.project_prompt_templates t
