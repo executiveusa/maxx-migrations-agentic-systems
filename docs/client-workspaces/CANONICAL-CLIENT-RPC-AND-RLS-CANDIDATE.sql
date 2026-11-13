@@ -182,3 +182,120 @@ USING (user_id=auth.uid() OR maxx.has_role(organization_id,ARRAY['owner','admin'
 -- Separate scoping of run_steps and approvals requires joins to their parent
 -- run/proposal and is intentionally NOT covered by the above loop. These are
 -- release blockers until their RLS rules and current app assumptions are reviewed.
+
+-- Parent-linked tenant isolation covers two high-risk child tables that lack
+-- their own project_id. Do not release the migration without these policies.
+-- Organization ownership remains allowed; non-owner roles require an active
+-- project membership at the corresponding parent.
+DROP POLICY IF EXISTS maxx_v3_run_steps_select ON maxx.run_steps;
+CREATE POLICY maxx_v3_run_steps_select ON maxx.run_steps
+AS RESTRICTIVE FOR SELECT TO authenticated
+USING (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.workflow_runs parent
+    WHERE parent.id=run_id AND parent.organization_id=run_steps.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','operator','reviewer','viewer']::text[])
+  )
+);
+
+DROP POLICY IF EXISTS maxx_v3_run_steps_insert ON maxx.run_steps;
+CREATE POLICY maxx_v3_run_steps_insert ON maxx.run_steps
+AS RESTRICTIVE FOR INSERT TO authenticated
+WITH CHECK (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.workflow_runs parent
+    WHERE parent.id=run_id AND parent.organization_id=run_steps.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','operator']::text[])
+  )
+);
+
+DROP POLICY IF EXISTS maxx_v3_run_steps_update ON maxx.run_steps;
+CREATE POLICY maxx_v3_run_steps_update ON maxx.run_steps
+AS RESTRICTIVE FOR UPDATE TO authenticated
+USING (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.workflow_runs parent
+    WHERE parent.id=run_id AND parent.organization_id=run_steps.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','operator']::text[])
+  )
+)
+WITH CHECK (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.workflow_runs parent
+    WHERE parent.id=run_id AND parent.organization_id=run_steps.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','operator']::text[])
+  )
+);
+
+DROP POLICY IF EXISTS maxx_v3_approvals_select ON maxx.approvals;
+CREATE POLICY maxx_v3_approvals_select ON maxx.approvals
+AS RESTRICTIVE FOR SELECT TO authenticated
+USING (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.action_proposals parent
+    WHERE parent.id=action_proposal_id
+      AND parent.organization_id=approvals.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','operator','reviewer','viewer']::text[])
+  )
+);
+
+DROP POLICY IF EXISTS maxx_v3_approvals_insert ON maxx.approvals;
+CREATE POLICY maxx_v3_approvals_insert ON maxx.approvals
+AS RESTRICTIVE FOR INSERT TO authenticated
+WITH CHECK (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.action_proposals parent
+    WHERE parent.id=action_proposal_id
+      AND parent.organization_id=approvals.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','reviewer']::text[])
+  )
+);
+
+DROP POLICY IF EXISTS maxx_v3_approvals_update ON maxx.approvals;
+CREATE POLICY maxx_v3_approvals_update ON maxx.approvals
+AS RESTRICTIVE FOR UPDATE TO authenticated
+USING (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.action_proposals parent
+    WHERE parent.id=action_proposal_id
+      AND parent.organization_id=approvals.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','reviewer']::text[])
+  )
+)
+WITH CHECK (
+  maxx.has_role(organization_id,ARRAY['owner','admin']::text[])
+  OR EXISTS (
+    SELECT 1 FROM maxx.action_proposals parent
+    WHERE parent.id=action_proposal_id
+      AND parent.organization_id=approvals.organization_id
+      AND parent.project_id IS NOT NULL
+      AND maxx.can_access_client_project(parent.organization_id,parent.project_id,
+        ARRAY['owner','admin','reviewer']::text[])
+  )
+);
+
+-- NOTE: Updating RLS of legacy parent/child tables is potentially
+-- behavior-changing for MAXX apps other than Agent MAXX. Independent review
+-- must compare old and new access using actual role-scoped tests. No assumption
+-- that the presence of an RLS policy alone constitutes a working isolation test.
