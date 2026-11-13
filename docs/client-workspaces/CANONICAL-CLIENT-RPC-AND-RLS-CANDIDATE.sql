@@ -43,6 +43,10 @@ AS $$
           AND ap.project_id = p.id
           AND a.status = 'pending'
       ),
+      -- Scope is verified for `maxx.approvals`, but historical
+      -- `public.maxx_approvals` is an operator-level store without project_id.
+      -- Do not call a zero scoped count the absence of *all* approvals.
+      'approvalCoverage', 'maxx_only',
       'urgentApprovalCount', (
         SELECT COUNT(*)::int
         FROM maxx.approvals a
