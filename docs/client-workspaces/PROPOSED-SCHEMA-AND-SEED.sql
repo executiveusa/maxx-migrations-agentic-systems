@@ -69,6 +69,12 @@ CREATE TABLE IF NOT EXISTS maxx.project_archive_requests (
 ALTER TABLE maxx.project_archive_requests ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON maxx.project_archive_requests FROM PUBLIC, anon, authenticated;
 
+-- New private MAXX tables: the browser's anon/authenticated clients cannot
+-- access them directly. Grant only the control-plane's server role.
+GRANT SELECT,INSERT,UPDATE,DELETE ON
+  maxx.project_memberships,maxx.project_prompt_templates,
+  maxx.project_archive_requests TO service_role;
+
 -- Seed seven USER-NAMED clients under one EXISTING MACS organization.
 -- Only names are user-confirmed; prompts remain proposed examples.
 WITH seed(slug,name,kind) AS (
@@ -87,6 +93,45 @@ SELECT o.id,seed.slug,seed.name,seed.kind,'active',
 FROM seed CROSS JOIN maxx.organizations o
 WHERE o.slug='macs-digital-media' AND o.status='active'
 ON CONFLICT (organization_id,slug) DO NOTHING;
+-- Seed reusable company-specific task prompts. Source is operator-approved
+-- template, NOT evidence of historical frequently executed missions.
+WITH seed(slug,position,title) AS (
+ VALUES
+ ('crown-and-core',1,'Review consultation requests and booking questions.'),
+ ('crown-and-core',2,'Draft a follow-up for approval.'),
+ ('crown-and-core',3,'Show pending company decisions.'),
+ ('crown-and-core',4,'Prepare a salon promotion with verified services.'),
+ ('thp-flooring',1,'Review open flooring estimates.'),
+ ('thp-flooring',2,'Prepare follow-ups for unanswered project leads.'),
+ ('thp-flooring',3,'Draft a before-and-after post from approved photos.'),
+ ('thp-flooring',4,'Show flooring jobs waiting for approval.'),
+ ('bunna-restaurant',1,'Audit the online ordering path.'),
+ ('bunna-restaurant',2,'Reconcile recorded cash and card receipts.'),
+ ('bunna-restaurant',3,'Draft a group-meal campaign for owner approval.'),
+ ('bunna-restaurant',4,'Show Bunna decisions awaiting approval.'),
+ ('macs-digital-media',1,'Show urgent approvals across authorized clients.'),
+ ('macs-digital-media',2,'Prepare a verified delivery and revenue report.'),
+ ('macs-digital-media',3,'Identify client follow-ups awaiting owner approval.'),
+ ('macs-digital-media',4,'Suggest the next revenue-generating task.'),
+ ('asc3nd',1,'Review onboarding and activation issues.'),
+ ('asc3nd',2,'Draft a community engagement campaign.'),
+ ('asc3nd',3,'Summarize verified weekly progress.'),
+ ('asc3nd',4,'Show ASC3ND decisions awaiting review.'),
+ ('3x-plumbers',1,'Review unanswered service requests.'),
+ ('3x-plumbers',2,'Follow up on estimates and callbacks.'),
+ ('3x-plumbers',3,'Draft a local plumbing FAQ using approved facts.'),
+ ('3x-plumbers',4,'Show urgent pending owner actions.'),
+ ('tangles-and-locs',1,'Review appointment gaps and cancellations.'),
+ ('tangles-and-locs',2,'Draft a client win-back message for approval.'),
+ ('tangles-and-locs',3,'Prepare an educational haircare post.'),
+ ('tangles-and-locs',4,'Show booking follow-ups awaiting review.')
+)
+INSERT INTO maxx.project_prompt_templates(organization_id,project_id,title,position,provenance)
+SELECT p.organization_id,p.id,seed.title,seed.position,'operator_template'
+FROM seed JOIN maxx.projects p ON p.slug=seed.slug
+JOIN maxx.organizations o ON o.id=p.organization_id
+WHERE o.slug='macs-digital-media'
+ON CONFLICT (project_id,position) DO NOTHING;
 -- NO automatic user membership, provider credentials or fake approvals seeded.
 -- NO purge job. Three separate server-bound confirmations are mandatory before
 -- `archived`, and automatic restoration remains available for >=30 days.
