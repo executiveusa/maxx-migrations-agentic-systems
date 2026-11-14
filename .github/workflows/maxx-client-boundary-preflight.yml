@@ -1,0 +1,32 @@
+name: MAXX client boundary static preflight
+
+on:
+  pull_request:
+    paths:
+      - 'docs/client-workspaces/**'
+      - '.github/workflows/maxx-client-boundary-preflight.yml'
+  push:
+    paths:
+      - 'docs/client-workspaces/**'
+      - '.github/workflows/maxx-client-boundary-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-boundary-preflight:
+    name: Candidate SQL static assertions (not RLS integration)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check client seeds, policy declarations and RPC provenance
+        run: node docs/client-workspaces/verify-candidate-boundaries.mjs
+      - name: Mark integration gate outstanding
+        run: |
+          echo 'Static source assertions only. This job does not establish SQL validity or two-identity tenant isolation.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Release remains blocked pending disposable database integration and independent review.' >> "$GITHUB_STEP_SUMMARY"
