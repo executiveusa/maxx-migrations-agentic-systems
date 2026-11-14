@@ -39,6 +39,12 @@ try {
   const revoke = /REVOKE\s+ALL\s+ON\s+FUNCTION\s+public\.maxx_service_client_workspaces\([^;]*?\)\s+FROM\s+[^;]+;/i;
   assert.match(scope, revoke, 'fixture missing expected service revoke');
   mustFail('missing service revoke', { [scopeName]: scope.replace(revoke, '') });
+  // A child-table policy regression must fail the same static gate.
+  assert.match(scope, /CREATE POLICY maxx_v3_approvals_select/);
+  mustFail('missing approvals isolation policy', {
+    [scopeName]: scope.replace('CREATE POLICY maxx_v3_approvals_select',
+      '-- CREATE POLICY maxx_v3_approvals_select removed'),
+  });
   const schemaName = 'PROPOSED-SCHEMA-AND-SEED.sql';
   const schema = source[schemaName];
   assert.match(schema, /ALTER TABLE maxx\.project_memberships ENABLE ROW LEVEL SECURITY/);
