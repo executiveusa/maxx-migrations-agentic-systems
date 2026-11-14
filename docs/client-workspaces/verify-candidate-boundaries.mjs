@@ -22,9 +22,26 @@ for (const policy of ['maxx_v3_project_read_scope','maxx_v3_run_steps_select',
   'maxx_v3_approvals_select','maxx_v3_intake_scope','maxx_v3_membership_scope']) {
   assert.ok(scope.includes('CREATE POLICY '+policy), 'missing restrictive policy '+policy);
 }
-for (const file of [scope, management]) {
-  for (const match of file.matchAll(/GRANT EXECUTE ON FUNCTION (public\.maxx_service_\w+\([^;]+?\))\s+TO\s+([^;]+);/gs)) {
-    assert.equal(match[2].trim(), 'service_role', 'unsafe public service RPC grant: '+match[1]);
+// Fail closed if any privileged service RPC loses its revoke or gains a broad grant.
+const serviceSql = scope + '\n' + management;
+for (const name of [
+  'maxx_service_client_workspaces',
+  'maxx_service_create_client_workspace',
+  'maxx_service_archive_client_step'
+]) {
+  const signature = 'public\\.' + name + '\\([^;]*?\\)';
+  const grants = [...serviceSql.matchAll(new RegExp(
+    'GRANT\\s+EXECUTE\\s+ON\\s+FUNCTION\\s+(' + signature + ')\\s+TO\\s+([^;]+);', 'gi'
+  ))];
+  assert.equal(grants.length, 1, 'expected one service grant: ' + name);
+  assert.equal(grants[0][2].trim().toLowerCase(), 'service_role', 'unsafe grant: ' + name);
+  const revokes = [...serviceSql.matchAll(new RegExp(
+    'REVOKE\\s+ALL\\s+ON\\s+FUNCTION\\s+' + signature + '\\s+FROM\\s+([^;]+);', 'gi'
+  ))];
+  assert.equal(revokes.length, 1, 'missing revoke: ' + name);
+  const roles = revokes[0][1].toLowerCase().split(',').map(x => x.trim());
+  for (const role of ['public', 'anon', 'authenticated']) {
+    assert.ok(roles.includes(role), 'missing ' + role + ' revoke: ' + name);
   }
 }
 assert.match(management, /recovery_until=now\(\)\+interval '30 days'/);
