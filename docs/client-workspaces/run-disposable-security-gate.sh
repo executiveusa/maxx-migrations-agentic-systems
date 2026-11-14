@@ -80,15 +80,25 @@ BEGIN
       'public.maxx_service_client_workspaces(uuid)', 'EXECUTE') THEN
     RAISE EXCEPTION 'Unsafe MAXX workspace RPC execute grants';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies
-      WHERE schemaname='maxx' AND tablename='approvals'
-        AND policyname='maxx_v3_approvals_select') THEN
-    RAISE EXCEPTION 'Missing approvals SELECT isolation policy';
-  END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policies
-      WHERE schemaname='maxx' AND tablename='run_steps'
-        AND policyname='maxx_v3_run_steps_select') THEN
-    RAISE EXCEPTION 'Missing run_steps isolation policy';
+  -- A policy name alone is not security evidence: enforce restrictive
+  -- semantics, authenticated target, and a project-scoped predicate.
+  IF EXISTS (
+    SELECT 1 FROM (VALUES
+      ('approvals','maxx_v3_approvals_select'),
+      ('run_steps','maxx_v3_run_steps_select'),
+      ('projects','maxx_v3_project_read_scope')
+    ) AS expected(table_name,policy_name)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM pg_policies p
+      WHERE p.schemaname='maxx' AND p.tablename=expected.table_name
+        AND p.policyname=expected.policy_name
+        AND p.permissive='RESTRICTIVE'
+        AND p.cmd='SELECT'
+        AND 'authenticated'=ANY(p.roles)
+        AND p.qual LIKE '%can_access_client_project%'
+    )
+  ) THEN
+    RAISE EXCEPTION 'Missing or weakened restrictive project SELECT isolation policy';
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace
       WHERE ns.nspname='maxx' AND c.relname='project_memberships' AND c.relrowsecurity) THEN
