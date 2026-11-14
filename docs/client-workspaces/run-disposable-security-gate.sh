@@ -14,6 +14,13 @@ sql="$root/docs/client-workspaces"
 # Require a database name containing a disposable marker; a label alone is
 # insufficient. Do not echo credentials or the connection string.
 db_name="$(psql "$MAXX_TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c 'select current_database()')"
+# Require a local socket/loopback server, not merely a caller-supplied label.
+# This is a defense in depth, not proof that a forwarded local port is safe.
+server_ip="$(psql "$MAXX_TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "select coalesce(inet_server_addr()::text, 'local-socket')")"
+case "$server_ip" in
+  local-socket|127.*|::1) ;;
+  *) echo "REFUSED: SQL gate only accepts local/loopback PostgreSQL" >&2; exit 2 ;;
+esac
 case "$db_name" in
   *disposable*|*throwaway*|*maxx_test*) ;;
   *) echo "REFUSED: database name is not explicitly disposable" >&2; exit 2 ;;
