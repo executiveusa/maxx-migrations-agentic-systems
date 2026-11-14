@@ -26,6 +26,8 @@ jobs:
           node-version: '22'
       - name: Check client seeds, policy declarations and RPC provenance
         run: node docs/client-workspaces/verify-candidate-boundaries.mjs
+      - name: Prove static preflight rejects unsafe SQL mutations
+        run: node docs/client-workspaces/verify-candidate-boundaries.test.mjs
       - name: Mark integration gate outstanding
         run: |
           echo 'Static source assertions only. This job does not establish SQL validity or two-identity tenant isolation.' >> "$GITHUB_STEP_SUMMARY"
