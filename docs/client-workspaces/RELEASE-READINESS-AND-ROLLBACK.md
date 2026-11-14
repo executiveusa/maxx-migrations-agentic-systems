@@ -55,3 +55,10 @@ Date: 2026-11-13. **STATUS: DRAFT / NOT LIVE**. Method: uploaded `full-stack-wir
 
 ## One measured release outcome
 An authorized operator signs in with Google, selects **BUNNA RESTAURANT**, sees only its verified prompts and approval count, requests a *draft* growth plan, receives a truthful no-data/approval-required response, and switches to **THP FLOORING** without cross-client leakage. Full autonomous task execution and cash-inclusive POS proof are subsequent verified slices—not a claim of this release.
+
+## 2026-11-14 candidate preflight iteration
+- PR #43 baseline `2df69d8423ad108603574379320a92b40a81c001`; added fail-closed static boundary test `docs/client-workspaces/verify-candidate-boundaries.mjs` in commits `2eeec838` and `641afaa3`.
+- Verified 17/17 equivalent source assertions against the candidate SQL through the GitHub connector: seven named seeds, RLS activation on three new private tables, five critical policy definitions, 30-day recovery interval, and operator-template provenance. These checks **do not** establish valid SQL execution or RLS isolation.
+- Local Node execution unavailable: runtime cannot resolve raw.githubusercontent.com; no database checkout or disposable Postgres instance. GitHub CI on the new exact HEAD remains unverified. Run `node docs/client-workspaces/verify-candidate-boundaries.mjs` from a repository checkout, then conduct real two-identity RLS integration tests on a disposable PostgreSQL/Supabase environment.
+- No changes to shared botanic-creations, production grants, or deployment. Rollback: revert `641afaa3` and `2eeec838` to remove the static preflight; this does not alter SQL candidates or runtime data.
+- Gate status: **NOT READY** until independent SQL review, two-principal deny/allow tests, OAuth, integration and deployment evidence. Next smallest slice: add executable isolated tenant fixtures and negative tests for project-scoped child tables; do not apply candidate SQL to shared database.
