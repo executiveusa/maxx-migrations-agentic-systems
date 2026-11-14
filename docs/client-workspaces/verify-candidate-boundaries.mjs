@@ -12,7 +12,7 @@ const management = read('MANAGEMENT-RPC-CANDIDATE.sql');
 const requiredClients = ['crown-and-core', 'thp-flooring', 'bunna-restaurant',
   'macs-digital-media', 'asc3nd', '3x-plumbers', 'tangles-and-locs'];
 for (const slug of requiredClients) {
-  assert.match(schema, new RegExp("'"+slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')+"'"), 'missing client '+slug);
+  assert.ok(schema.includes("'" + slug + "'"), 'missing client '+slug);
 }
 for (const table of ['project_memberships','project_prompt_templates','project_archive_requests']) {
   assert.match(schema, new RegExp('ALTER TABLE maxx\\.'+table+' ENABLE ROW LEVEL SECURITY'), 'RLS absent: '+table);
