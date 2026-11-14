@@ -20,7 +20,8 @@ for (const table of ['project_memberships','project_prompt_templates','project_a
 }
 for (const policy of ['maxx_v3_project_read_scope','maxx_v3_run_steps_select',
   'maxx_v3_approvals_select','maxx_v3_intake_scope','maxx_v3_membership_scope']) {
-  assert.ok(scope.includes('CREATE POLICY '+policy), 'missing restrictive policy '+policy);
+  // Anchor to a SQL statement so commented-out policies cannot satisfy the gate.
+  assert.match(scope, new RegExp('^\\s*CREATE\\s+POLICY\\s+' + policy + '\\b', 'm'), 'missing restrictive policy '+policy);
 }
 // Fail closed if any privileged service RPC loses its revoke or gains a broad grant.
 const serviceSql = scope + '\n' + management;

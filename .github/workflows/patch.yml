@@ -118,6 +118,8 @@ jobs:
         env:
           DB: mariadb
           TYPE: server
+          # Frappe is upstream; the MAXX PR base is not a frappe/frappe branch.
+          FRAPPE_BRANCH: version-16-hotfix
 
       - name: Run Patch Tests
         run: |
@@ -168,7 +170,7 @@ jobs:
           update_to_version 16 3.14
 
           echo "Updating to latest version"
-          git -C "apps/frappe" fetch --depth 1 upstream "${GITHUB_BASE_REF:-${GITHUB_REF##*/}}"
+          git -C "apps/frappe" fetch --depth 1 upstream version-16-hotfix
           git -C "apps/frappe" checkout -q -f FETCH_HEAD
           git -C "apps/erpnext" checkout -q -f "$GITHUB_SHA"
 
