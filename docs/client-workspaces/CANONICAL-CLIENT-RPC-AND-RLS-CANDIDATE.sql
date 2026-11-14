@@ -32,7 +32,8 @@ AS $$
         WHERE t.project_id = p.id
           AND t.organization_id = p.organization_id AND t.active
       ), '[]'::jsonb),
-      'promptsSource', 'verified',
+      -- Templates are operator-authored suggestions, not verified historical tasks.
+      'promptsSource', 'operator_template',
       'pendingApprovalCount', (
         SELECT COUNT(*)::int
         FROM maxx.approvals a
