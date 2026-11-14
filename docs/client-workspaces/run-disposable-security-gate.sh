@@ -53,6 +53,33 @@ BEGIN
   IF n <> 0 THEN
     RAISE NOTICE 'Existing memberships: % (not interpreted as verified)', n;
   END IF;
+  -- Confirm the seed actually created the seven named clients and 28 prompts.
+  -- A missing MACS organization must fail rather than silently pass.
+  IF (SELECT count(*) FROM maxx.projects p
+      JOIN maxx.organizations o ON o.id=p.organization_id
+      WHERE o.slug='macs-digital-media' AND p.slug IN (
+        'crown-and-core','thp-flooring','bunna-restaurant',
+        'macs-digital-media','asc3nd','3x-plumbers','tangles-and-locs')) <> 7 THEN
+    RAISE EXCEPTION 'Seven MAXX workspace seeds not present';
+  END IF;
+  IF (SELECT count(*) FROM maxx.project_prompt_templates t
+      JOIN maxx.projects p ON p.id=t.project_id AND p.organization_id=t.organization_id
+      JOIN maxx.organizations o ON o.id=p.organization_id
+      WHERE o.slug='macs-digital-media' AND p.slug IN (
+        'crown-and-core','thp-flooring','bunna-restaurant',
+        'macs-digital-media','asc3nd','3x-plumbers','tangles-and-locs')
+        AND t.provenance='operator_template') <> 28 THEN
+    RAISE EXCEPTION 'Expected 28 operator-template prompts';
+  END IF;
+  -- Public client RPC is callable by service_role only, never browser roles.
+  IF has_function_privilege('anon',
+      'public.maxx_service_client_workspaces(uuid)', 'EXECUTE')
+     OR has_function_privilege('authenticated',
+      'public.maxx_service_client_workspaces(uuid)', 'EXECUTE')
+     OR NOT has_function_privilege('service_role',
+      'public.maxx_service_client_workspaces(uuid)', 'EXECUTE') THEN
+    RAISE EXCEPTION 'Unsafe MAXX workspace RPC execute grants';
+  END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_policies
       WHERE schemaname='maxx' AND tablename='approvals'
         AND policyname='maxx_v3_approvals_select') THEN
