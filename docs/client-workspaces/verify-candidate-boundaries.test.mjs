@@ -45,6 +45,13 @@ try {
   mustFail('missing membership RLS', {
     [schemaName]: schema.replace('ALTER TABLE maxx.project_memberships ENABLE ROW LEVEL SECURITY', '-- RLS deliberately removed'),
   });
+  // A service-role insert can bypass RLS; the composite FK must still reject
+  // mismatched organization/project pairs at the database constraint layer.
+  const compositeFk = /CONSTRAINT project_scope_fk FOREIGN KEY \(organization_id, project_id\)\s+REFERENCES maxx\.projects\(organization_id,id\)/;
+  assert.match(schema, compositeFk, 'fixture missing composite project FK');
+  mustFail('missing composite tenant FK', {
+    [schemaName]: schema.replace(compositeFk, '-- cross-organization FK deliberately removed'),
+  });
   const managementName = 'MANAGEMENT-RPC-CANDIDATE.sql';
   const management = source[managementName];
   assert.match(management, /CREATE OR REPLACE FUNCTION public\.maxx_service_create_client_workspace\(/);
