@@ -31,9 +31,13 @@ export MAXX_MOCK_DATABASE=maxx_disposable MAXX_MOCK_SERVER=203.0.113.10
 assert_refusal remote_server 2
 export MAXX_MOCK_DATABASE=production MAXX_MOCK_SERVER=127.0.0.1
 assert_refusal production_named_database 2
+export MAXX_MOCK_DATABASE=production_disposable MAXX_MOCK_SERVER=127.0.0.1
+assert_refusal ambiguous_production_disposable 2
+export MAXX_MOCK_DATABASE=staging_maxx_test MAXX_MOCK_SERVER=127.0.0.1
+assert_refusal ambiguous_staging_test 2
 export MAXX_MOCK_DATABASE=maxx_disposable MAXX_MOCK_SERVER=127.0.0.1 MAXX_TEST_DB_LABEL=production
 assert_refusal missing_disposable_label 0
-echo 'PASS: three refusal negative controls; no SQL mutations reached'
+echo 'PASS: five refusal negative controls; no SQL mutations reached'
 
 # Inspect the actual SQL streamed to psql after all guards pass. A prior
 # regression emitted "DO $ ... END $;" which PostgreSQL rejects immediately.
