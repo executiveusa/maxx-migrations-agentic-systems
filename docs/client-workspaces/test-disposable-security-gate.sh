@@ -10,7 +10,7 @@ printf '%s\n' "$*" >> "$MAXX_MOCK_LOG"
 case "$*" in
   *current_database\(\)*) printf '%s\n' "$MAXX_MOCK_DATABASE" ;;
   *inet_server_addr\(\)*) printf '%s\n' "$MAXX_MOCK_SERVER" ;;
-  *) echo 'MOCK: SQL execution would be reached' >&2; exit 97 ;;
+  *) cat > "$MAXX_MOCK_SQL"; echo 'MOCK: SQL execution would be reached' >&2; exit 97 ;;
 esac
 MOCK
 chmod +x "$work/psql"
@@ -34,3 +34,23 @@ assert_refusal production_named_database 2
 export MAXX_MOCK_DATABASE=maxx_disposable MAXX_MOCK_SERVER=127.0.0.1 MAXX_TEST_DB_LABEL=production
 assert_refusal missing_disposable_label 0
 echo 'PASS: three refusal negative controls; no SQL mutations reached'
+
+# Inspect the actual SQL streamed to psql after all guards pass. A prior
+# regression emitted "DO $ ... END $;" which PostgreSQL rejects immediately.
+# This mock is NOT evidence of successful PostgreSQL execution or RLS isolation.
+export MAXX_MOCK_SQL="$work/candidate.sql" MAXX_MOCK_DATABASE=maxx_disposable MAXX_MOCK_SERVER=127.0.0.1 MAXX_TEST_DB_LABEL=maxx-disposable
+rc=0
+bash "$script" >/dev/null 2>&1 || rc=$?
+if [[ "$rc" -ne 97 ]] || [[ ! -s "$MAXX_MOCK_SQL" ]]; then
+  echo "FAIL: disposable SQL did not reach mocked psql as expected (exit=$rc)" >&2
+  exit 1
+fi
+if ! grep -Fq 'DO $$' "$MAXX_MOCK_SQL" || ! grep -Fq 'END $$;' "$MAXX_MOCK_SQL" || grep -Fxq 'DO $' "$MAXX_MOCK_SQL" || grep -Fxq 'END $;' "$MAXX_MOCK_SQL"; then
+  echo 'FAIL: membership snapshot has malformed PostgreSQL dollar quotes' >&2
+  exit 1
+fi
+if ! grep -Fq 'CREATE TEMP TABLE maxx_gate_memberships_before' "$MAXX_MOCK_SQL" || ! grep -Fxq 'ROLLBACK;' "$MAXX_MOCK_SQL"; then
+  echo 'FAIL: membership snapshot or transaction rollback missing' >&2
+  exit 1
+fi
+echo 'PASS: generated SQL uses valid DO dollar delimiters and rollback (mock only)'
