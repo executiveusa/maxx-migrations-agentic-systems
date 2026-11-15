@@ -10,11 +10,17 @@ Acceptance requires reproducible clean installation, exact-HEAD CI, two independ
 
 ## EVIDENCE (GitHub API read, 2026-11-15)
 - Portal `executiveusa/macs-agent-portal#113`, draft, HEAD `b16cdffc3461f51345db9598a57fcb4642174630`: CI, MAXX Pups CI, MAXX release gates, MAXX Gap Closure CI all success. This is **CI evidence, not staging or production verification**.
-- Backend `executiveusa/maxx-migrations-agentic-systems#43`, draft, HEAD `33caf39898a80b263785ae2657ac9f7cd0488f5a`: client boundary static preflight and Patch success; Linters and Semantic Commits failure; PostgreSQL skipped; MariaDB queued at inspection.
+- Backend `executiveusa/maxx-migrations-agentic-systems#43`, draft, HEAD `c3fc2c63d780a784bba6359773d9e4c0d478d209`: client boundary static preflight and Patch success; Linters and Semantic Commits failure; PostgreSQL skipped; MariaDB queued at inspection.
 - Dependent backend draft `#29` HEAD `75074cb4faae791aa1cd80ee8ffcf1f8bfa309ed`: Linters, Semantic Commits and Restaurant validation failed.
 - Dependent backend draft `#42` HEAD `bab6a79456d9ae8d9cddac3b341400b70b8ee084`: Linters and MAXX Web CI failed.
 - Candidate SQL, disposable runner, negative controls and static assertions live in `docs/client-workspaces/`. The static preflight explicitly does **not** prove database RLS. No authorized disposable PostgreSQL execution receipt exists in this packet.
 - Inspection environment could read GitHub via connected API, but direct git network access failed DNS resolution. No local test execution or new CI trigger is claimed.
+
+## Fresh exact-HEAD gate audit (2026-11-15, run 10)
+- Backend HEAD `c3fc2c63d780a784bba6359773d9e4c0d478d209`: Patch, static client-boundary preflight, Documentation Required and skipped-test checks succeeded; Linters and Semantic Commits failed; Server (Postgres) skipped and Server (Mariadb) queued. The static pass does not establish executable SQL or RLS isolation.
+- Portal HEAD `b16cdffc3461f51345db9598a57fcb4642174630`: all four portal workflows succeeded. No staging verification is implied.
+- Reviewed backend `.pre-commit-config.yaml`: Ruff import sorting and formatting are active, as are JS Prettier/ESLint and syntax hooks. Do not bypass or remove these checks. The PR commit list includes conventional `fix(maxx):`, `test(maxx):` and `docs(maxx):` titles, but the semantic-commit job's exact failure reason is not proven from those titles alone.
+- Exact failing lint/semantic logs and a runnable isolated PostgreSQL environment are still required. Direct git access from this inspection runtime failed DNS resolution; do not claim local checks ran. No production/shared Supabase action authorized.
 
 ## GRAPH → SPEC → SLICE
 Priority dependencies:
