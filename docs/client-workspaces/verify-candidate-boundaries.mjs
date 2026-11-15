@@ -47,5 +47,13 @@ for (const name of [
 assert.match(management, /recovery_until=now\(\)\+interval '30 days'/);
 assert.match(management, /v_project\.slug IN \('client-zero','macs-digital-media'\)/);
 assert.match(schema, /NO automatic user membership/);
+// The service role bypasses RLS: an otherwise authenticated workspace-create
+// RPC must not silently enroll the actor (or any other user) as a project owner.
+// Membership changes require an independently authorized enrollment operation.
+const createRpc = management.split('CREATE OR REPLACE FUNCTION public.maxx_service_create_client_workspace(')[1]
+  ?.split('CREATE UNIQUE INDEX IF NOT EXISTS maxx_one_open_archive_request')[0];
+assert.ok(createRpc, 'missing create-client RPC');
+assert.doesNotMatch(createRpc, /INSERT\s+INTO\s+maxx\.project_memberships\b/i,
+  'create-client RPC must not implicitly grant membership');
 assert.match(scope, /'promptsSource', 'operator_template'/);
 console.log('MAXX candidate static boundary checks passed (NOT a database RLS test)');
