@@ -45,3 +45,9 @@ Release blocked by backend CI and missing disposable database identity/RLS evide
 - **Product status:** NOT READY. No deployment, live membership grant, shared Supabase SQL or customer records touched.
 - **Rollback:** revert the three code/test commits in reverse order if independent review finds regression; no data migration needed.
 - **Next:** finish full exact-HEAD CI, resolve longstanding lint/semantic failures, execute disposable PostgreSQL + two-user RLS tests, then verify OAuth/ICM/Instinct and staging under the existing MAXX-COMPLETE-001 PRD.
+
+## 2026-11-15 — exact failed-job log diagnosis (no policy bypass)
+- Read GitHub Actions job logs for PR #43 HEAD `e138eeacd805fa88af686a2380c6ad14223cf779`: **Linters** job `132892639340` failed because Prettier v2.7.1 modified JS files and Ruff formatter v0.2.0 reformatted exactly `ops/a2a/test_watch.py` and `ops/a2a/watch.py` (2 files); ESLint, Ruff import sorter and Ruff linter passed. This is a formatting-only diagnosis, not a security or database test result.
+- **Semantic Commits** job `132892717820` identified one historical offending commit title: `security(maxx): scope approval and workflow-step RLS by parent client project`. `security` is not in the repository's allowed commitlint types. All other displayed candidate titles passed. Do **not** rewrite shared PR history or relax commitlint without explicit owner review; an isolated, reviewed branch replacement/cherry-pick strategy may be needed.
+- Smallest safe next repair: run pinned Prettier and Ruff formatters in an authenticated checkout, commit only resulting source formatting, and confirm exact-HEAD checks. The historical semantic-commit failure requires separate authorized history strategy, not repeated new documentation commits.
+- Current status **NOT READY**. No SQL executed, no shared Supabase changes, no merges/deployments. Rollback for this documentation note: revert its commit.
