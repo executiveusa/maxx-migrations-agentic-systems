@@ -41,6 +41,9 @@ SQL
 # clients behind even if a later assertion fails.
 {
   echo 'BEGIN;'
+  # Snapshot existing membership assignments; the candidate must never grant
+  # access implicitly while seeding the seven workspaces.
+  echo 'CREATE TEMP TABLE maxx_gate_memberships_before ON COMMIT DROP AS SELECT organization_id,project_id,user_id,role,status FROM maxx.project_memberships;'
   cat "$sql/PROPOSED-SCHEMA-AND-SEED.sql" | sed '/^BEGIN;$/d; /^COMMIT;$/d'
   cat "$sql/CANONICAL-CLIENT-RPC-AND-RLS-CANDIDATE.sql"
   cat "$sql/MANAGEMENT-RPC-CANDIDATE.sql"
@@ -49,6 +52,15 @@ DO $$
 DECLARE
   n integer;
 BEGIN
+  IF EXISTS (
+    (SELECT organization_id,project_id,user_id,role,status FROM maxx.project_memberships
+     EXCEPT ALL SELECT * FROM maxx_gate_memberships_before)
+    UNION ALL
+    (SELECT * FROM maxx_gate_memberships_before
+     EXCEPT ALL SELECT organization_id,project_id,user_id,role,status FROM maxx.project_memberships)
+  ) THEN
+    RAISE EXCEPTION 'Candidate SQL unexpectedly modified project memberships';
+  END IF;
   SELECT count(*) INTO n FROM maxx.project_memberships;
   IF n <> 0 THEN
     RAISE NOTICE 'Existing memberships: % (not interpreted as verified)', n;
