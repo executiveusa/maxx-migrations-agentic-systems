@@ -10,7 +10,7 @@ printf '%s\n' "$*" >> "$MAXX_MOCK_LOG"
 case "$*" in
   *current_database\(\)*) printf '%s\n' "$MAXX_MOCK_DATABASE" ;;
   *inet_server_addr\(\)*) printf '%s\n' "$MAXX_MOCK_SERVER" ;;
-  *) cat > "$MAXX_MOCK_SQL"; echo 'MOCK: SQL execution would be reached' >&2; exit 97 ;;
+  *) cat > "$MAXX_MOCK_SQL"; if grep -Fq "Missing required MAXX baseline schema" "$MAXX_MOCK_SQL"; then exit 0; fi; echo 'MOCK: candidate SQL execution would be reached' >&2; exit 97 ;;
 esac
 MOCK
 chmod +x "$work/psql"
