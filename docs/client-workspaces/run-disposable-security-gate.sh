@@ -43,7 +43,19 @@ SQL
   echo 'BEGIN;'
   # Snapshot existing membership assignments; the candidate must never grant
   # access implicitly while seeding the seven workspaces.
-  echo 'CREATE TEMP TABLE maxx_gate_memberships_before ON COMMIT DROP AS SELECT organization_id,project_id,user_id,role,status FROM maxx.project_memberships;'
+  # The baseline production schema has no project_memberships table yet.
+  # Capture a zero-row baseline safely in that case, while preserving every
+  # existing row when re-testing a partially migrated disposable clone.
+  cat <<'SQL'
+CREATE TEMP TABLE maxx_gate_memberships_before (membership jsonb) ON COMMIT DROP;
+DO $
+BEGIN
+  IF to_regclass('maxx.project_memberships') IS NOT NULL THEN
+    INSERT INTO maxx_gate_memberships_before(membership)
+    SELECT to_jsonb(m) FROM maxx.project_memberships m;
+  END IF;
+END $;
+SQL
   cat "$sql/PROPOSED-SCHEMA-AND-SEED.sql" | sed '/^BEGIN;$/d; /^COMMIT;$/d'
   cat "$sql/CANONICAL-CLIENT-RPC-AND-RLS-CANDIDATE.sql"
   cat "$sql/MANAGEMENT-RPC-CANDIDATE.sql"
@@ -53,11 +65,11 @@ DECLARE
   n integer;
 BEGIN
   IF EXISTS (
-    (SELECT organization_id,project_id,user_id,role,status FROM maxx.project_memberships
-     EXCEPT ALL SELECT * FROM maxx_gate_memberships_before)
+    (SELECT to_jsonb(m) FROM maxx.project_memberships m
+     EXCEPT ALL SELECT membership FROM maxx_gate_memberships_before)
     UNION ALL
-    (SELECT * FROM maxx_gate_memberships_before
-     EXCEPT ALL SELECT organization_id,project_id,user_id,role,status FROM maxx.project_memberships)
+    (SELECT membership FROM maxx_gate_memberships_before
+     EXCEPT ALL SELECT to_jsonb(m) FROM maxx.project_memberships m)
   ) THEN
     RAISE EXCEPTION 'Candidate SQL unexpectedly modified project memberships';
   END IF;
