@@ -124,6 +124,31 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'Missing or weakened restrictive project SELECT isolation policy';
   END IF;
+  -- Writes need their own restrictive policies. A secure SELECT policy does
+  -- not constrain INSERT or UPDATE under PostgreSQL RLS.
+  IF EXISTS (
+    SELECT 1 FROM (VALUES
+      ('projects','maxx_v3_project_insert_scope','INSERT'),
+      ('run_steps','maxx_v3_run_steps_insert','INSERT'),
+      ('run_steps','maxx_v3_run_steps_update','UPDATE'),
+      ('approvals','maxx_v3_approvals_insert','INSERT'),
+      ('approvals','maxx_v3_approvals_update','UPDATE')
+    ) AS expected(table_name,policy_name,command)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM pg_policies p
+      WHERE p.schemaname='maxx' AND p.tablename=expected.table_name
+        AND p.policyname=expected.policy_name
+        AND p.permissive='RESTRICTIVE'
+        AND p.cmd=expected.command
+        AND 'authenticated'=ANY(p.roles)
+        AND CASE WHEN expected.command='INSERT'
+          THEN p.with_check IS NOT NULL
+          ELSE p.qual IS NOT NULL AND p.with_check IS NOT NULL
+        END
+    )
+  ) THEN
+    RAISE EXCEPTION 'Missing restrictive project write isolation policy';
+  END IF;
   -- Parent project-linked tables must not inherit legacy org-wide visibility.
   -- Check the complete set, not just the three headline policies.
   IF EXISTS (
