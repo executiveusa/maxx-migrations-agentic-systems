@@ -100,6 +100,26 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'Missing or weakened restrictive project SELECT isolation policy';
   END IF;
+  -- Parent project-linked tables must not inherit legacy org-wide visibility.
+  -- Check the complete set, not just the three headline policies.
+  IF EXISTS (
+    SELECT 1 FROM unnest(ARRAY[
+      'action_proposals','artifacts','audit_log','context_snapshots',
+      'events','evidence_receipts','external_refs','workflow_runs'
+    ]) AS expected(table_name)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM pg_policies p
+      WHERE p.schemaname='maxx'
+        AND p.tablename=expected.table_name
+        AND p.policyname='maxx_v3_scope_select'
+        AND p.permissive='RESTRICTIVE'
+        AND p.cmd='SELECT'
+        AND 'authenticated'=ANY(p.roles)
+        AND p.qual LIKE '%can_access_client_project%'
+    )
+  ) THEN
+    RAISE EXCEPTION 'Missing restrictive project SELECT policy on a parent table';
+  END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace
       WHERE ns.nspname='maxx' AND c.relname='project_memberships' AND c.relrowsecurity) THEN
     RAISE EXCEPTION 'Membership RLS not enabled';
