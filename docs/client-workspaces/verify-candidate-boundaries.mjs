@@ -14,6 +14,15 @@ const requiredClients = ['crown-and-core', 'thp-flooring', 'bunna-restaurant',
 for (const slug of requiredClients) {
   assert.ok(schema.includes("'" + slug + "'"), 'missing client '+slug);
 }
+// Membership and related records must be tied to the SAME organization as
+// their project, including for service-role writes that bypass RLS.
+for (const table of ['project_memberships', 'project_prompt_templates', 'project_archive_requests']) {
+  const definition = schema.split('CREATE TABLE IF NOT EXISTS maxx.' + table + ' (')[1]
+    ?.split(');')[0];
+  assert.ok(definition, 'missing table definition: ' + table);
+  assert.match(definition, /FOREIGN KEY\s*\(organization_id,\s*project_id\)\s*REFERENCES\s+maxx\.projects\s*\(organization_id,\s*id\)/i,
+    'missing composite organization/project FK: ' + table);
+}
 for (const table of ['project_memberships','project_prompt_templates','project_archive_requests']) {
   assert.match(schema, new RegExp('ALTER TABLE maxx\\.'+table+' ENABLE ROW LEVEL SECURITY'), 'RLS absent: '+table);
   assert.match(schema, new RegExp('REVOKE ALL ON maxx\\.'+table+' FROM PUBLIC, anon, authenticated'), 'grants too broad: '+table);
