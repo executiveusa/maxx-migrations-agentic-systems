@@ -25,9 +25,9 @@ BEGIN
  VALUES(p_organization_id,trim(p_slug),trim(p_name),'client','active',
         jsonb_build_object('source','operator-approved','integrations_verified',false))
  RETURNING id INTO v_id;
- INSERT INTO maxx.project_memberships
-   (organization_id,project_id,user_id,role,status)
- VALUES(p_organization_id,v_id,p_actor,'owner','active');
+ -- Creating a workspace does NOT grant project membership. Organization
+ -- owner/admin rights were already verified above; any new per-project
+ -- membership requires a separate explicit, reviewed authorization action.
  INSERT INTO maxx.audit_log
    (organization_id,project_id,actor_type,actor_id,action,object_type,object_id,payload_redacted)
  VALUES(p_organization_id,v_id,'human',p_actor::text,'client.created','project',v_id::text,
