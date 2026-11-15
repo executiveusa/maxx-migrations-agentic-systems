@@ -48,13 +48,13 @@ SQL
   # existing row when re-testing a partially migrated disposable clone.
   cat <<'SQL'
 CREATE TEMP TABLE maxx_gate_memberships_before (membership jsonb) ON COMMIT DROP;
-DO $
+DO $$
 BEGIN
   IF to_regclass('maxx.project_memberships') IS NOT NULL THEN
     INSERT INTO maxx_gate_memberships_before(membership)
     SELECT to_jsonb(m) FROM maxx.project_memberships m;
   END IF;
-END $;
+END $$;
 SQL
   cat "$sql/PROPOSED-SCHEMA-AND-SEED.sql" | sed '/^BEGIN;$/d; /^COMMIT;$/d'
   cat "$sql/CANONICAL-CLIENT-RPC-AND-RLS-CANDIDATE.sql"
