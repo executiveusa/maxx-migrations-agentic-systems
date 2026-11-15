@@ -21,6 +21,13 @@ case "$server_ip" in
   local-socket|127.*|::1) ;;
   *) echo "REFUSED: SQL gate only accepts local/loopback PostgreSQL" >&2; exit 2 ;;
 esac
+# A disposable substring does not make a production/staging clone safe to mutate.
+# Reject ambiguous names even if they also contain an allowed test marker.
+case "${db_name,,}" in
+  *prod*|*staging*|*stage*|*live*|*primary*)
+    echo "REFUSED: database name contains an environment marker" >&2
+    exit 2 ;;
+esac
 case "$db_name" in
   *disposable*|*throwaway*|*maxx_test*) ;;
   *) echo "REFUSED: database name is not explicitly disposable" >&2; exit 2 ;;
