@@ -45,6 +45,15 @@ try {
   mustFail('missing membership RLS', {
     [schemaName]: schema.replace('ALTER TABLE maxx.project_memberships ENABLE ROW LEVEL SECURITY', '-- RLS deliberately removed'),
   });
+  const managementName = 'MANAGEMENT-RPC-CANDIDATE.sql';
+  const management = source[managementName];
+  assert.match(management, /CREATE OR REPLACE FUNCTION public\.maxx_service_create_client_workspace\(/);
+  mustFail('implicit project owner enrollment', {
+    [managementName]: management.replace(
+      " RETURNING id INTO v_id;",
+      " RETURNING id INTO v_id;\n INSERT INTO maxx.project_memberships (organization_id,project_id,user_id,role,status) VALUES(p_organization_id,v_id,p_actor,'owner','active');"
+    ),
+  });
   console.log('MAXX boundary negative controls passed (static only; database isolation untested)');
 } finally {
   rmSync(tmp, { recursive: true, force: true });
