@@ -35,3 +35,13 @@ This packet is documentation-only; no SQL was applied and no product behavior ch
 
 ## RELEASE → LEARN
 Release blocked by backend CI and missing disposable database identity/RLS evidence. Required human action if a server-side agent cannot provision an isolated database: provide an authorized disposable test environment (never shared production credentials). Rollback for this packet: revert its documentation commit. Next smallest engineering action: obtain exact failing backend CI log and make the minimum formatter/lint correction, then rerun checks at the resulting SHA.
+
+## BUILD → VERIFY — 2026-11-15: explicit-membership security repair
+
+- **Finding:** Candidate `public.maxx_service_create_client_workspace` implicitly inserted a project owner membership for the creator. This violates the owner-approved no-auto-membership constraint and unnecessarily grants project permissions through a server-role RPC.
+- **Fix:** Removed the implicit insert from `docs/client-workspaces/MANAGEMENT-RPC-CANDIDATE.sql` (commit `d2d3d92985ca6e5ff02edc9348788e22475b7a74`). Existing authenticated organization owner/admin authorization remains the RPC prerequisite; project memberships must be handled by a separately approved enrollment path.
+- **Verification code:** `verify-candidate-boundaries.mjs` now rejects implicit membership writes in the create RPC (`73013bc0ae60eed03b385cde567f32b33bf276a2`); negative-control test injects the prohibited insert and expects failure (`1a05277634bb031be3e10442b9d0800bd21fe992`).
+- **Exact SHA CI at inspection:** Static client boundary preflight completed SUCCESS at `1a05277634bb031be3e10442b9d0800bd21fe992`; other workflows were in progress/queued. This is a static source/negative-control check only, **not PostgreSQL RLS or production proof**.
+- **Product status:** NOT READY. No deployment, live membership grant, shared Supabase SQL or customer records touched.
+- **Rollback:** revert the three code/test commits in reverse order if independent review finds regression; no data migration needed.
+- **Next:** finish full exact-HEAD CI, resolve longstanding lint/semantic failures, execute disposable PostgreSQL + two-user RLS tests, then verify OAuth/ICM/Instinct and staging under the existing MAXX-COMPLETE-001 PRD.
