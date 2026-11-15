@@ -141,9 +141,17 @@ BEGIN
         AND p.permissive='RESTRICTIVE'
         AND p.cmd=expected.command
         AND 'authenticated'=ANY(p.roles)
+        -- A non-null WITH CHECK is insufficient: WITH CHECK (true) would
+        -- satisfy the old assertion while permitting cross-client writes.
         AND CASE WHEN expected.command='INSERT'
           THEN p.with_check IS NOT NULL
           ELSE p.qual IS NOT NULL AND p.with_check IS NOT NULL
+        END
+        AND CASE WHEN expected.table_name='projects'
+          THEN p.with_check LIKE '%has_role%'
+          ELSE p.with_check LIKE '%can_access_client_project%'
+            AND (expected.command='INSERT'
+              OR p.qual LIKE '%can_access_client_project%')
         END
     )
   ) THEN
