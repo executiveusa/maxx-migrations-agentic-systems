@@ -65,4 +65,8 @@ if ! grep -Fq 'CREATE TEMP TABLE maxx_gate_memberships_before' "$MAXX_MOCK_SQL" 
   echo 'FAIL: membership snapshot or transaction rollback missing' >&2
   exit 1
 fi
+if ! grep -Fq "'project_memberships','project_prompt_templates','project_archive_requests'" "$MAXX_MOCK_SQL" || ! grep -Fq "has_table_privilege('anon'" "$MAXX_MOCK_SQL" || ! grep -Fq "has_table_privilege('authenticated'" "$MAXX_MOCK_SQL" || ! grep -Fq "has_table_privilege('service_role'" "$MAXX_MOCK_SQL"; then
+  echo 'FAIL: private client table RLS/effective-grant assertions missing' >&2
+  exit 1
+fi
 echo 'PASS: generated SQL uses valid DO dollar delimiters and rollback (mock only)'
