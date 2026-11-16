@@ -51,6 +51,9 @@ CREATE TABLE maxx.action_proposals (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id uuid NOT NULL REFERENCES maxx.organizations(id),
   project_id uuid REFERENCES maxx.projects(id),
+  action_key text NOT NULL DEFAULT 'disposable-example-action',
+  action_class text NOT NULL DEFAULT 'draft',
+  risk_class text NOT NULL DEFAULT 'low',
   status text NOT NULL DEFAULT 'proposed'
 );
 CREATE TABLE maxx.approvals (
@@ -58,6 +61,7 @@ CREATE TABLE maxx.approvals (
   organization_id uuid NOT NULL REFERENCES maxx.organizations(id),
   action_proposal_id uuid NOT NULL REFERENCES maxx.action_proposals(id),
   status text NOT NULL DEFAULT 'pending',
+  requested_at timestamptz NOT NULL DEFAULT now(),
   expires_at timestamptz NOT NULL DEFAULT now()+interval '24 hours'
 );
 CREATE TABLE maxx.run_steps (
