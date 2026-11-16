@@ -69,6 +69,23 @@ jobs:
         run: psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f docs/client-workspaces/disposable-maxx-baseline.sql
       - name: Execute candidate SQL, two-identity RLS and 30-day recovery
         run: bash docs/client-workspaces/run-disposable-tenant-isolation.sh
+      - name: Verify transaction rollback removed every candidate schema change
+        run: |
+          psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 <<'SQL'
+          DO $rollback$
+          BEGIN
+            IF to_regclass('maxx.project_memberships') IS NOT NULL
+              OR to_regclass('maxx.project_prompt_templates') IS NOT NULL
+              OR to_regclass('maxx.project_archive_requests') IS NOT NULL
+              OR to_regprocedure('public.maxx_service_client_workspaces(uuid)') IS NOT NULL
+              OR EXISTS (SELECT 1 FROM maxx.projects)
+              OR EXISTS (SELECT 1 FROM maxx.memberships)
+              OR EXISTS (SELECT 1 FROM maxx.audit_log)
+            THEN RAISE EXCEPTION 'Disposable RLS gate did not roll back cleanly'; END IF;
+            RAISE NOTICE 'PASS: no candidate DDL, seeded clients, memberships or audit writes survived';
+          END
+          $rollback$;
+          SQL
       - name: Remove disposable PostgreSQL container
         if: always()
         run: docker rm -f maxx-disposable-db || true
