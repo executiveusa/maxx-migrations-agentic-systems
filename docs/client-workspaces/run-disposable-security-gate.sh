@@ -111,6 +111,19 @@ BEGIN
       'public.maxx_service_client_workspaces(uuid)', 'EXECUTE') THEN
     RAISE EXCEPTION 'Unsafe MAXX workspace RPC execute grants';
   END IF;
+  -- Every management RPC must remain server-only, not just workspace listing.
+  -- has_function_privilege checks effective grants, including PUBLIC.
+  IF EXISTS (
+    SELECT 1 FROM (VALUES
+      ('public.maxx_service_create_client_workspace(uuid,uuid,text,text)'),
+      ('public.maxx_service_archive_client_step(uuid,uuid,text,uuid,text)')
+    ) AS expected(signature)
+    WHERE has_function_privilege('anon',expected.signature,'EXECUTE')
+       OR has_function_privilege('authenticated',expected.signature,'EXECUTE')
+       OR NOT has_function_privilege('service_role',expected.signature,'EXECUTE')
+  ) THEN
+    RAISE EXCEPTION 'Unsafe MAXX management RPC execute grants';
+  END IF;
   -- A policy name alone is not security evidence: enforce restrictive
   -- semantics, authenticated target, and a project-scoped predicate.
   IF EXISTS (
