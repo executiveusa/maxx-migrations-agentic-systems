@@ -39,20 +39,9 @@ jobs:
     name: Disposable Postgres 17 two-user RLS + restore (rollback only)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_DB: maxx_disposable_ci
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: disposable_ci_only
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d maxx_disposable_ci"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
+    # Docker service bridge networking reports the bridge IP to PostgreSQL.
+    # Run a throwaway server on runner loopback instead: do NOT relax the
+    # database gate's strictly local server-address check.
     env:
       # Hard-coded throwaway CI container credentials, never shared secrets.
       MAXX_TEST_DATABASE_URL: postgresql://postgres:disposable_ci_only@127.0.0.1:5432/maxx_disposable_ci
@@ -63,10 +52,26 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq postgresql-client
+      - name: Start PostgreSQL 17 bound to runner loopback ONLY
+        run: |
+          docker run -d --rm --name maxx-disposable-db --network host \
+            -e POSTGRES_DB=maxx_disposable_ci \
+            -e POSTGRES_PASSWORD=disposable_ci_only \
+            postgres:17 -c listen_addresses=127.0.0.1
+          for attempt in {1..30}; do
+            if pg_isready -h 127.0.0.1 -p 5432 -U postgres -d maxx_disposable_ci; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
       - name: Create synthetic empty baseline (no customer data)
         run: psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f docs/client-workspaces/disposable-maxx-baseline.sql
       - name: Execute candidate SQL, two-identity RLS and 30-day recovery
         run: bash docs/client-workspaces/run-disposable-tenant-isolation.sh
+      - name: Remove disposable PostgreSQL container
+        if: always()
+        run: docker rm -f maxx-disposable-db || true
       - name: Record scope
         if: always()
         run: |
