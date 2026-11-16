@@ -197,9 +197,22 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'Missing restrictive project SELECT policy on a parent table';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_class c JOIN pg_namespace ns ON ns.oid=c.relnamespace
-      WHERE ns.nspname='maxx' AND c.relname='project_memberships' AND c.relrowsecurity) THEN
-    RAISE EXCEPTION 'Membership RLS not enabled';
+  -- A restrictive policy is inert if RLS is disabled on its table.
+  -- Check every project-scoped table, not only project_memberships.
+  IF EXISTS (
+    SELECT 1 FROM unnest(ARRAY[
+      'project_memberships','projects','approvals','run_steps',
+      'action_proposals','artifacts','audit_log','context_snapshots',
+      'events','evidence_receipts','external_refs','workflow_runs'
+    ]) AS expected(table_name)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM pg_class c
+      JOIN pg_namespace ns ON ns.oid=c.relnamespace
+      WHERE ns.nspname='maxx' AND c.relname=expected.table_name
+        AND c.relkind IN ('r','p') AND c.relrowsecurity
+    )
+  ) THEN
+    RAISE EXCEPTION 'RLS disabled or table missing on a project-scoped relation';
   END IF;
 END $$;
 ROLLBACK;
