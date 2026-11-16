@@ -59,3 +59,11 @@ Release blocked by backend CI and missing disposable database identity/RLS evide
 - At write time exact-HEAD CI for the new code was not yet available. No local Node run claimed; direct git checkout remained blocked by DNS. Review the actual preflight result before promoting.
 - No SQL executed, membership assigned, deployment or shared Supabase modification. Rollback: revert the two test-only commits in reverse order. Product remains **NOT READY**.
 - Next smallest action: verify exact-HEAD CI; repair existing formatter/semantic failures without rewriting history; then test the composite FK and independent identities on disposable PostgreSQL.
+
+## 2026-11-15 — management RPC privilege gate slice
+- **INTENT/BAR:** prevent the create/archive service RPCs from becoming callable by browser roles after migration; database acceptance must verify *effective* PostgreSQL EXECUTE privileges, not only static GRANT text.
+- **EVIDENCE:** portal PR #113 HEAD `b16cdffc3461f51345db9598a57fcb4642174630`, four workflows successful. Backend PR #43 baseline HEAD `24a552995d19dd84a31992f02fac3100fd697fcd`: static boundary, Patch and Documentation succeeded; Linters and Semantic Commits failed; PostgreSQL skipped. Dependent #29/#42 remain draft with failed checks.
+- **BUILD:** added two service-only management RPC signatures to `run-disposable-security-gate.sh` effective-privilege checks, using `has_function_privilege` for `anon`, `authenticated`, and `service_role`. Commit `a25d13e23ed3479fb392e01f023205435358a6c7`.
+- **VERIFY/GAUNTLET:** GitHub source write succeeded. Actual PostgreSQL execution and two-user RLS are **not proven** by this commit. Exact-HEAD CI must be inspected before promotion. No SQL was run against shared Supabase.
+- **RELEASE:** NOT READY; no merge, deployment, data mutation, or permission grant. Rollback: revert `a25d13e23ed3479fb392e01f023205435358a6c7`.
+- **NEXT:** obtain green backend lint and semantic checks without weakening policy; execute candidate SQL on authorized disposable local PostgreSQL, then independent two-principal project read/write denial.
