@@ -14,7 +14,9 @@ bash "$here/run-disposable-security-gate.sh"
   sed '/^BEGIN;$/d; /^COMMIT;$/d' "$here/PROPOSED-SCHEMA-AND-SEED.sql"
   cat "$here/CANONICAL-CLIENT-RPC-AND-RLS-CANDIDATE.sql"
   cat "$here/MANAGEMENT-RPC-CANDIDATE.sql"
+  cat "$here/CLIENT-CHAT-PERSISTENCE-CANDIDATE.sql"
   cat "$here/disposable-tenant-isolation.assert.sql"
+  cat "$here/disposable-client-chat.assert.sql"
   echo 'ROLLBACK;'
 } | psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f -
 echo 'PASS: isolated PostgreSQL tenant/RLS integration completed and rolled back'
