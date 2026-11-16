@@ -87,3 +87,11 @@ Release blocked by backend CI and missing disposable database identity/RLS evide
 - **BUILD:** `run-disposable-security-gate.sh` changed in `92ef79cf519d155f2c5a4fa0de9eb1022cbbc4cd`; mock assertion changed in `6e85224ee9889a5e334fbdd1dd80537d69eb913f`.
 - **VERIFY/GAUNTLET:** Exact-head CI and real disposable PostgreSQL execution must still be collected. Do not claim authenticated Alice/Bob isolation from SQL text or mocks.
 - **RELEASE/LEARN:** NOT READY. No shared Supabase writes, merges, production deployment, client data or membership grants. Rollback: revert the two code/test commits in reverse order. Next: inspect exact-head CI; run real two-principal project read/write tests on a disposable PostgreSQL environment and independently review receipts.
+
+
+### 2026-11-16 — Patch upstream ref isolation (NOT READY)
+- **INTENT/BAR:** Repair Patch CI setup without changing RLS, client data, shared Supabase, or test assertions. Require actual Patch workflow success at exact HEAD before closing this gate.
+- **LOCK/EVIDENCE:** Backend dependent PR #47 HEAD `86416795d0ea201386d57bce08bad5e1e023f00d`; Patch run [43950719306](https://github.com/executiveusa/maxx-migrations-agentic-systems/actions/runs/43950719306), job 133592143904 failed in Install: `fatal: couldn't find remote ref test/maxx-disposable-rls-acceptance-20261115`. `.github/helper/install.sh` defaults FRAPPE_BRANCH to GITHUB_BASE_REF, then fetches from `https://github.com/frappe/frappe`, where the fork-specific PR base is not present. Patch workflow's later upstream fetch also used GITHUB_BASE_REF.
+- **GRAPH/SPEC/SLICE/BUILD:** One workflow-only patch: set FRAPPE_BRANCH=develop for Install and fetch upstream Frappe develop in Run Patch Tests; leave ERPNext checkout at the tested SHA. No upstream branch creation, no bypass or weakened assertions.
+- **VERIFY/GAUNTLET:** Confirm both upstream fetch sites in committed workflow; GitHub Actions exact-head outcome pending. Independent review pending. This is not authenticated two-user RLS proof.
+- **RELEASE/LEARN:** Remain draft, NOT READY; no merge/deploy/SQL. Rollback: revert the workflow commit on this dependent branch. Next: inspect new Patch run logs and separately execute Alice/Bob isolation against disposable PostgreSQL.
