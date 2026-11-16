@@ -66,6 +66,7 @@ SQL
   cat "$sql/PROPOSED-SCHEMA-AND-SEED.sql" | sed '/^BEGIN;$/d; /^COMMIT;$/d'
   cat "$sql/CANONICAL-CLIENT-RPC-AND-RLS-CANDIDATE.sql"
   cat "$sql/MANAGEMENT-RPC-CANDIDATE.sql"
+  cat "$sql/CLIENT-CHAT-PERSISTENCE-CANDIDATE.sql"
   cat <<'SQL'
 DO $$
 DECLARE
