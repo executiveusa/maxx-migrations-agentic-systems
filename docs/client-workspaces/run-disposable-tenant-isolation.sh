@@ -15,7 +15,9 @@ bash "$here/run-disposable-security-gate.sh"
   cat "$here/CANONICAL-CLIENT-RPC-AND-RLS-CANDIDATE.sql"
   cat "$here/MANAGEMENT-RPC-CANDIDATE.sql"
   cat "$here/CLIENT-CHAT-PERSISTENCE-CANDIDATE.sql"
+  cat "$here/CLIENT-APPROVAL-READ-CANDIDATE.sql"
   cat "$here/disposable-tenant-isolation.assert.sql"
+  cat "$here/disposable-client-approvals.assert.sql"
   cat "$here/disposable-client-chat.assert.sql"
   echo 'ROLLBACK;'
 } | psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f -
