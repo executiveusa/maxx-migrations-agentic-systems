@@ -1,4 +1,4 @@
-name: MAXX client boundary static preflight
+name: MAXX client boundary gates
 
 on:
   pull_request:
@@ -34,3 +34,41 @@ jobs:
         run: |
           echo 'Static source assertions only. This job does not establish SQL validity or two-identity tenant isolation.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Release remains blocked pending disposable database integration and independent review.' >> "$GITHUB_STEP_SUMMARY"
+
+  disposable-postgres-isolation:
+    name: Disposable Postgres 17 two-user RLS + restore (rollback only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: maxx_disposable_ci
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: disposable_ci_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d maxx_disposable_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      # Hard-coded throwaway CI container credentials, never shared secrets.
+      MAXX_TEST_DATABASE_URL: postgresql://postgres:disposable_ci_only@127.0.0.1:5432/maxx_disposable_ci
+      MAXX_TEST_DB_LABEL: maxx-disposable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Create synthetic empty baseline (no customer data)
+        run: psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f docs/client-workspaces/disposable-maxx-baseline.sql
+      - name: Execute candidate SQL, two-identity RLS and 30-day recovery
+        run: bash docs/client-workspaces/run-disposable-tenant-isolation.sh
+      - name: Record scope
+        if: always()
+        run: |
+          echo 'Isolated PostgreSQL container only; synthetic baseline; no production/customer data.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'All candidate SQL and test identities are rolled back. This is not staging or production verification.' >> "$GITHUB_STEP_SUMMARY"
