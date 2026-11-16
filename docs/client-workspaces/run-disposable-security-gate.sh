@@ -197,6 +197,28 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'Missing restrictive project SELECT policy on a parent table';
   END IF;
+  -- Newly introduced private client tables also need active RLS and no
+  -- effective browser privileges (including grants inherited from PUBLIC).
+  -- The service role must retain SELECT for the server-only control plane.
+  IF EXISTS (
+    SELECT 1 FROM unnest(ARRAY[
+      'project_memberships','project_prompt_templates','project_archive_requests'
+    ]) AS expected(table_name)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM pg_class c
+      JOIN pg_namespace ns ON ns.oid=c.relnamespace
+      WHERE ns.nspname='maxx' AND c.relname=expected.table_name
+        AND c.relkind IN ('r','p') AND c.relrowsecurity
+    )
+    OR has_table_privilege('anon',format('maxx.%I',expected.table_name),
+      'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+    OR has_table_privilege('authenticated',format('maxx.%I',expected.table_name),
+      'SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER')
+    OR NOT has_table_privilege('service_role',
+      format('maxx.%I',expected.table_name),'SELECT')
+  ) THEN
+    RAISE EXCEPTION 'Unsafe RLS or effective grants on a private client table';
+  END IF;
   -- A restrictive policy is inert if RLS is disabled on its table.
   -- Check every project-scoped table, not only project_memberships.
   IF EXISTS (
