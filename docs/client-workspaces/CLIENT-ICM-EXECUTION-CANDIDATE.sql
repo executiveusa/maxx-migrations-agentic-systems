@@ -219,6 +219,10 @@ BEGIN
     length(coalesce(p_external_run_id,'')) NOT BETWEEN 1 AND 150 THEN
     RAISE EXCEPTION 'invalid_runtime_ack' USING errcode='22023';
  END IF;
+ IF NOT maxx.service_client_authorized(
+    p_actor,p_project_id,ARRAY['owner','admin','operator']::text[]) THEN
+    RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
+ END IF;
  SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
  IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1'
    OR v_run.input_manifest->>'claimedBy'<>p_actor::text OR v_run.status<>'running' THEN
@@ -247,6 +251,9 @@ GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_record_dispatch(uui
 -- If the worker does not return a verifiable acknowledgement, lock the
 -- claim. Do NOT auto-retry: the remote agent might have accepted the request.
 -- A human must independently reconcile the external run before any new work.
+CREATE OR REPLACE wledgement, lock the
+-- claim. Do NOT auto-retry: the remote agent might have accepted the request.
+-- A human must independently reconcile the external run before any new work.
 CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_dispatch_block(
  p_actor uuid,p_project_id uuid,p_mission_id uuid
 ) RETURNS jsonb
@@ -255,6 +262,10 @@ SET search_path=pg_catalog,maxx,public
 AS $$
 DECLARE v_run maxx.workflow_runs%ROWTYPE; v_prop maxx.action_proposals%ROWTYPE;
 BEGIN
+ IF NOT maxx.service_client_authorized(
+    p_actor,p_project_id,ARRAY['owner','admin','operator']::text[]) THEN
+    RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
+ END IF;
  SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
  IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1'
     OR v_run.input_manifest->>'claimedBy'<>p_actor::text THEN
@@ -294,12 +305,15 @@ BEGIN
    'status','blocked','requiresReconciliation',true,'duplicate',false);
 END;
 $$;
-REVOKE ALL ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
- FROM PUBLIC,anon,authenticated;
-GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
- TO service_role;
-
-CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_finish(
+REVOKE ALL ON FUNCTION public.maxx_service_client_missidacted)
+ VALUES(v_run.organization_id,p_project_id,'system',p_actor::text,
+   'client_mission_dispatch_unconfirmed','workflow_run',p_mission_id::text,
+   '{"requiresReconciliation":true}'::jsonb);
+ RETURN jsonb_build_object('missionId',p_mission_id::text,
+   'status','blocked','requiresReconciliation',true,'duplicate',false);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.maxx_service_client_missiFUNCTION public.maxx_service_client_mission_finish(
  p_actor uuid,p_project_id uuid,p_mission_id uuid,p_receipt_id uuid,
  p_outcome text,p_receipt jsonb
 ) RETURNS jsonb
@@ -318,6 +332,10 @@ BEGIN
     p_receipt->>'missionId' IS DISTINCT FROM p_mission_id::text THEN
    RAISE EXCEPTION 'invalid_client_receipt' USING errcode='22023';
  END IF;
+ IF NOT maxx.service_client_authorized(
+    p_actor,p_project_id,ARRAY['owner','admin','operator']::text[]) THEN
+    RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
+ END IF;
  SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
  IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1' OR
    v_run.input_manifest->>'claimedBy'<>p_actor::text THEN
@@ -325,16 +343,16 @@ BEGIN
  END IF;
  SELECT * INTO STRICT v_prop FROM maxx.action_proposals
  WHERE run_id=p_mission_id AND action_key='maxx.client_draft.v1' FOR UPDATE;
+ IF v_run.input_manifest->'dispatch'->>'source' IS DISTINCT FROM p_receipt->>'source' OR
+    v_run.input_manifest->'dispatch'->>'externalRunId' IS DISTINCT FROM p_receipt->>'externalRunId' THEN
+   RAISE EXCEPTION 'runtime_receipt_not_bound_to_ack' USING errcode='42501';
+ END IF;
  IF v_run.status IN ('completed','failed') THEN
    SELECT * INTO v_receipt FROM maxx.evidence_receipts
    WHERE id=p_receipt_id AND action_proposal_id=v_prop.id;
    IF NOT FOUND THEN RAISE EXCEPTION 'client_receipt_conflict' USING errcode='23505'; END IF;
    RETURN jsonb_build_object('missionId',p_mission_id::text,'receiptId',v_receipt.id::text,
       'status',v_run.status,'verification','human_review_required','duplicate',true);
- END IF;
- IF v_run.input_manifest->'dispatch'->>'source' IS DISTINCT FROM p_receipt->>'source' OR
-    v_run.input_manifest->'dispatch'->>'externalRunId' IS DISTINCT FROM p_receipt->>'externalRunId' THEN
-   RAISE EXCEPTION 'runtime_receipt_not_bound_to_ack' USING errcode='42501';
  END IF;
  IF v_run.status<>'running' OR v_prop.status<>'executing' THEN
    RAISE EXCEPTION 'client_mission_not_running' USING errcode='55000';
@@ -365,16 +383,7 @@ BEGIN
  VALUES(v_run.organization_id,p_project_id,'system',p_actor::text,
    'client_mission_'||p_outcome,'evidence_receipt',p_receipt_id::text,
    jsonb_build_object('missionId',p_mission_id::text,'source',p_receipt->>'source'));
- RETURN jsonb_build_object('missionId',p_mission_id::text,'receiptId',p_receipt_id::text,
-   'status',p_outcome,'verification','human_review_required','duplicate',false);
-END;
-$$;
-REVOKE ALL ON FUNCTION public.maxx_service_client_mission_finish(uuid,uuid,uuid,uuid,text,jsonb)
-  FROM PUBLIC,anon,authenticated;
-GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_finish(uuid,uuid,uuid,uuid,text,jsonb)
-  TO service_role;
-
-CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_status(
+ RETURN jsonb_build_object('missionId',p_mission_id::textFUNCTION public.maxx_service_client_mission_status(
  p_actor uuid,p_project_id uuid,p_mission_id uuid
 ) RETURNS jsonb
 LANGUAGE plpgsql STABLE SECURITY INVOKER
