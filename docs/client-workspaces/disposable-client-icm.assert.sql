@@ -74,6 +74,12 @@ BEGIN
  decided:=public.maxx_service_client_mission_decide(reviewer,bunna,mission,'approved');
  IF decided->>'status'<>'approved' THEN RAISE EXCEPTION 'Independent approval failed'; END IF;
  claimed:=public.maxx_service_client_mission_claim(bob,bunna,mission);
+ PERFORM public.maxx_service_client_mission_record_dispatch(
+    bob,bunna,mission,'hermes','hermes-draft-123');
+ IF (public.maxx_service_client_mission_status(reviewer,bunna,mission)->'dispatch'->>'externalRunId')
+     <> 'hermes-draft-123' THEN
+   RAISE EXCEPTION 'Dispatch ACK is not persisted';
+ END IF;
  IF claimed->>'action'<>'client_draft_only' OR
     claimed->'allowedTools'<>'[]'::jsonb OR
     claimed->>'projectId'<>bunna::text OR
@@ -150,6 +156,7 @@ BEGIN
   'public.maxx_service_client_mission_propose(uuid,uuid,uuid,text)',
   'public.maxx_service_client_mission_decide(uuid,uuid,uuid,text)',
   'public.maxx_service_client_mission_claim(uuid,uuid,uuid)',
+  'public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)',
   'public.maxx_service_client_mission_finish(uuid,uuid,uuid,uuid,text,jsonb)',
   'public.maxx_service_client_mission_status(uuid,uuid,uuid)'
  ] LOOP
