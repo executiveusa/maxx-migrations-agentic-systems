@@ -244,6 +244,61 @@ REVOKE ALL ON FUNCTION public.maxx_service_client_mission_record_dispatch(uuid,u
 GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)
  TO service_role;
 
+-- If the worker does not return a verifiable acknowledgement, lock the
+-- claim. Do NOT auto-retry: the remote agent might have accepted the request.
+-- A human must independently reconcile the external run before any new work.
+CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_dispatch_block(
+ p_actor uuid,p_project_id uuid,p_mission_id uuid
+) RETURNS jsonb
+LANGUAGE plpgsql VOLATILE SECURITY INVOKER
+SET search_path=pg_catalog,maxx,public
+AS $
+DECLARE v_run maxx.workflow_runs%ROWTYPE; v_prop maxx.action_proposals%ROWTYPE;
+BEGIN
+ SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
+ IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1'
+    OR v_run.input_manifest->>'claimedBy'<>p_actor::text THEN
+    RAISE EXCEPTION 'client_dispatch_block_denied' USING errcode='42501';
+ END IF;
+ IF v_run.input_manifest ? 'dispatch' THEN
+    RAISE EXCEPTION 'client_dispatch_ack_already_recorded' USING errcode='55000';
+ END IF;
+ IF v_run.status='blocked' AND
+    v_run.output_manifest->>'dispatch'='unconfirmed' THEN
+    RETURN jsonb_build_object('missionId',p_mission_id::text,
+      'status','blocked','requiresReconciliation',true,'duplicate',true);
+ END IF;
+ IF v_run.status<>'running' THEN
+    RAISE EXCEPTION 'client_dispatch_not_running' USING errcode='55000';
+ END IF;
+ SELECT * INTO STRICT v_prop FROM maxx.action_proposals
+   WHERE run_id=p_mission_id AND project_id=p_project_id
+     AND organization_id=v_run.organization_id
+     AND action_key='maxx.client_draft.v1' FOR UPDATE;
+ IF v_prop.status<>'executing' THEN
+    RAISE EXCEPTION 'client_dispatch_proposal_not_running' USING errcode='55000';
+ END IF;
+ UPDATE maxx.workflow_runs SET status='blocked',completed_at=now(),
+  output_manifest=jsonb_build_object('dispatch','unconfirmed',
+     'requiresReconciliation',true,'executionVerified',false),
+  updated_at=now() WHERE id=p_mission_id;
+ UPDATE maxx.action_proposals SET status='failed',updated_at=now(),
+  result_redacted=jsonb_build_object('dispatch','unconfirmed',
+     'requiresReconciliation',true) WHERE id=v_prop.id;
+ INSERT INTO maxx.audit_log(organization_id,project_id,actor_type,
+   actor_id,action,object_type,object_id,payload_redacted)
+ VALUES(v_run.organization_id,p_project_id,'system',p_actor::text,
+   'client_mission_dispatch_unconfirmed','workflow_run',p_mission_id::text,
+   '{"requiresReconciliation":true}'::jsonb);
+ RETURN jsonb_build_object('missionId',p_mission_id::text,
+   'status','blocked','requiresReconciliation',true,'duplicate',false);
+END;
+$;
+REVOKE ALL ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
+ FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
+ TO service_role;
+
 CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_finish(
  p_actor uuid,p_project_id uuid,p_mission_id uuid,p_receipt_id uuid,
  p_outcome text,p_receipt jsonb
