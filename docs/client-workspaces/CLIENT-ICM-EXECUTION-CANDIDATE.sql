@@ -212,7 +212,7 @@ CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_record_dispatch(
 ) RETURNS jsonb
 LANGUAGE plpgsql VOLATILE SECURITY INVOKER
 SET search_path=pg_catalog,maxx,public
-AS $
+AS $$
 DECLARE v_run maxx.workflow_runs%ROWTYPE; v_old jsonb;
 BEGIN
  IF p_source NOT IN ('hermes','instinct') OR
@@ -238,7 +238,7 @@ BEGIN
  RETURN jsonb_build_object('missionId',p_mission_id::text,'projectId',p_project_id::text,
      'source',p_source,'externalRunId',p_external_run_id,'status','dispatched');
 END;
-$;
+$$;
 REVOKE ALL ON FUNCTION public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)
  FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)
