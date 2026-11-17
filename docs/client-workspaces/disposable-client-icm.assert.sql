@@ -18,6 +18,8 @@ DECLARE
  mission uuid:='99999999-9999-4999-8999-999999999999';
  mission2 uuid:='90909090-9090-4090-8090-909090909090';
  mission3 uuid:='aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+ mission4 uuid:='bbbbbbbb-cccc-4ddd-8eee-ffffffffffff';
+ mission5 uuid:='cccccccc-dddd-4eee-8fff-aaaaaaaaaaaa';
  receipt uuid:='abababab-abab-4bab-8bab-abababababab';
  proposed jsonb; repeat_proposed jsonb; decided jsonb;
  claimed jsonb; finished jsonb; viewed jsonb;
@@ -166,6 +168,18 @@ BEGIN
  PERFORM public.maxx_service_client_mission_propose(
    bob,bunna,mission2,'Another internal Bunna drafting task');
  PERFORM public.maxx_service_client_mission_decide(reviewer,bunna,mission2,'approved');
+ -- Seed a claimed but unacknowledged run, and a distinct acknowledged
+ -- run, so revocation applies to BOTH dispatch and final receipt transitions.
+ PERFORM public.maxx_service_client_mission_propose(
+   bob,bunna,mission4,'Draft an internal Bunna staffing update');
+ PERFORM public.maxx_service_client_mission_decide(reviewer,bunna,mission4,'approved');
+ PERFORM public.maxx_service_client_mission_claim(bob,bunna,mission4);
+ PERFORM public.maxx_service_client_mission_propose(
+   bob,bunna,mission5,'Draft an internal Bunna weekly report');
+ PERFORM public.maxx_service_client_mission_decide(reviewer,bunna,mission5,'approved');
+ PERFORM public.maxx_service_client_mission_claim(bob,bunna,mission5);
+ PERFORM public.maxx_service_client_mission_record_dispatch(
+   bob,bunna,mission5,'hermes','hermes-approved-before-revoke');
  UPDATE maxx.project_memberships SET status='revoked'
  WHERE project_id=bunna AND user_id=bob;
  refused:=false;
@@ -174,6 +188,24 @@ BEGIN
  EXCEPTION WHEN insufficient_privilege THEN refused:=true;
  END;
  IF NOT refused THEN RAISE EXCEPTION 'Revoked identity claimed approved action'; END IF;
+ refused:=false;
+ BEGIN
+   PERFORM public.maxx_service_client_mission_record_dispatch(
+      bob,bunna,mission4,'hermes','hermes-unknown');
+ EXCEPTION WHEN insufficient_privilege THEN refused:=true;
+ END;
+ IF NOT refused THEN RAISE EXCEPTION 'Revoked actor recorded a runtime ACK'; END IF;
+ refused:=false;
+ BEGIN
+   PERFORM public.maxx_service_client_mission_finish(
+     bob,bunna,mission5,'dddddddd-eeee-4fff-8aaa-111111111111','completed',
+     jsonb_build_object('source','hermes',
+       'externalRunId','hermes-approved-before-revoke',
+       'summary','Attempt to finalize after revocation',
+       'projectId',bunna::text,'missionId',mission5::text));
+ EXCEPTION WHEN insufficient_privilege THEN refused:=true;
+ END;
+ IF NOT refused THEN RAISE EXCEPTION 'Revoked actor finalized signed evidence'; END IF;
  UPDATE maxx.project_memberships SET status='active'
  WHERE project_id=bunna AND user_id=bob;
  RAISE NOTICE 'PASS: ICM client proposal, independent approval, single-claim, immutable unverified evidence, replay and revoke gates';
