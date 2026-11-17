@@ -19,10 +19,12 @@ command -v psql >/dev/null || { echo 'REFUSED: psql required' >&2; exit 2; }
 [[ "$MAXX_TEST_DATABASE_URL" =~ ^postgres(ql)?://([^/@]*@)?(localhost|127\.0\.0\.1)(:[0-9]+)?/([A-Za-z0-9_-]+)$ ]] || { echo 'REFUSED: explicit loopback PostgreSQL URI required' >&2; exit 2; }
 test_database_name="${BASH_REMATCH[5]}"
 [[ "$test_database_name" =~ (disposable|throwaway|maxx_test) ]] && [[ ! "$test_database_name" =~ (prod|staging|stage|live|primary) ]] || { echo 'REFUSED: disposable database name required' >&2; exit 2; }
-psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+PGCONNECT_TIMEOUT=5 psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
   -v alice="$MAXX_ALICE_USER_ID" -v bob="$MAXX_BOB_USER_ID" \
   -v alice_project="$MAXX_ALICE_PROJECT_ID" -v bob_project="$MAXX_BOB_PROJECT_ID" <<'SQL'
 BEGIN TRANSACTION READ ONLY;
+SET LOCAL statement_timeout = '15s';
+SET LOCAL lock_timeout = '3s';
 DO $$ BEGIN
   IF current_database() !~* '(disposable|throwaway|maxx_test)' OR
      current_database() ~* '(prod|staging|stage|live|primary)' OR
