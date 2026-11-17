@@ -29,6 +29,13 @@ END $$;
 -- SET LOCAL ROLE and request.jwt.claim.sub emulate Supabase authenticated
 -- requests; this tests the real SQL policy helper, not OAuth signature checks.
 SET LOCAL ROLE authenticated;
+-- Fail closed if the probe is accidentally run as an RLS-bypassing role,
+-- or if the session has row-level security disabled.
+SELECT 1 / (CASE WHEN
+  current_user = 'authenticated'
+  AND current_setting('row_security') = 'on'
+  AND NOT (SELECT rolbypassrls FROM pg_roles WHERE rolname = current_user)
+  THEN 1 ELSE 0 END) AS rls_execution_context;
 SELECT set_config('request.jwt.claim.sub', :'alice', true);
 SELECT 1 / (CASE WHEN
   EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'alice_project'::uuid)
