@@ -205,6 +205,45 @@ REVOKE ALL ON FUNCTION public.maxx_service_client_mission_claim(uuid,uuid,uuid)
 GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_claim(uuid,uuid,uuid)
   TO service_role;
 
+-- Store the runtime's ACTUAL acknowledged run ID. Never derive a fake
+-- acknowledgement from the MAXX mission ID or trust user-supplied IDs.
+CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_record_dispatch(
+ p_actor uuid,p_project_id uuid,p_mission_id uuid,p_source text,p_external_run_id text
+) RETURNS jsonb
+LANGUAGE plpgsql VOLATILE SECURITY INVOKER
+SET search_path=pg_catalog,maxx,public
+AS $
+DECLARE v_run maxx.workflow_runs%ROWTYPE; v_old jsonb;
+BEGIN
+ IF p_source NOT IN ('hermes','instinct') OR
+    length(coalesce(p_external_run_id,'')) NOT BETWEEN 1 AND 150 THEN
+    RAISE EXCEPTION 'invalid_runtime_ack' USING errcode='22023';
+ END IF;
+ SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
+ IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1'
+   OR v_run.input_manifest->>'claimedBy'<>p_actor::text OR v_run.status<>'running' THEN
+   RAISE EXCEPTION 'runtime_ack_not_claimed' USING errcode='42501';
+ END IF;
+ v_old:=v_run.input_manifest->'dispatch';
+ IF v_old IS NOT NULL THEN
+   IF v_old->>'source'<>p_source OR v_old->>'externalRunId'<>p_external_run_id THEN
+     RAISE EXCEPTION 'runtime_ack_conflict' USING errcode='23505';
+   END IF;
+ ELSE
+   UPDATE maxx.workflow_runs SET
+      input_manifest=input_manifest||jsonb_build_object('dispatch',
+        jsonb_build_object('source',p_source,'externalRunId',p_external_run_id)),
+      updated_at=now() WHERE id=p_mission_id;
+ END IF;
+ RETURN jsonb_build_object('missionId',p_mission_id::text,'projectId',p_project_id::text,
+     'source',p_source,'externalRunId',p_external_run_id,'status','dispatched');
+END;
+$;
+REVOKE ALL ON FUNCTION public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)
+ FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)
+ TO service_role;
+
 CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_finish(
  p_actor uuid,p_project_id uuid,p_mission_id uuid,p_receipt_id uuid,
  p_outcome text,p_receipt jsonb
@@ -237,6 +276,10 @@ BEGIN
    IF NOT FOUND THEN RAISE EXCEPTION 'client_receipt_conflict' USING errcode='23505'; END IF;
    RETURN jsonb_build_object('missionId',p_mission_id::text,'receiptId',v_receipt.id::text,
       'status',v_run.status,'verification','human_review_required','duplicate',true);
+ END IF;
+ IF v_run.input_manifest->'dispatch'->>'source' IS DISTINCT FROM p_receipt->>'source' OR
+    v_run.input_manifest->'dispatch'->>'externalRunId' IS DISTINCT FROM p_receipt->>'externalRunId' THEN
+   RAISE EXCEPTION 'runtime_receipt_not_bound_to_ack' USING errcode='42501';
  END IF;
  IF v_run.status<>'running' OR v_prop.status<>'executing' THEN
    RAISE EXCEPTION 'client_mission_not_running' USING errcode='55000';
@@ -298,7 +341,8 @@ BEGIN
  SELECT * INTO v_receipt FROM maxx.evidence_receipts
  WHERE action_proposal_id=v_prop.id ORDER BY signed_at DESC LIMIT 1;
  RETURN jsonb_build_object('missionId',p_mission_id::text,'projectId',p_project_id::text,
-  'status',v_run.status,'approvalStatus',v_ap.status,
+  'status',v_run.status,'dispatch',v_run.input_manifest->'dispatch',
+  'approvalStatus',v_ap.status,
   'approvalId',v_ap.id::text,
   'receiptId',CASE WHEN v_receipt.id IS NULL THEN null ELSE v_receipt.id::text END,
   'verification',CASE WHEN v_receipt.id IS NULL THEN 'not_yet_executed'
