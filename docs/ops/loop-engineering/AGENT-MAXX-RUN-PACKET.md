@@ -98,3 +98,31 @@ Release blocked by backend CI and missing disposable database identity/RLS evide
 4. **Review/release:** Independent security and product review for portal #113 and backend #45, reconcile dependent #44 without wholesale merging unrelated #29/#42, verify CI exact HEAD (including any queued MariaDB runner), run staging acceptance. Owner authorization required to deploy to production and set production mutation flag.
 
 **Rollback:** close draft backend #45 and revert portal code-only changes; no database rollback is necessary because synthetic database transactions rolled back and shared Supabase was untouched. For future authorized production release, separately backup/plan the actual schema migration and DNS/proxy reversions.
+
+## 2026-11-17 scoped ICM/Instinct code handoff
+
+**Decision:** SOURCE/CANDIDATE CODE IMPLEMENTED; **PRODUCT NOT READY** until server acceptance and release. Keep one canonical workstream; do not add a new orchestrator, scheduler or database.
+
+### New backend implementation in PR #45
+- `docs/client-workspaces/CLIENT-ICM-EXECUTION-CANDIDATE.sql` is **review-only** sixth candidate after the schema, scoped RLS, management, chat and approval-read SQL. It uses preexisting `maxx.workflow_runs`, `maxx.action_proposals`, `maxx.approvals`, `maxx.evidence_receipts`, and `maxx.audit_log`. New service-only SQL RPCs: `maxx_service_client_mission_propose`, `_decide`, `_claim`, `_record_dispatch`, `_dispatch_block`, `_finish`, `_status`, `_missions`.
+- The ONLY allowed v1 execution policy is `client_draft_only`, empty tools, no external side effects or source reads, zero spend. Server validates active org+project membership at each transition; proposer cannot self-approve; distinct owner/admin/reviewer must decide; approval must be unexpired; one row-locked claim per mission; dispatch ACK binds real external run ID; result only qualifies as **partial/unreviewed** until independent evidence.
+- Ambiguous downstream ACK is blocked (not retried) with audited `requiresReconciliation=true`. Revoked access, foreign-project reads/writes, duplicate changes, replay and browser-role RPC execution must fail. Do not infer success from an HTTP ACK.
+- Synthetic integration test `docs/client-workspaces/disposable-client-icm.assert.sql` and runner execute the same SQL against throwaway PostgreSQL 17, together with two-user RLS, scoped approvals, scoped chat and 30-day recoverable archive tests. Synthetic baseline mirrors inspected columns but **is not a production clone**.
+- Executed backend security workflow at code SHA `978e53d438280de8fe579416bd357e10ccd2575f`: [MAXX client boundary gates, run 44156735096](https://github.com/executiveusa/maxx-migrations-agentic-systems/actions/runs/44156735096), PostgreSQL integration job `134299352857` SUCCESS. Logs confirm two-principal RLS, independent mission approval, record/replay protection, project membership revocation, service-only RPCs, chat and approval boundaries, and actual transaction ROLLBACK. New inbox/dispatch quarantine amendments on later commits require latest-head CI verification.
+- No SQL ran on shared `botanic-creations` `cyxdevcjycmffhmwxojh`.
+
+### Portal wiring PR #113 and server-only limits
+- Existing Fastify now exposes project-scoped mission inbox, propose, independent decide, start, status/poll and signed Instinct callback via `services/maxx-control-plane/src/client-mission-routes.ts`.
+- Outbound Instinct A2A uses HTTPS, no redirect, canonical HMAC-SHA256, scoped idempotency, explicit empty tool list and exact run ACK. Incoming callback requires BOTH machine event key AND independent HMAC with bounded timestamp. Runtime receipts bind to recorded dispatch and never claim independent review.
+- Existing Hermes adapter launches a bounded ICM run only when configured worker profile is independently confirmed as **no-tools**, which is a SERVER/INFRA GATE, not proven by text instructions. Executor flag, workspace flag and production-mutation flag all default **false**. Worker/model is never authority for user, project, tools or approvals.
+- React client mission panel integrates approval requests, independent review, execution, status and truthful receipt state with latest text/voice chat. No unapproved client actions are released.
+
+### Next server requirements, ordered
+1. Identify canonical Contabo/Coolify/MAXX deployment, confirm HTTPS and exact Vercel preview auth origin; production DNS/env remain untouched.
+2. Confirm single authorized Supabase project (old `sxkemnqvxlgewrjplcag` vs connected `cyxdevcjycmffhmwxojh` is an unresolved data-ownership decision). Rehearse all **six** SQL candidates in the order specified on a disposable real-schema clone, with independently verified restore and actual signed Alice/Bob client identities. Obtain DB reviewer and owner approval before any shared migration.
+3. Verify operator Google subject, explicit org+project membership, no auto-enrollment; verify all seven workspaces and per-user/prompt/chat/approval history in a browser.
+4. Install and independently audit a **tool-free Hermes profile** or an Instinct A2A worker that enforces empty tools outside of prompt text. Configure distinct vault-only outbound/ingress HMAC keys and existing machine event key. Verify network error/replay, revoke, wrong-project and ambiguous ACK reconciliation. This is runtime work; no fake or simulated task receipts.
+5. Enable client draft mode in **staging only** after checks, finish one actual authorized Bunna internal draft through independent reviewer, externally acknowledged worker run and partial evidence receipt. Expand read-only/bounded tools later only by separate consented, independently reviewed policy; source ownership must be proved.
+6. Independent code/security review, exact-HEAD CI, native Windows locked build, visual/voice acceptance, real HTTPS staging smoke and rollback. Final production rollout requires separate owner release authorization.
+
+**Rollback:** close draft PR #45 (preserves #43 and default `develop`) and revert portal PR #113 additions; disable executor/workspace flags first if staging is deployed. No production DB change occurred here. SQL production rollback must use reviewed forward-repair, never reopen permissive legacy RLS.
