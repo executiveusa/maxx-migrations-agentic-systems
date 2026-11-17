@@ -353,3 +353,54 @@ REVOKE ALL ON FUNCTION public.maxx_service_client_mission_status(uuid,uuid,uuid)
   FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_status(uuid,uuid,uuid)
   TO service_role;
+
+-- Reusable client-specific inbox: survives refresh and gives the distinct
+-- reviewer sufficient request context to make an informed approval decision.
+CREATE OR REPLACE FUNCTION public.maxx_service_client_missions(
+ p_actor uuid,p_project_id uuid,p_limit integer DEFAULT 30
+) RETURNS jsonb
+LANGUAGE plpgsql STABLE SECURITY INVOKER
+SET search_path=pg_catalog,maxx,public
+AS $$
+DECLARE v_org uuid; v_result jsonb;
+BEGIN
+ IF p_limit IS NULL OR p_limit NOT BETWEEN 1 AND 50 THEN
+   RAISE EXCEPTION 'invalid_client_mission_limit' USING errcode='22023';
+ END IF;
+ IF NOT maxx.service_client_authorized(p_actor,p_project_id,
+   ARRAY['owner','admin','operator','reviewer','viewer']::text[]) THEN
+   RAISE EXCEPTION 'client_mission_list_denied' USING errcode='42501';
+ END IF;
+ SELECT organization_id INTO STRICT v_org FROM maxx.projects WHERE id=p_project_id;
+ SELECT coalesce(jsonb_agg(jsonb_build_object(
+   'missionId',x.id::text,'projectId',x.project_id::text,
+   'requestedBy',x.started_by::text,'objective',x.objective,
+   'status',x.status,'approvalStatus',x.approval_status,
+   'approvalId',x.approval_id::text,'receiptId',x.receipt_id::text,
+   'createdAt',x.created_at
+ ) ORDER BY x.created_at DESC,x.id),'[]'::jsonb) INTO v_result
+ FROM (
+   SELECT r.id,r.project_id,r.started_by,r.objective,r.status,r.created_at,
+      a.status AS approval_status,a.id AS approval_id,
+      (SELECT er.id FROM maxx.evidence_receipts er
+        WHERE er.action_proposal_id=ap.id AND er.project_id=p_project_id
+        AND er.organization_id=v_org ORDER BY er.signed_at DESC LIMIT 1) AS receipt_id
+   FROM maxx.workflow_runs r
+   JOIN maxx.action_proposals ap
+     ON ap.run_id=r.id AND ap.organization_id=r.organization_id
+     AND ap.project_id=r.project_id AND ap.action_key='maxx.client_draft.v1'
+   JOIN maxx.approvals a
+     ON a.action_proposal_id=ap.id AND a.organization_id=ap.organization_id
+   WHERE r.project_id=p_project_id AND r.organization_id=v_org
+      AND r.workflow_key='maxx.client_draft.v1'
+      AND (r.started_by=p_actor OR maxx.service_client_authorized(
+          p_actor,p_project_id,ARRAY['owner','admin','reviewer']::text[]))
+   ORDER BY r.created_at DESC,r.id DESC LIMIT p_limit
+ ) x;
+ RETURN v_result;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.maxx_service_client_missions(uuid,uuid,integer)
+ FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.maxx_service_client_missions(uuid,uuid,integer)
+ TO service_role;
