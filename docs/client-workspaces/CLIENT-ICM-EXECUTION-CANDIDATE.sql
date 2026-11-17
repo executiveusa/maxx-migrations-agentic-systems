@@ -221,7 +221,7 @@ BEGIN
  END IF;
  IF NOT maxx.service_client_authorized(
     p_actor,p_project_id,ARRAY['owner','admin','operator']::text[]) THEN
-    RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
+   RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
  END IF;
  SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
  IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1'
@@ -251,9 +251,6 @@ GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_record_dispatch(uui
 -- If the worker does not return a verifiable acknowledgement, lock the
 -- claim. Do NOT auto-retry: the remote agent might have accepted the request.
 -- A human must independently reconcile the external run before any new work.
-CREATE OR REPLACE wledgement, lock the
--- claim. Do NOT auto-retry: the remote agent might have accepted the request.
--- A human must independently reconcile the external run before any new work.
 CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_dispatch_block(
  p_actor uuid,p_project_id uuid,p_mission_id uuid
 ) RETURNS jsonb
@@ -264,7 +261,7 @@ DECLARE v_run maxx.workflow_runs%ROWTYPE; v_prop maxx.action_proposals%ROWTYPE;
 BEGIN
  IF NOT maxx.service_client_authorized(
     p_actor,p_project_id,ARRAY['owner','admin','operator']::text[]) THEN
-    RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
+   RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
  END IF;
  SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
  IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1'
@@ -305,15 +302,12 @@ BEGIN
    'status','blocked','requiresReconciliation',true,'duplicate',false);
 END;
 $$;
-REVOKE ALL ON FUNCTION public.maxx_service_client_missidacted)
- VALUES(v_run.organization_id,p_project_id,'system',p_actor::text,
-   'client_mission_dispatch_unconfirmed','workflow_run',p_mission_id::text,
-   '{"requiresReconciliation":true}'::jsonb);
- RETURN jsonb_build_object('missionId',p_mission_id::text,
-   'status','blocked','requiresReconciliation',true,'duplicate',false);
-END;
-$$;
-REVOKE ALL ON FUNCTION public.maxx_service_client_missiFUNCTION public.maxx_service_client_mission_finish(
+REVOKE ALL ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
+ FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
+ TO service_role;
+
+CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_finish(
  p_actor uuid,p_project_id uuid,p_mission_id uuid,p_receipt_id uuid,
  p_outcome text,p_receipt jsonb
 ) RETURNS jsonb
@@ -334,7 +328,7 @@ BEGIN
  END IF;
  IF NOT maxx.service_client_authorized(
     p_actor,p_project_id,ARRAY['owner','admin','operator']::text[]) THEN
-    RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
+   RAISE EXCEPTION 'revoked_client_mission_actor' USING errcode='42501';
  END IF;
  SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
  IF v_run.project_id<>p_project_id OR v_run.workflow_key<>'maxx.client_draft.v1' OR
@@ -383,7 +377,16 @@ BEGIN
  VALUES(v_run.organization_id,p_project_id,'system',p_actor::text,
    'client_mission_'||p_outcome,'evidence_receipt',p_receipt_id::text,
    jsonb_build_object('missionId',p_mission_id::text,'source',p_receipt->>'source'));
- RETURN jsonb_build_object('missionId',p_mission_id::textFUNCTION public.maxx_service_client_mission_status(
+ RETURN jsonb_build_object('missionId',p_mission_id::text,'receiptId',p_receipt_id::text,
+   'status',p_outcome,'verification','human_review_required','duplicate',false);
+END;
+$$;
+REVOKE ALL ON FUNCTION public.maxx_service_client_mission_finish(uuid,uuid,uuid,uuid,text,jsonb)
+  FROM PUBLIC,anon,authenticated;
+GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_finish(uuid,uuid,uuid,uuid,text,jsonb)
+  TO service_role;
+
+CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_status(
  p_actor uuid,p_project_id uuid,p_mission_id uuid
 ) RETURNS jsonb
 LANGUAGE plpgsql STABLE SECURITY INVOKER
