@@ -43,6 +43,8 @@ SELECT 1 / (CASE WHEN EXISTS (
   JOIN pg_namespace n ON n.oid = c.relnamespace
   WHERE n.nspname = 'maxx' AND c.relname = 'projects'
     AND c.relkind IN ('r', 'p') AND c.relrowsecurity
+    -- Table owners bypass RLS unless FORCE ROW LEVEL SECURITY is set.
+    AND (c.relforcerowsecurity OR c.relowner <> (SELECT oid FROM pg_roles WHERE rolname = current_user))
 ) THEN 1 ELSE 0 END) AS projects_rls_enabled;
 SELECT set_config('request.jwt.claim.sub', :'alice', true);
 SELECT 1 / (CASE WHEN
