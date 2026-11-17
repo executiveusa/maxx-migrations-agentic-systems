@@ -59,6 +59,17 @@ SELECT 1 / (CASE WHEN
   NOT EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'alice_project'::uuid)
   AND NOT EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'bob_project'::uuid)
   THEN 1 ELSE 0 END) AS missing_subject_denied;
+-- A validly shaped but unassigned subject must not gain project access.
+-- Keep the sentinel distinct from both explicitly provisioned test users.
+SELECT 1 / (CASE WHEN
+  :'alice'::uuid <> '00000000-0000-4000-8000-000000000000'::uuid
+  AND :'bob'::uuid <> '00000000-0000-4000-8000-000000000000'::uuid
+  THEN 1 ELSE 0 END) AS sentinel_unassigned;
+SELECT set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000000', true);
+SELECT 1 / (CASE WHEN
+  NOT EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'alice_project'::uuid)
+  AND NOT EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'bob_project'::uuid)
+  THEN 1 ELSE 0 END) AS unassigned_subject_denied;
 SELECT set_config('request.jwt.claim.sub', :'alice', true);
 SELECT 1 / (CASE WHEN
   EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'alice_project'::uuid)
