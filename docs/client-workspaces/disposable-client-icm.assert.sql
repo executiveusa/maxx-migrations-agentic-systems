@@ -42,6 +42,16 @@ BEGIN
     bob,bunna,mission,'Draft an internal Bunna menu response');
  repeat_proposed:=public.maxx_service_client_mission_propose(
     bob,bunna,mission,'Draft an internal Bunna menu response');
+ IF jsonb_array_length(public.maxx_service_client_missions(bob,bunna,30))<>1 OR
+    jsonb_array_length(public.maxx_service_client_missions(reviewer,bunna,30))<>1 THEN
+    RAISE EXCEPTION 'Durable project mission inbox did not reveal scoped request';
+ END IF;
+ refused:=false;
+ BEGIN
+   PERFORM public.maxx_service_client_missions(outsider,bunna,30);
+ EXCEPTION WHEN insufficient_privilege THEN refused:=true;
+ END;
+ IF NOT refused THEN RAISE EXCEPTION 'Unaffiliated client can list private missions'; END IF;
  IF proposed<>repeat_proposed OR proposed->>'status'<>'pending'
    OR proposed->>'action'<>'client_draft_only' THEN
    RAISE EXCEPTION 'Proposal idempotency or approval gating failed';
@@ -158,7 +168,8 @@ BEGIN
   'public.maxx_service_client_mission_claim(uuid,uuid,uuid)',
   'public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)',
   'public.maxx_service_client_mission_finish(uuid,uuid,uuid,uuid,text,jsonb)',
-  'public.maxx_service_client_mission_status(uuid,uuid,uuid)'
+  'public.maxx_service_client_mission_status(uuid,uuid,uuid)',
+  'public.maxx_service_client_missions(uuid,uuid,integer)'
  ] LOOP
   IF has_function_privilege('anon',f,'EXECUTE')
      OR has_function_privilege('authenticated',f,'EXECUTE')
