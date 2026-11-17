@@ -115,3 +115,9 @@ Release blocked by backend CI and missing disposable database identity/RLS evide
 - **SLICE/BUILD:** Added a fail-closed assertion that the authenticated role is not the `maxx.projects` table owner unless `relforcerowsecurity` is enabled. Source commit `039a9d643bd7313293abd7720b5caf0d846d7c54`. No policy or schema changed.
 - **VERIFY/GAUNTLET:** GitHub source change committed. Exact-HEAD CI and executable two-identity disposable DB proof remain pending; do not treat static preflight as runtime isolation. Independently review the new guard and run the probe on an authorized disposable DB.
 - **RELEASE:** NOT READY. No shared Supabase writes, memberships, merges or deployments. **Rollback:** revert `039a9d643` and this packet update in reverse order.
+
+### 2026-11-17 — pre-connect disposable URL gate (NOT READY)
+- **INTENT/BAR:** Refuse remote/non-disposable database targets before `psql` opens a connection. Previously the loopback assertion executed only after connecting.
+- **LOCK/SLICE/BUILD:** Existing draft PR #49; restrict the probe's connection URL to a simple loopback PostgreSQL URI with a disposable database name and no query-string host overrides. Commits `e20b835`, `b7129f6`, `851cc8f`. No schema or shared Supabase changes.
+- **VERIFY:** Locally exercised the exact preflight shell pattern with `bash -n` and five cases: accepted localhost disposable and 127.0.0.1 maxx_test; rejected remote host, production database, and query-string host override. This is a *pattern-only* check, not an executed PostgreSQL probe. Exact-head CI and independent review pending.
+- **GAUNTLET/RELEASE:** NOT READY; no actual Alice/Bob DB execution or cross-project write/approval proof. Current HEAD after this receipt must be rechecked. **Rollback:** revert this packet commit and the three source commits in reverse order. Next: authorized disposable PostgreSQL execution with sanitized evidence.
