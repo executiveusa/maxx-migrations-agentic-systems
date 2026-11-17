@@ -1,0 +1,96 @@
+name: MAXX client boundary gates
+
+on:
+  pull_request:
+    paths:
+      - 'docs/client-workspaces/**'
+      - '.github/workflows/maxx-client-boundary-preflight.yml'
+  push:
+    paths:
+      - 'docs/client-workspaces/**'
+      - '.github/workflows/maxx-client-boundary-preflight.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-boundary-preflight:
+    name: Candidate SQL static assertions (not RLS integration)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check client seeds, policy declarations and RPC provenance
+        run: node docs/client-workspaces/verify-candidate-boundaries.mjs
+      - name: Prove static preflight rejects unsafe SQL mutations
+        run: node docs/client-workspaces/verify-candidate-boundaries.test.mjs
+      - name: Prove disposable SQL runner refuses unsafe database targets
+        run: bash docs/client-workspaces/test-disposable-security-gate.sh
+      - name: Mark integration gate outstanding
+        run: |
+          echo 'Static source assertions only. This job does not establish SQL validity or two-identity tenant isolation.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Release remains blocked pending disposable database integration and independent review.' >> "$GITHUB_STEP_SUMMARY"
+
+  disposable-postgres-isolation:
+    name: Disposable Postgres 17 two-user RLS + restore (rollback only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Docker service bridge networking reports the bridge IP to PostgreSQL.
+    # Run a throwaway server on runner loopback instead: do NOT relax the
+    # database gate's strictly local server-address check.
+    env:
+      # Hard-coded throwaway CI container credentials, never shared secrets.
+      MAXX_TEST_DATABASE_URL: postgresql://postgres:disposable_ci_only@127.0.0.1:5432/maxx_disposable_ci
+      MAXX_TEST_DB_LABEL: maxx-disposable
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client
+      - name: Start PostgreSQL 17 bound to runner loopback ONLY
+        run: |
+          docker run -d --rm --name maxx-disposable-db --network host \
+            -e POSTGRES_DB=maxx_disposable_ci \
+            -e POSTGRES_PASSWORD=disposable_ci_only \
+            postgres:17 -c listen_addresses=127.0.0.1
+          for attempt in {1..30}; do
+            if pg_isready -h 127.0.0.1 -p 5432 -U postgres -d maxx_disposable_ci; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+      - name: Create synthetic empty baseline (no customer data)
+        run: psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -f docs/client-workspaces/disposable-maxx-baseline.sql
+      - name: Execute candidate SQL, two-identity RLS and 30-day recovery
+        run: bash docs/client-workspaces/run-disposable-tenant-isolation.sh
+      - name: Verify transaction rollback removed every candidate schema change
+        run: |
+          psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 <<'SQL'
+          DO $rollback$
+          BEGIN
+            IF to_regclass('maxx.project_memberships') IS NOT NULL
+              OR to_regclass('maxx.project_prompt_templates') IS NOT NULL
+              OR to_regclass('maxx.project_archive_requests') IS NOT NULL
+              OR to_regprocedure('public.maxx_service_client_workspaces(uuid)') IS NOT NULL
+              OR EXISTS (SELECT 1 FROM maxx.projects)
+              OR EXISTS (SELECT 1 FROM maxx.memberships)
+              OR EXISTS (SELECT 1 FROM maxx.audit_log)
+            THEN RAISE EXCEPTION 'Disposable RLS gate did not roll back cleanly'; END IF;
+            RAISE NOTICE 'PASS: no candidate DDL, seeded clients, memberships or audit writes survived';
+          END
+          $rollback$;
+          SQL
+      - name: Remove disposable PostgreSQL container
+        if: always()
+        run: docker rm -f maxx-disposable-db || true
+      - name: Record scope
+        if: always()
+        run: |
+          echo 'Isolated PostgreSQL container only; synthetic baseline; no production/customer data.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'All candidate SQL and test identities are rolled back. This is not staging or production verification.' >> "$GITHUB_STEP_SUMMARY"
