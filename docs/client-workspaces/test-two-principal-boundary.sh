@@ -13,6 +13,11 @@ for value in "$MAXX_ALICE_USER_ID" "$MAXX_BOB_USER_ID" "$MAXX_ALICE_PROJECT_ID" 
 done
 [[ "$MAXX_ALICE_USER_ID" != "$MAXX_BOB_USER_ID" && "$MAXX_ALICE_PROJECT_ID" != "$MAXX_BOB_PROJECT_ID" ]] || { echo 'REFUSED: distinct identities and projects required' >&2; exit 2; }
 command -v psql >/dev/null || { echo 'REFUSED: psql required' >&2; exit 2; }
+# Refuse remote connections BEFORE invoking psql. The SQL loopback check alone
+# runs only after a connection has already been established.
+# Deliberately require a simple loopback URI with no query-string overrides.
+[[ "$MAXX_TEST_DATABASE_URL" =~ ^postgres(ql)?://([^/@]*@)?(localhost|127\\.0\\.0\\.1)(:[0-9]+)?/([A-Za-z0-9_-]+)$ ]] || { echo 'REFUSED: explicit loopback PostgreSQL URI required' >&2; exit 2; }
+[[ "${BASH_REMATCH[5]}" =~ (disposable|throwaway|maxx_test) ]] && [[ ! "${BASH_REMATCH[5]}" =~ (prod|staging|stage|live|primary) ]] || { echo 'REFUSED: disposable database name required' >&2; exit 2; }
 psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
   -v alice="$MAXX_ALICE_USER_ID" -v bob="$MAXX_BOB_USER_ID" \
   -v alice_project="$MAXX_ALICE_PROJECT_ID" -v bob_project="$MAXX_BOB_PROJECT_ID" <<'SQL'
