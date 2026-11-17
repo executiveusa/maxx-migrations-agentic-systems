@@ -17,6 +17,7 @@ DECLARE
  outsider uuid:='33333333-3333-4333-8333-333333333333';
  mission uuid:='99999999-9999-4999-8999-999999999999';
  mission2 uuid:='90909090-9090-4090-8090-909090909090';
+ mission3 uuid:='aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
  receipt uuid:='abababab-abab-4bab-8bab-abababababab';
  proposed jsonb; repeat_proposed jsonb; decided jsonb;
  claimed jsonb; finished jsonb; viewed jsonb;
@@ -141,6 +142,26 @@ BEGIN
  EXCEPTION WHEN insufficient_privilege THEN refused:=true;
  END;
  IF NOT refused THEN RAISE EXCEPTION 'Outsider can inspect mission evidence'; END IF;
+ -- Ambiguous remote ACK must be quarantined, NEVER automatically retried.
+ PERFORM public.maxx_service_client_mission_propose(
+   bob,bunna,mission3,'Draft another internal Bunna note');
+ PERFORM public.maxx_service_client_mission_decide(
+   reviewer,bunna,mission3,'approved');
+ PERFORM public.maxx_service_client_mission_claim(bob,bunna,mission3);
+ IF public.maxx_service_client_mission_dispatch_block(
+    bob,bunna,mission3)->>'requiresReconciliation'<>'true' THEN
+    RAISE EXCEPTION 'Ambiguous remote dispatch not quarantined';
+ END IF;
+ IF public.maxx_service_client_mission_dispatch_block(
+    bob,bunna,mission3)->>'duplicate'<>'true' THEN
+    RAISE EXCEPTION 'Blocked dispatch was not idempotent';
+ END IF;
+ refused:=false;
+ BEGIN
+   PERFORM public.maxx_service_client_mission_claim(bob,bunna,mission3);
+ EXCEPTION WHEN object_not_in_prerequisite_state THEN refused:=true;
+ END;
+ IF NOT refused THEN RAISE EXCEPTION 'Ambiguous dispatch was retried'; END IF;
  -- Verify revocation AFTER prior approval cannot be bypassed by a cached claim.
  PERFORM public.maxx_service_client_mission_propose(
    bob,bunna,mission2,'Another internal Bunna drafting task');
@@ -167,6 +188,7 @@ BEGIN
   'public.maxx_service_client_mission_decide(uuid,uuid,uuid,text)',
   'public.maxx_service_client_mission_claim(uuid,uuid,uuid)',
   'public.maxx_service_client_mission_record_dispatch(uuid,uuid,uuid,text,text)',
+  'public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)',
   'public.maxx_service_client_mission_finish(uuid,uuid,uuid,uuid,text,jsonb)',
   'public.maxx_service_client_mission_status(uuid,uuid,uuid)',
   'public.maxx_service_client_missions(uuid,uuid,integer)'
