@@ -252,7 +252,7 @@ CREATE OR REPLACE FUNCTION public.maxx_service_client_mission_dispatch_block(
 ) RETURNS jsonb
 LANGUAGE plpgsql VOLATILE SECURITY INVOKER
 SET search_path=pg_catalog,maxx,public
-AS $
+AS $$
 DECLARE v_run maxx.workflow_runs%ROWTYPE; v_prop maxx.action_proposals%ROWTYPE;
 BEGIN
  SELECT * INTO STRICT v_run FROM maxx.workflow_runs WHERE id=p_mission_id FOR UPDATE;
@@ -293,7 +293,7 @@ BEGIN
  RETURN jsonb_build_object('missionId',p_mission_id::text,
    'status','blocked','requiresReconciliation',true,'duplicate',false);
 END;
-$;
+$$;
 REVOKE ALL ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
  FROM PUBLIC,anon,authenticated;
 GRANT EXECUTE ON FUNCTION public.maxx_service_client_mission_dispatch_block(uuid,uuid,uuid)
