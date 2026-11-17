@@ -46,6 +46,13 @@ SELECT 1 / (CASE WHEN EXISTS (
     -- Table owners bypass RLS unless FORCE ROW LEVEL SECURITY is set.
     AND (c.relforcerowsecurity OR c.relowner <> (SELECT oid FROM pg_roles WHERE rolname = current_user))
 ) THEN 1 ELSE 0 END) AS projects_rls_enabled;
+-- A session with the authenticated DB role but no JWT subject must not
+-- inherit access to either workspace. This catches fail-open policy helpers.
+SELECT set_config('request.jwt.claim.sub', '', true);
+SELECT 1 / (CASE WHEN
+  NOT EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'alice_project'::uuid)
+  AND NOT EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'bob_project'::uuid)
+  THEN 1 ELSE 0 END) AS missing_subject_denied;
 SELECT set_config('request.jwt.claim.sub', :'alice', true);
 SELECT 1 / (CASE WHEN
   EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'alice_project'::uuid)
