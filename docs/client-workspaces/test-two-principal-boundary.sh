@@ -36,6 +36,14 @@ SELECT 1 / (CASE WHEN
   AND current_setting('row_security') = 'on'
   AND NOT (SELECT rolbypassrls FROM pg_roles WHERE rolname = current_user)
   THEN 1 ELSE 0 END) AS rls_execution_context;
+-- The identity check is meaningless if the target relation has RLS disabled.
+-- Assert the actual projects table is protected, not just the session setting.
+SELECT 1 / (CASE WHEN EXISTS (
+  SELECT 1 FROM pg_class c
+  JOIN pg_namespace n ON n.oid = c.relnamespace
+  WHERE n.nspname = 'maxx' AND c.relname = 'projects'
+    AND c.relkind IN ('r', 'p') AND c.relrowsecurity
+) THEN 1 ELSE 0 END) AS projects_rls_enabled;
 SELECT set_config('request.jwt.claim.sub', :'alice', true);
 SELECT 1 / (CASE WHEN
   EXISTS (SELECT 1 FROM maxx.projects WHERE id=:'alice_project'::uuid)
