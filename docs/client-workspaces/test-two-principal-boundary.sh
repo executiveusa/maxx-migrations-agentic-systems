@@ -16,8 +16,10 @@ command -v psql >/dev/null || { echo 'REFUSED: psql required' >&2; exit 2; }
 # Refuse remote connections BEFORE invoking psql. The SQL loopback check alone
 # runs only after a connection has already been established.
 # Deliberately require a simple loopback URI with no query-string overrides.
-[[ "$MAXX_TEST_DATABASE_URL" =~ ^postgres(ql)?://([^/@]*@)?(localhost|127\.0\.0\.1)(:[0-9]+)?/([A-Za-z0-9_-]+)$ ]] || { echo 'REFUSED: explicit loopback PostgreSQL URI required' >&2; exit 2; }
-test_database_name="${BASH_REMATCH[5]}"
+# Do not permit URI userinfo: credentials in argv can be exposed by process listings.
+# Use a local PostgreSQL service/PGPASSFILE for disposable test authentication.
+[[ "$MAXX_TEST_DATABASE_URL" =~ ^postgres(ql)?://(localhost|127\.0\.0\.1)(:[0-9]+)?/([A-Za-z0-9_-]+)$ ]] || { echo 'REFUSED: explicit loopback PostgreSQL URI required' >&2; exit 2; }
+test_database_name="${BASH_REMATCH[4]}"
 [[ "$test_database_name" =~ (disposable|throwaway|maxx_test) ]] && [[ ! "$test_database_name" =~ (prod|staging|stage|live|primary) ]] || { echo 'REFUSED: disposable database name required' >&2; exit 2; }
 PGCONNECT_TIMEOUT=5 psql "$MAXX_TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
   -v alice="$MAXX_ALICE_USER_ID" -v bob="$MAXX_BOB_USER_ID" \
