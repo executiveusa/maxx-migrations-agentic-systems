@@ -36,6 +36,16 @@ DO $$ BEGIN
     RAISE EXCEPTION 'Refusing non-disposable/non-loopback database';
   END IF;
 END $$;
+-- Verify the sentinel has no membership BEFORE assuming the authenticated role.
+-- row_security=off makes an RLS-filtered result an error rather than a false
+-- zero; insufficient privileges also fail closed. The fixture must be audited
+-- using a separate disposable-database test runner, never shared production.
+SET LOCAL row_security = off;
+SELECT 1 / (CASE WHEN NOT EXISTS (
+  SELECT 1 FROM maxx.project_memberships
+  WHERE user_id = '00000000-0000-4000-8000-000000000000'::uuid
+) THEN 1 ELSE 0 END) AS sentinel_has_no_membership;
+SET LOCAL row_security = on;
 -- SET LOCAL ROLE and request.jwt.claim.sub emulate Supabase authenticated
 -- requests; this tests the real SQL policy helper, not OAuth signature checks.
 SET LOCAL ROLE authenticated;
