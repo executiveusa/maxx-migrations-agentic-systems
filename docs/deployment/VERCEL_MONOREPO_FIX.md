@@ -73,4 +73,4 @@ without 404s.
 
 ## If Vercel still fails
 
-If Vercel ignores the root-level fallback or still uses Python runtime detection, set the dashboard Root Directory manually to `apps/maxx-web` and redeploy the latest `develop` commit.
+If Vercel ignores the root-level fallback or still uses Python runtime detection, set the dashboard Root Directory manually to `apps/maxx-web` and redeploy the latest `main` commit.

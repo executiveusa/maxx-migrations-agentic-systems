@@ -1,92 +1,39 @@
-# Skills & Agent Configuration Index
+# Skills and routing index
 
-Quick reference for all skills and agent guidelines in this project.
+The active product is `apps/maxx-web`; the repository-root ERPNext/Frappe tree and `banking/` frontend are legacy.
 
-## Start Here
+## Route work by outcome
 
-1. **New Agent?** → Read `agents.md` first
-2. **Need a Skill?** → Check `skills/README.md` 
-3. **Frontend Work?** → See `skills/interactive-artifacts.md`
-4. **Finding Tools?** → See `skills/skills-library.md`
+| Work | Start here |
+| --- | --- |
+| Repository orientation and rules | `AGENTS.md` |
+| Cross-repository MAXX routing | `icm/federation/CONTEXT.md` |
+| Product or portfolio decision | `icm/maxx-suite/00_router/CONTEXT.md` |
+| Website audit, rebuild, or migration | `icm/site-transformation-protocol/00_router/CONTEXT.md` |
+| Revenue, offers, positioning, or growth | `icm/growth-engine/SKILL.md` |
+| Specialized implementation references | `skills/README.md` |
+| Application requirements and architecture | `docs/openspec/00_CONTEXT.md` |
+| Deployment | `docs/deployment/VERCEL_MONOREPO_FIX.md` |
 
-## Directory Structure
+## Active stack
 
+- Next.js 16 + React 19 + TypeScript in `apps/maxx-web`
+- Supabase data/auth with explicit seed-mode behavior
+- npm for install, build, lint, typecheck, and tests
+- Vercel deployment from `apps/maxx-web`
+
+## Verification
+
+From the repository root:
+
+```bash
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+npm run verify
 ```
-maxx-migrations-agentic-systems/
-├── SKILLS.md                    (this file — quick index)
-├── agents.md                    (agent workflow config)
-├── skills/
-│   ├── README.md                (skill registry and discovery)
-│   ├── skills-library.md        (76+ categorized skills)
-│   ├── interactive-artifacts.md (claude.ai widget skill)
-│   └── [additional skills as added]
-└── banking/                     (Vite + React frontend)
-    ├── src/
-    ├── package.json
-    ├── vite.config.ts
-    └── globals.css              (design tokens)
-```
 
-## Available Skills
+`npm run verify` includes the application harness. A green build is not proof that deployed machine-to-machine paths are verified; use `icm/federation/WALK_TEST.md` for that distinction.
 
-| Skill | Location | Purpose | Quality Floor |
-|-------|----------|---------|---------------|
-| **Interactive Artifacts** | `skills/interactive-artifacts.md` | Build dashboards, widgets, calculators for Claude.ai | 8.5/10 UDEC |
-| **Skills Library** | `skills/skills-library.md` | 76+ categorized tools for all domains | Reference |
-| **Agent Workflows** | `agents.md` | How agents should work in this repo | N/A |
-
-## Quick Skill Matrix
-
-### I'm building a **frontend feature**
-→ Use `interactive-artifacts.md` for widgets, dashboards
-→ Follow `/banking/globals.css` design tokens
-→ Reference existing Radix UI + Tailwind components
-
-### I'm building an **interactive widget**
-→ MUST use `interactive-artifacts.md`
-→ Quality floor: 8.5/10 (UDEC score)
-→ No localStorage, no position:fixed, CDN allowlist only
-
-### I'm choosing **which tools/skills to use**
-→ Start with `skills/skills-library.md` category map
-→ Find your domain (Backend, Frontend, etc.)
-→ Load the specialized skill file
-
-### I'm **unsure about conventions**
-→ Read `agents.md` for project standards
-→ Check code organization and patterns
-→ See quality standards section
-
-## Project Context
-
-- **Root**: ERPNext (Python/Frappe) banking module
-- **Frontend**: `/banking/` — Vite + React 19.2 + Tailwind CSS v4
-- **Package Manager**: yarn (in `/banking`)
-- **Build**: `yarn build` → `/banking/dist`
-- **Design System**: oklch colors, 3-5 colors max, 2 fonts max
-
-## Agent Checklist
-
-When starting work:
-- [ ] Read `agents.md`
-- [ ] Identify task type (frontend, backend, tooling, etc.)
-- [ ] Load relevant skill from `skills/`
-- [ ] Read skill file **completely** before writing code
-- [ ] Check existing code patterns
-- [ ] Follow quality standards
-- [ ] Test in preview/build before finishing
-
-## Adding New Skills
-
-1. Create new `.md` in `skills/` directory
-2. Use YAML frontmatter (see `interactive-artifacts.md` example)
-3. Include examples, constraints, and quality metrics
-4. Add entry to `skills/README.md` Available Skills section
-5. Update this index if skill is high-frequency
-6. Update `agents.md` if affecting workflow
-
----
-
-**Last Updated**: 2026-06-29
-**Project**: maxx-migrations-agentic-systems
-**Maintained By**: Agent Workflow Team
+**Last updated:** 2026-09-18
