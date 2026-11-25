@@ -1,106 +1,33 @@
-# Agent Workflow Configuration
+# MAXX Migrations Agentic Systems — Universal Agent Router (`AGENTS.md`)
 
-This file defines how agents should work on the maxx-migrations-agentic-systems repository.
+> Readable by **ALL agents** (Hermes, Instinct, Maus Bots, Antigravity, Claude, Codex, Cursor).
+> **ICM is law.** Keep cold Check-In under 3,000 tokens. Do not bulk-load this repository.
 
-## Agent Discovery Rules
+## 1. Governing Authority & System Boundary
+Before any meaningful work, read:
+1. [CONTEXT.md](CONTEXT.md) — Universal MAXX OS ICM root map (`01_orient -> 02_plan -> 03_work -> 04_verify -> 05_release -> 06_learn`).
+2. `docs/icm/HUMAN_MACHINE_CONTRACT.md` — Human ↔ Machine authority & approval gates.
+3. [wiki/HANDOFF.md](wiki/HANDOFF.md) — Rolling Check-In / Check-Out subcontext ledger.
 
-All agents working in this repo MUST:
-1. Check `/skills/README.md` for available skills
-2. Load relevant skills from `/skills/` directory based on task type
-3. Follow the constraints and patterns defined in each skill file
-4. Update this file when establishing new conventions or patterns
+### Federation Boundaries (Strict Tenant Isolation)
+- **Public Storefront:** `executiveusa/macsdigitalmedia` (never holds backend secrets or `MAXX_MIGRATIONS_API_KEY`).
+- **Owner/Operator Surface:** `executiveusa/macs-agent-portal` (Agent MAXX control plane & approvals).
+- **Canonical Business Brain & Execution Backend:** This repository (`executiveusa/maxx-migrations-agentic-systems`).
+- **COSMOS Personal HQ (Separate):** Bambu's personal COSMOS (`cosmos`, `nwkids`, `vibe-engineering`, `VisionClaw`) is strictly isolated from MACS and Kupuri tenants. Agents operating inside MACS must **never** read or write COSMOS, NWKids, or Kupuri data.
 
-## Project Context
+## 2. Mandatory Coding & Quality Discipline
+- **ICM Is Law:** Every new feature, protocol, or client template must obey `CONTEXT.md`'s 6-stage grammar (`01_orient` through `06_learn`) and keep cold context small (`2k–8k` tokens).
+- **Feature Engineering:** Use **Lauren Tan's PStack (`pstack-*`)** for structured feature development.
+- **Lean Edits & Refactors:** Use **Ponytail (`ponytail-*`)** + `jcodemunch` for minimal diffs and low token spend.
+- **Model-Agnostic Execution:** Never hardcode vendor-specific model names; route through the configured LLM router/gateway.
+- **Computer-Use Runtime:** Default to self-hosted Maus Bots (tenant-scoped, `draft_and_queue` mode) rather than external SaaS computer-use vendors.
 
-### Repository Structure
-- **Root**: ERPNext (Python/Frappe framework) — banking module
-- **Web App**: `/banking/` — Vite + React 19.2 + Tailwind CSS v4 + Radix UI + React Router v7
-- **State Management**: Jotai (atoms) + frappe-react-sdk
-- **Build Output**: `/banking/dist/` built with `yarn build` command
-- **Vercel Config**: Set to root=`/banking`, build command=`yarn build`
+## 3. Hard Safety & Approval Gates
+- **GREEN (Autonomous):** Read-only inspection, running tests/linters/typechecks, drafting plans, updating `wiki/HANDOFF.md`.
+- **YELLOW (Draft & Queue):** Creating PRs, staging migrations, drafting client deliverables.
+- **RED (Explicit Human Approval Required):** Spending money, sending external client outreach, rotating/exposing secrets, destructive DB migrations, or production deploys.
 
-### Design Tokens (globals.css)
-- Color system: oklch-based, full light/dark support
-- Semantic tokens: `--background`, `--foreground`, `--primary`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--border`, `--ring`
-- Sidebar tokens available
-- Radius: `--radius: 0.625rem` with scale (sm/md/lg/xl/2xl/3xl/4xl)
-
-## Skill Selection Matrix
-
-### For Frontend / UI Work
-Required skills (in order):
-1. `interactive-artifacts.md` — if building widgets or dashboards
-2. Design guidelines from `/banking/globals.css`
-3. Radix UI + Tailwind patterns from existing components
-
-### For Backend / Integration Work
-Recommended skills:
-1. `skills-library.md` — infrastructure, backend, data integration skills
-2. Frappe SDK documentation
-3. ERPNext module patterns
-
-### For Uncertain Tasks
-1. Start with `skills-library.md` category map
-2. Find matching category
-3. Load the appropriate specialized skill
-4. Reference that skill completely before starting work
-
-## Code Organization
-
-### Frontend (`/banking/src/`)
-- **pages**: React Router page components
-- **components**: Reusable UI components (Radix UI + Tailwind)
-- **hooks**: Custom React hooks
-- **atoms**: Jotai state atoms
-- **utils**: Helper functions and utilities
-- **types**: TypeScript type definitions
-
-### Package Manager
-- Use `yarn` for all operations in `/banking`
-- Run `yarn build` to create `/banking/dist`
-- Run `yarn dev` to start dev server
-
-## Quality Standards
-
-### Frontend Polish (from interactive-artifacts.md)
-- UDEC quality floor: 8.5/10 minimum
-- No hardcoded colors — use CSS variables
-- No localStorage — use window.storage or in-memory state
-- No position:fixed — use normal flow
-- Responsive design — mobile-first, enhanced for larger screens
-
-### Design System
-- 3-5 colors maximum per feature
-- 2 fonts maximum (one heading, one body)
-- Semantic HTML with proper ARIA
-- Alt text for all meaningful images
-- Typography scale: h1 (22px), h2 (18px), h3 (16px), p (16px)
-
-### Code Quality
-- Use token-efficient code retrieval before editing
-- Prefer Edit tool over Bash for file changes
-- Follow existing component patterns
-- Write postambles explaining changes (2-4 sentences max)
-
-## Agent Initialization Checklist
-
-When an agent starts work on this repo:
-- [ ] Read this file (agents.md)
-- [ ] Review `/skills/README.md` for available skills
-- [ ] Load skill(s) relevant to the task
-- [ ] Read skill file completely before writing code
-- [ ] Check existing code patterns for the component/module type
-- [ ] Follow design tokens and quality standards
-- [ ] Test changes in preview before declaring done
-
-## Handoff Protocol
-
-When handing off work to another agent:
-1. Update this file with new conventions or patterns discovered
-2. Summarize project context in the handoff message
-3. Reference specific skills that apply to the next task
-4. Include links to relevant skill files and configuration
-
----
-
-This file is the source of truth for agent workflows in this project. Update it as patterns and conventions evolve.
+## 4. Check-In / Check-Out Protocol
+1. **Check-In:** Read `AGENTS.md` -> `CONTEXT.md` -> `wiki/HANDOFF.md` -> smallest relevant `icm/` stage.
+2. **Execute:** Make the smallest verified change; run tests/linters; keep `TESTED` separate from `PRODUCTION VERIFIED`.
+3. **Check-Out:** Append a concise 3–5 line entry to `wiki/HANDOFF.md` (files changed, validation run, risks, next action).
