@@ -1,0 +1,38 @@
+name: MAXX portable client template
+
+on:
+  pull_request:
+    paths:
+      - 'icm/clients/_template/**'
+      - 'ops/client-template/**'
+      - '.github/workflows/maxx-client-template-check.yml'
+  push:
+    paths:
+      - 'icm/clients/_template/**'
+      - 'ops/client-template/**'
+      - '.github/workflows/maxx-client-template-check.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  template-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate template graph and policy
+        run: node ops/client-template/validate.mjs
+      - name: Scaffold disposable client workspace
+        run: node ops/client-template/scaffold.mjs --slug smoke-founder --name "Smoke Founder" --out "$RUNNER_TEMP/maxx-smoke-founder"
+      - name: Validate generated workspace
+        run: node ops/client-template/validate.mjs "$RUNNER_TEMP/maxx-smoke-founder"
+      - name: Refuse overwrite
+        run: |
+          if node ops/client-template/scaffold.mjs --slug smoke-founder --name "Smoke Founder" --out "$RUNNER_TEMP/maxx-smoke-founder"; then
+            echo "ERROR: scaffold overwrote an existing client"
+            exit 1
+          fi

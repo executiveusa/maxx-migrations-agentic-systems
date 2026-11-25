@@ -1,93 +1,36 @@
-# MAXX Migrations - Agentic Systems
+# MAXX Migrations Agentic Systems
 
-**Sovereign AI migrations for mission-driven teams.** This is the MACS Digital Media migration suite: the Maxx Migrations web product plus the private ICM (Interpretable Context Methodology) and agentic execution brain behind MACS Digital Media.
+> **Complexity underneath. Simplicity on top.**
+> Canonical ICM business brain, client-governance contracts, portable MAXX Suite client templates, and execution backend for MACS Digital Media.
 
-This repository started life as a fork of ERPNext, and the old README described only that fork. That is why the repo looked like an ERP project. The active product is described below; the ERPNext code is retained legacy (see the last section).
+## Architecture Map (Start Here)
 
-## The three-repo MACS system
+| Need | Canonical File |
+|---|---|
+| Universal Agent Router (all models) | [AGENTS.md](agents.md) & [CLAUDE.md](CLAUDE.md) |
+| ICM Root Map (`01_orient -> 06_learn`) | [CONTEXT.md](CONTEXT.md) |
+| Human ↔ Machine Approval Contract | [docs/icm/HUMAN_MACHINE_CONTRACT.md](docs/icm/HUMAN_MACHINE_CONTRACT.md) |
+| Rolling Agent Check-In / Check-Out Wiki | [wiki/HANDOFF.md](wiki/HANDOFF.md) |
+| MAXX Suite Product Portfolio | [icm/maxx-suite/README.md](icm/maxx-suite/README.md) |
+| Portable Model-Agnostic Client Template | [icm/clients/_template/README.md](icm/clients/_template/README.md) |
+| Site Transformation Protocol | [icm/site-transformation-protocol/](icm/site-transformation-protocol/) |
 
-Per `icm/maxx-suite/README.md`:
+## Three-Repository MACS Federation
 
-| Repo | Job |
-| --- | --- |
-| `executiveusa/macsdigitalmedia` | Public MACS Digital Media storefront |
-| `executiveusa/maxx-migrations-agentic-systems` (this repo) | Canonical data, ICM, workflow, approval, evidence, migration and agentic backend |
-| `executiveusa/macs-agent-portal` | Agent MAXX customer/operator interface; calls this repo's backend as a control API |
+1. **`executiveusa/macsdigitalmedia`** — Public storefront & COLLINS-style proof-of-work showcase (zero backend secrets).
+2. **`executiveusa/macs-agent-portal`** — Agent MAXX operator surface, human approvals, and Hermes/Instinct runtime bridge.
+3. **`executiveusa/maxx-migrations-agentic-systems`** *(this repo)* — Canonical ICM, commercial routing, tenant governance, and execution backend.
 
-## What is real now
+> **Sovereign Isolation Law:** Bambu's personal **COSMOS** HQ (`cosmos`, `nwkids`, `vibe-engineering`, `VisionClaw`) is strictly isolated from MACS and Kupuri client workspaces. Each company runs its own scoped Instinct + Hermes + Maus Bot environment backed by Postgres `FORCE ROW LEVEL SECURITY`.
 
-### `apps/maxx-web` - the Maxx Migrations web app
+## Working With Agents in This Repo
 
-Next.js 16 + Supabase, deployed on Vercel as a monorepo with root directory `apps/maxx-web` (see `docs/deployment/VERCEL_MONOREPO_FIX.md`).
+1. Every agent checks in through [AGENTS.md](agents.md) -> [CONTEXT.md](CONTEXT.md) -> [wiki/HANDOFF.md](wiki/HANDOFF.md) (`< 3,000` tokens cold load).
+2. All feature work follows **ICM as law**, **Lauren Tan's PStack**, and **Ponytail** minimal-diff discipline.
+3. Consequential actions (spending money, external outreach, secret changes, production deploys) require explicit human approval per `docs/icm/HUMAN_MACHINE_CONTRACT.md`.
 
-Public marketing surface:
+---
 
-- `/`, `/how-it-works`, `/pricing`, `/work`, `/privacy`, `/terms`
-- `/features` with sub-pages: website-migration, ghl-import, missed-call-text-back, social-planner, workflows, community, courses
+## Upstream Attribution & License
 
-Migration audit intake:
-
-- `/migration-audit` posts to `POST /api/migrations/extract` (lead capture). Approved audits become real migration jobs through `POST /api/migrations/jobs`.
-
-Client workspace (MVP, under `/app`):
-
-- contacts, pipeline, migrations, inbox, projects, revenue, workflows, agents, command-center, community, forms, import, missed-calls, social-planner, settings
-
-API surface (under `/api`):
-
-- agents, contacts, pipeline, migrations (extract, jobs), workflows, forms, community (posts, comments, dm), courses, social (posts, publish, schedule), missed-call text-back and Twilio (sms, voice, status), flywheel (launch, status, stop), health
-
-Agent interfaces:
-
-- CLI: `npm run maxx:cli` (`cli/maxx-migrations.mjs`)
-- MCP server: `npm run maxx:mcp` (`mcp/maxx-migrations-server.mjs`)
-
-Verification:
-
-- `npm run verify:full` = lint + typecheck + unit tests + production build + 12 harness checks (preflight, no-stubs, route audit, link check, API CRUD, copy audit, env audit, artifact audit, browser verify, client-zero proof, federation contract). CI enforces a production dependency audit and a client quality gate.
-
-Backend:
-
-- Supabase schema, auth, CRUD, agent chat and voice landed in July 2026 (PR #8). An authenticated, JWT-protected Agent MAXX backend with fail-closed tenant isolation and approval proofs landed across August-September 2026.
-- When auth is not configured the app runs in seed mode against an in-memory store, the workspace shows a visible sample-data demo banner, and API responses say which mode served the request.
-
-### `icm/` - the ICM workflow library
-
-ICM (Interpretable Context Methodology): the folder structure is the routing architecture; stage contracts name exact inputs, process, outputs, and human checks; plain-text artifacts carry inspectable state.
-
-- `icm/site-transformation-protocol/` - the canonical website migration workflow: TRUTH, POSITION, ARCHITECT, PROVE, DESIGN, BUILD, GAUNTLET, LEARN. Design is phase 5, not phase 1. Agents must pass its `WALK_TEST.md` before executing a transformation.
-- `icm/clients/macs-digital-media/` - Client Zero, the first client instance of the protocol.
-- `icm/growth-engine/` - the four-bucket commercial system: Reset, Momentum, Scale, Launch, plus experiment records judged by observed evidence.
-- `icm/maxx-suite/` - the MAXX portfolio router: which repo owns which job, what is core vs experimental, and the product-pipeline gate for new ideas.
-- `icm/federation/` - cross-repo contracts and the federation walk test (status is PASS only with current evidence).
-
-### Supporting folders
-
-- `docs/` - operating docs: business intake SOP, Revenue Capture OS, deployment (Vercel monorepo, Flywheel VPS), QA, design, harness, client-zero rollback, final polish audit
-- `agencies/` - six agency workspaces: macs-digital, afromations, cheggie-media, kupuri-media, myweblane, pauli-effect
-- `skills/` - agent skill packs, loaded per task type
-- `beads/` - the BEADS protocol and checkpoints
-- `ops/` - Flywheel VPS setup and reports
-- `AGENTS.md`, `CLAUDE.md`, `agents.md` - the agent authority and workflow contracts for this repo
-
-## Honest status
-
-Real and verified against the tree (September 2026):
-
-- Everything above exists and builds; recent history is active (Next 16 security upgrade, authenticated Agent MAXX backend, ICM federation, restaurant workflow harness).
-- The product positioning in the live hero copy: "Sovereign AI migrations for mission-driven teams. One-time install. Owned code. Owned data. Optional AI partnership."
-
-Stated plainly, not done yet:
-
-- The audit-intake endpoint (`/api/migrations/extract`) stores submissions in a process-lifetime store; its own contract notes Supabase write-through still has to be wired before the form is used for paid traffic.
-- The client workspace is an MVP: without configured auth it serves seeded sample data, labeled as such in the UI.
-- Voice is the preferred long-term command surface; current voice support is partial.
-- The federation walk test governs what the three-repo system may claim; documentation or build presence alone is not motion.
-
-## Legacy: the ERPNext fork
-
-The repository root still contains the upstream ERPNext fork (`erpnext/`, `banking/`, `app.py`, `pyproject.toml`, and the original CI/config files). That code is retained history, not the active product, and the Vercel deployment builds only `apps/maxx-web`. Upstream ERPNext code remains under its original license (`license.txt`).
-
-## Working in this repo
-
-Agents cold-start from `AGENTS.md`: read the ICM contracts, inspect the actual current state before changing anything, reuse before adding, make one verifiable slice at a time, and never claim production success without production evidence. Secrets are never committed; consequential writes require explicit approval.
+This repository inherits upstream open-source ERPNext / Frappe framework modules (`erpnext/`, `banking/`). All upstream **GNU General Public License v3.0 (GPLv3)** obligations and attributions in [license.txt](license.txt) and [attributions.md](attributions.md) remain preserved. Inherited upstream modules are not claims that the full upstream ERP suite is deployed for every MAXX client.

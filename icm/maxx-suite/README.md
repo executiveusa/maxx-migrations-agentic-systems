@@ -25,3 +25,6 @@ Every new product, repo, model, workflow or major idea must pass `04_product-pip
 - `working-state/` — next inspections and unresolved decisions.
 
 Secrets are never stored here.
+## Portable client workspace v1 (draft)
+
+Use [the non-secret, model-independent client template](../clients/_template/README.md) and [local scaffolder](../../ops/client-template/README.md) to create one private workspace per authorized client. This extends the existing canonical backend and ICM; it is not a fourth control plane or a production deployment. Instinct remains an external optional front door; Hermes/Paperclip and the MAXX portal use versioned contracts, and Composio connections must be scoped per client.
